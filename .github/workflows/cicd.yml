@@ -2,7 +2,7 @@ name: CI/CD
 
 on:
   push:
-    branches: ['main']
+    branches: ['main', 'develop']
     paths-ignore: ['src/resources/**']
   pull_request:
     branches: ['main', 'develop']
