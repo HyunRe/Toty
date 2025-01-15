@@ -1,0 +1,77 @@
+name: CI/CD
+
+on:
+  push:
+    branches: ['main']
+    paths-ignore: ['src/resources/**']
+  pull_request:
+    branches: ['main', 'develop']
+    paths-ignore: ['src/resources/**']
+
+jobs:
+
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Make application-deploy.yaml
+        if: contains(github.ref, 'main')
+        run: |
+          echo "${{ secrets.APPLICATION_DEPLOY }}" > ./src/main/resources/application-deploy.yaml
+        shell: bash
+
+      - name: Grant execute permission for Gradle Wrapper
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean build -x test
+
+      #    - name: Build with Gradle Wrapper
+      #      run: |
+      #        ./gradlew clean build -x unitTest -x e2eTest
+      #
+      #    - name: Test with Gradle Wrapper - Unit Test
+      #      run: ./gradlew unitTest
+      #
+      #    - name: Test with Gradle Wrapper - E2E Test (API)
+      #      run: ./gradlew e2eTest
+
+      - name: DockerHub Login
+        if: github.event_name == 'push' && contains(github.ref, 'main')
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Docker Image Build & Push
+        if: github.event_name == 'push' && contains(github.ref, 'main')
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/toty .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/toty
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && contains(github.ref, 'main')
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Application Run
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            sudo docker kill toty
+            sudo docker rm -f toty
+            sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/toty
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/toty
+            sudo docker run -p 8070:8070 \
+            --name toty \
+            -d ${{ secrets.DOCKERHUB_USERNAME }}/toty
