@@ -39,7 +39,8 @@ out/
 /logs/
 
 application-local.yaml
-application-deploy.yaml
 application-test.yaml
+application-deploy.yaml
+application-staging.yaml
 
 README-SECRET.md
