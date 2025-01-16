@@ -25,7 +25,7 @@ public class UserController {
     // 내 정보 보기
     @GetMapping("/{id}")
     @ResponseBody
-    public UserInfoResponse getUserInfo(@PathVariable Long id) {
+    public UserInfoResponse getUserInfo(@PathVariable("id") Long id) {
         return userService.getUserInfo(id);
     }
 }

@@ -40,5 +40,6 @@ out/
 
 application-local.yaml
 application-deploy.yaml
+application-test.yaml
 
 README-SECRET.md
