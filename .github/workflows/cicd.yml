@@ -28,12 +28,6 @@ jobs:
           echo "${{ secrets.APPLICATION_DEPLOY }}" > ./src/main/resources/application-deploy.yaml
         shell: bash
 
-      - name: Make application-staging.yaml
-        if: contains(github.ref, 'develop')
-        run: |
-          echo "${{ secrets.APPLICATION_STAGING }}" > ./src/main/resources/application-staging.yaml
-        shell: bash
-
       - name: Grant execute permission for Gradle Wrapper
         run: |
           chmod +x ./gradlew
