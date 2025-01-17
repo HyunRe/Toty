@@ -1,5 +1,3 @@
-package com.toty.apie2e;
-
 import com.toty.user.domain.User;
 import com.toty.user.domain.UserRepository;
 import com.toty.user.presentation.dto.request.UserSignUpRequest;
@@ -36,14 +34,14 @@ public class UserApiE2ETest extends BaseTest {
         UserSignUpRequest signUpRequest = new UserSignUpRequest("test@gmail.com", "test123");
 
         RestAssured.given()
-                        .contentType(ContentType.JSON)
-                        .body(signUpRequest)
-                    .when()
-                        .post("/api/users/signup")
-                    .then()
-                        .statusCode(200)
-                        .body("email", Matchers.equalTo("test@gmail.com"))
-                        .body("password", Matchers.equalTo("test123"));
+                .contentType(ContentType.JSON)
+                .body(signUpRequest)
+                .when()
+                .post("/api/users/signup")
+                .then()
+                .statusCode(200)
+                .body("email", Matchers.equalTo("test@gmail.com"))
+                .body("password", Matchers.equalTo("test123"));
     }
 
     @Test
@@ -55,12 +53,11 @@ public class UserApiE2ETest extends BaseTest {
 
         // When & Then
         RestAssured.given()
-                        .pathParam("id", userId)
-                    .when()
-                        .get("/api/users/{id}")
-                    .then()
-                        .statusCode(200)
-                        .body("email", Matchers.equalTo("test@gmail.com"));
+                .pathParam("id", userId)
+                .when()
+                .get("/api/users/{id}")
+                .then()
+                .statusCode(200)
+                .body("email", Matchers.equalTo("test@gmail.com"));
     }
 }
-

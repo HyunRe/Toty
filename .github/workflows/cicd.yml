@@ -33,15 +33,15 @@ jobs:
           chmod +x ./gradlew
           ./gradlew clean build -x test
 
-      #    - name: Build with Gradle Wrapper
-      #      run: |
-      #        ./gradlew clean build -x unitTest -x e2eTest
-      #
-      #    - name: Test with Gradle Wrapper - Unit Test
-      #      run: ./gradlew unitTest
-      #
-      #    - name: Test with Gradle Wrapper - E2E Test (API)
-      #      run: ./gradlew e2eTest
+      - name: Build with Gradle Wrapper
+        run: |
+          ./gradlew clean build -x unitTest -x apiE2ETest
+
+      - name: Test with Gradle Wrapper - Unit Test
+        run: ./gradlew unitTest
+
+      - name: Test with Gradle Wrapper - E2E Test (API)
+        run: ./gradlew apiE2ETest
 
       - name: DockerHub Login
         if: contains(github.ref, 'main')

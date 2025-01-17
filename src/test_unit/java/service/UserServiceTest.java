@@ -1,4 +1,4 @@
-package com.toty.unit.service;
+package service;
 
 import com.toty.user.application.UserService;
 import com.toty.user.domain.User;
