@@ -41,11 +41,10 @@ public class UserServiceTest {
                 .willReturn(newUser);
 
         // when
-        User result = userService.signUp(userSignUpRequest);
+        Long userId = userService.signUp(userSignUpRequest);
 
         // then
-        Assertions.assertThat(result.getEmail()).isEqualTo(userSignUpRequest.getEmail());
-        Assertions.assertThat(result.getPassword()).isEqualTo(userSignUpRequest.getPassword());
+        Assertions.assertThat(userId).isEqualTo(3L);
         BDDMockito.then(userRepository).should().save(ArgumentMatchers.any(User.class));
     }
 

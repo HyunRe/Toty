@@ -29,35 +29,34 @@ public class UserApiE2ETest extends BaseTest {
     }
 
     @Test
-    @DisplayName("회원 가입")
-    void signUp() {
+    @DisplayName("회원 가입 성공")
+    void signUp_Success() {
         UserSignUpRequest signUpRequest = new UserSignUpRequest("test@gmail.com", "test123");
 
         RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(signUpRequest)
-                .when()
-                .post("/api/users/signup")
-                .then()
-                .statusCode(200)
-                .body("email", Matchers.equalTo("test@gmail.com"))
-                .body("password", Matchers.equalTo("test123"));
+                        .contentType(ContentType.JSON)
+                        .body(signUpRequest)
+                    .when()
+                        .post("/api/users/signup")
+                    .then()
+                        .statusCode(201)
+                        .body("", Matchers.greaterThanOrEqualTo(1));
     }
 
     @Test
-    @DisplayName("내 정보 찾기")
-    void getUserInfo() {
+    @DisplayName("내 정보 찾기 성공")
+    void getUserInfo_Success() {
         // Given
-        User existingUser = new User("test@gmail.com", "test123");
+        User existingUser = User.builder().email("test@gmail.com").password("test123").build();
         Long userId = userRepository.save(existingUser).getId();
 
         // When & Then
         RestAssured.given()
-                .pathParam("id", userId)
-                .when()
-                .get("/api/users/{id}")
-                .then()
-                .statusCode(200)
-                .body("email", Matchers.equalTo("test@gmail.com"));
+                        .pathParam("id", userId)
+                    .when()
+                        .get("/api/users/{id}")
+                    .then()
+                        .statusCode(200)
+                        .body("email", Matchers.equalTo("test@gmail.com"));
     }
 }

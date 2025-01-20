@@ -41,8 +41,10 @@ dependencies {
 	unitTestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	apiE2ETestImplementation 'org.springframework.boot:spring-boot-starter-test'
-	apiE2ETestImplementation 'io.rest-assured:rest-assured:5.3.1'
 	apiE2ETestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	apiE2ETestImplementation 'io.rest-assured:rest-assured:5.3.1'
+	apiE2ETestImplementation 'com.github.mwiede:jsch:0.2.22'
+
 }
 
 sourceSets {
