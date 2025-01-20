@@ -22,26 +22,51 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # Gradle 종속성 캐싱
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Make application-deploy.yaml
         if: contains(github.ref, 'main')
         run: |
           echo "${{ secrets.APPLICATION_DEPLOY }}" > ./src/main/resources/application-deploy.yaml
         shell: bash
 
+      # API E2E 테스트에서 데이터베이스 연결(SSH)을 위한 key 파일
+      - name: Create SSH Key File
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.BASTION_HOST_KEY }}" > ~/.ssh/bastion-key.pem
+          chmod 600 ~/.ssh/bastion-key.pem
+        shell: bash
+
+      - name: Make application-test.yaml
+        run: |
+          mkdir -p ./src/test/resources
+          echo "${{ secrets.APPLICATION_TEST }}" > ./src/test/resources/application-test.yaml
+        shell: bash
+
       - name: Grant execute permission for Gradle Wrapper
         run: |
           chmod +x ./gradlew
-          ./gradlew clean build -x test
 
-      #    - name: Build with Gradle Wrapper
-      #      run: |
-      #        ./gradlew clean build -x unitTest -x e2eTest
-      #
-      #    - name: Test with Gradle Wrapper - Unit Test
-      #      run: ./gradlew unitTest
-      #
-      #    - name: Test with Gradle Wrapper - E2E Test (API)
-      #      run: ./gradlew e2eTest
+      - name: Build with Gradle Wrapper
+        run: |
+          ./gradlew clean build -x unitTest -x apiE2ETest
+
+      - name: Test with Gradle Wrapper - Unit Test
+        run: ./gradlew unitTest
+
+      - name: Test with Gradle Wrapper - API E2E Test
+        if: contains(github.ref, 'main')
+        run: ./gradlew apiE2ETest
 
       - name: DockerHub Login
         if: contains(github.ref, 'main')

@@ -13,13 +13,16 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public User signUp(UserSignUpRequest userSignUpRequest) {
+    public Long signUp(UserSignUpRequest userSignUpRequest) {
         if(userRepository.findByEmail(userSignUpRequest.getEmail()).isPresent()) {
             throw new IllegalArgumentException("이미 가입된 사용자입니다.");
         }
 
-        User newUser = new User(userSignUpRequest.getEmail(), userSignUpRequest.getPassword());
-        return userRepository.save(newUser);
+        User user = User.builder()
+                .email(userSignUpRequest.getEmail())
+                .password(userSignUpRequest.getPassword())
+                .build();
+        return userRepository.save(user).getId();
     }
 
     public UserInfoResponse getUserInfo(Long userId) {

@@ -3,6 +3,7 @@ package com.toty.user.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +23,7 @@ public class User {
     @Column(name = "password")
     private String password;
 
+    @Builder
     public User(String email, String password) {
         this.email = email;
         this.password = password;
