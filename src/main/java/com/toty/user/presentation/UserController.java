@@ -5,6 +5,8 @@ import com.toty.user.domain.User;
 import com.toty.user.presentation.dto.request.UserSignUpRequest;
 import com.toty.user.presentation.dto.response.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,14 +20,16 @@ public class UserController {
     // 회원 가입
     @PostMapping("/signup")
     @ResponseBody
-    public User signUp(@RequestBody UserSignUpRequest userSignUpRequest) {
-        return userService.signUp(userSignUpRequest);
+    public ResponseEntity<Long> signUp(@RequestBody UserSignUpRequest userSignUpRequest) {
+        Long userId = userService.signUp(userSignUpRequest);
+        return new ResponseEntity<>(userId, HttpStatus.CREATED);
     }
 
     // 내 정보 보기
     @GetMapping("/{id}")
     @ResponseBody
-    public UserInfoResponse getUserInfo(@PathVariable("id") Long id) {
-        return userService.getUserInfo(id);
+    public ResponseEntity<UserInfoResponse> getUserInfo(@PathVariable("id") Long id) {
+        UserInfoResponse userInfo = userService.getUserInfo(id);
+        return ResponseEntity.ok(userInfo);
     }
 }

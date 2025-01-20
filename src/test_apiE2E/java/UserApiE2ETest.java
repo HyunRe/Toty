@@ -1,5 +1,3 @@
-package com.toty.apie2e;
-
 import com.toty.user.domain.User;
 import com.toty.user.domain.UserRepository;
 import com.toty.user.presentation.dto.request.UserSignUpRequest;
@@ -31,8 +29,8 @@ public class UserApiE2ETest extends BaseTest {
     }
 
     @Test
-    @DisplayName("회원 가입")
-    void signUp() {
+    @DisplayName("회원 가입 성공")
+    void signUp_Success() {
         UserSignUpRequest signUpRequest = new UserSignUpRequest("test@gmail.com", "test123");
 
         RestAssured.given()
@@ -41,16 +39,15 @@ public class UserApiE2ETest extends BaseTest {
                     .when()
                         .post("/api/users/signup")
                     .then()
-                        .statusCode(200)
-                        .body("email", Matchers.equalTo("test@gmail.com"))
-                        .body("password", Matchers.equalTo("test123"));
+                        .statusCode(201)
+                        .body("", Matchers.greaterThanOrEqualTo(1));
     }
 
     @Test
-    @DisplayName("내 정보 찾기")
-    void getUserInfo() {
+    @DisplayName("내 정보 찾기 성공")
+    void getUserInfo_Success() {
         // Given
-        User existingUser = new User("test@gmail.com", "test123");
+        User existingUser = User.builder().email("test@gmail.com").password("test123").build();
         Long userId = userRepository.save(existingUser).getId();
 
         // When & Then
@@ -63,4 +60,3 @@ public class UserApiE2ETest extends BaseTest {
                         .body("email", Matchers.equalTo("test@gmail.com"));
     }
 }
-

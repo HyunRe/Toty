@@ -28,20 +28,26 @@ jobs:
           echo "${{ secrets.APPLICATION_DEPLOY }}" > ./src/main/resources/application-deploy.yaml
         shell: bash
 
+      - name: Make application-test.yaml
+        run: |
+          mkdir -p ./src/test/resources
+          echo "${{ secrets.APPLICATION_TEST }}" > ./src/test/resources/application-test.yaml
+        shell: bash
+
       - name: Grant execute permission for Gradle Wrapper
         run: |
           chmod +x ./gradlew
-          ./gradlew clean build -x test
 
-      #    - name: Build with Gradle Wrapper
-      #      run: |
-      #        ./gradlew clean build -x unitTest -x e2eTest
-      #
-      #    - name: Test with Gradle Wrapper - Unit Test
-      #      run: ./gradlew unitTest
-      #
-      #    - name: Test with Gradle Wrapper - E2E Test (API)
-      #      run: ./gradlew e2eTest
+      - name: Build with Gradle Wrapper
+        run: |
+          ./gradlew clean build -x unitTest -x apiE2ETest
+
+      - name: Test with Gradle Wrapper - Unit Test
+        run: ./gradlew unitTest
+
+      - name: Test with Gradle Wrapper - API E2E Test
+        if: contains(github.ref, 'main') || contains(github.ref, 'develop')
+        run: ./gradlew apiE2ETest
 
       - name: DockerHub Login
         if: contains(github.ref, 'main')
