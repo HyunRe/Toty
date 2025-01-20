@@ -53,9 +53,8 @@ jobs:
       - name: Test with Gradle Wrapper - Unit Test
         run: ./gradlew unitTest
 
-      # API E2E 테스트는 push 이벤트에서만 실행
       - name: Test with Gradle Wrapper - API E2E Test
-        if: contains(github.ref, 'main') || contains(github.ref, 'develop')
+        if: contains(github.ref, 'main')
         run: ./gradlew apiE2ETest
 
       - name: DockerHub Login
