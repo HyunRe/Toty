@@ -30,6 +30,7 @@ jobs:
 
       - name: Make application-test.yaml
         run: |
+          mkdir -p ./src/test/resources
           echo "${{ secrets.APPLICATION_TEST }}" > ./src/test/resources/application-test.yaml
         shell: bash
 
