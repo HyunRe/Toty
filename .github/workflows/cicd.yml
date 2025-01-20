@@ -28,6 +28,14 @@ jobs:
           echo "${{ secrets.APPLICATION_DEPLOY }}" > ./src/main/resources/application-deploy.yaml
         shell: bash
 
+      # API E2E 테스트에서 데이터베이스 연결(SSH)을 위한 key 파일
+      - name: Create SSH Key File
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.BASTION_HOST_KEY }}" > ~/.ssh/bastion-key.pem
+          chmod 600 ~/.ssh/bastion-key.pem
+        shell: bash
+
       - name: Make application-test.yaml
         run: |
           mkdir -p ./src/test/resources
@@ -45,6 +53,7 @@ jobs:
       - name: Test with Gradle Wrapper - Unit Test
         run: ./gradlew unitTest
 
+      # API E2E 테스트는 push 이벤트에서만 실행
       - name: Test with Gradle Wrapper - API E2E Test
         if: contains(github.ref, 'main') || contains(github.ref, 'develop')
         run: ./gradlew apiE2ETest
