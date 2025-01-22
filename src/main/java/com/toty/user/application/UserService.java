@@ -6,7 +6,7 @@ import com.toty.user.presentation.dto.request.UserSignUpRequest;
 import com.toty.user.presentation.dto.response.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+//hi
 @Service
 @RequiredArgsConstructor
 public class UserService {
