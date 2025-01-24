@@ -4,7 +4,7 @@ import com.toty.base.domain.model.BaseTime;
 import com.toty.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.w3c.dom.Comment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,9 +39,8 @@ public class Post extends BaseTime {
     @Column(name = "like_count", columnDefinition = "int default 0")
     private int likeCount;
 
-    // 댓글
-//    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Comment> comments = new ArrayList<>();
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostImage> postImages = new ArrayList<>();
@@ -57,24 +56,23 @@ public class Post extends BaseTime {
         setPostMethod.accept(entity, this);
     }
 
-    //  댓글
-//    public void addComment(Comment comment) {
-//        addRelatedEntity(this.comment, comment, Comment::setPost);
-//    }
+    public void addComment(Comment comment) {
+        addRelatedEntity(this.comments, comment, Comment::setPost);
+    }
 
     public void addPostImage(PostImage postImage) {
         addRelatedEntity(this.postImages, postImage, PostImage::setPost);
     }
 
     public Post(User user, PostCategory postCategory, String title, String content, int viewCount, int likeCount,
-                List<PostImage> postImages, List<PostTag> postTags) { // List<Comment> comments
+                List<Comment> comments, List<PostImage> postImages, List<PostTag> postTags) {
         this.user = user;
         this.postCategory = postCategory;
         this.title = title;
         this.content = content;
         this.viewCount = viewCount;
         this.likeCount = likeCount;
-        // this.comments = comments;
+        this.comments = comments;
         this.postImages = postImages;
         this.postTags = postTags;
     }
