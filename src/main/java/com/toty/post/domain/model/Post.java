@@ -4,7 +4,7 @@ import com.toty.base.domain.model.BaseTime;
 import com.toty.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.w3c.dom.Comment;
+import com.toty.comment.domain.model.Comment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,14 @@ public class Post extends BaseTime {
         if (list == null) {
             list = new ArrayList<>();
         }
-        list.add(entity);
+
+        int index = list.indexOf(entity);
+        if (index != -1) {
+            list.set(index, entity);
+        } else {
+            list.add(entity);
+        }
+
         setPostMethod.accept(entity, this);
     }
 

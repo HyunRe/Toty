@@ -1,10 +1,11 @@
 package com.toty.post.application.strategy.convert.postdetail;
 
+import com.toty.base.pagination.PaginationResult;
 import com.toty.post.domain.model.Post;
 import com.toty.post.presentation.dto.response.postdetail.PostDetailResponse;
 
 public class PostDetailResponseContext {
-    private PostDetailResponseStrategy strategy;
+    private final PostDetailResponseStrategy strategy;
 
     public PostDetailResponseContext(String postCategory) {
         if ("general".equals(postCategory)) {
@@ -18,8 +19,8 @@ public class PostDetailResponseContext {
         }
     }
 
-    public PostDetailResponse convertPost(Post post) {
-        return strategy.convert(post);
+    public PostDetailResponse convertPost(Post post, PaginationResult pagedComments) {
+        return strategy.convert(post, pagedComments);
     }
 }
 

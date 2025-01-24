@@ -1,5 +1,6 @@
 package com.toty.comment.domain.model;
 
+import com.toty.base.domain.model.BaseTime;
 import com.toty.post.domain.model.Post;
 import com.toty.user.domain.User;
 import jakarta.persistence.*;
@@ -13,7 +14,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment {
+public class Comment extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

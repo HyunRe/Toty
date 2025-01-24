@@ -14,8 +14,8 @@ public class QnaPostListResponseStrategy implements PostListResponseStrategy {
                 post.getViewCount(),
                 post.getLikeCount(),
                 post.getUpdatedAt(),
-                post.getPostTags()
-                // post.getComments().size
+                post.getPostTags(),
+                post.getComments().size()
         );
     }
 }

@@ -31,7 +31,7 @@ public class QnaPostUpdateStrategy implements PostUpdateStrategy {
         }
 
         Post updatedPost = new Post(post.getUser(), post.getPostCategory(), postUpdateRequest.getTitle(), postUpdateRequest.getContent(),
-                post.getViewCount(), post.getLikeCount(), null, postUpdateRequest.getPostTags());
+                post.getViewCount(), post.getLikeCount(), null, null, postUpdateRequest.getPostTags());
 
         // 태그
         for (PostTag postTag: postTags) {

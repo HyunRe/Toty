@@ -1,6 +1,5 @@
 package com.toty.base.pagination;
 
-import com.toty.post.presentation.dto.response.postlist.PostListResponse;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -31,7 +31,7 @@ public class QnaPostCreationStrategy implements PostCreationStrategy {
         }
 
         Post post = new Post(user, postCreateRequest.getPostCategory(), postCreateRequest.getTitle(),
-                postCreateRequest.getContent(), 0, 0, null, postCreateRequest.getPostTags());
+                postCreateRequest.getContent(), 0, 0, null, null, postCreateRequest.getPostTags());
 
         // 태그
         for (PostTag postTag: postTags) {

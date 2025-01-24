@@ -106,8 +106,17 @@ public class PostApiController {
     // 카테고리 별 게시글 상세 보기
     @GetMapping("/{id}/detail")
     public ResponseEntity<?> postDetail(@PathVariable Long id,
+                                        @RequestParam(name = "page", defaultValue = "1") int page,
+                                        @RequestParam(name = "likeAction", required = false) String likeAction,
                                         @RequestParam(name = "postCategory", required = false) String postCategory) {
-        PostDetailResponse response = postService.getPostDetailByCategory(id, postCategory);
+        postService.incrementViewCount(id);
+        if ("like".equals(likeAction)) {
+            postService.incrementLikeCount(id);
+        } else {
+            postService.decrementLikeCount(id);
+        }
+
+        PostDetailResponse response = postService.getPostDetailByCategory(page, id, postCategory);
         // 댓글 필요
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
@@ -117,5 +126,4 @@ public class PostApiController {
 
         return ResponseEntity.ok(successResponse);
     }
-
 }

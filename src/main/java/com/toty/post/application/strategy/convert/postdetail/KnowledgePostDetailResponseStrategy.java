@@ -1,12 +1,13 @@
 package com.toty.post.application.strategy.convert.postdetail;
 
+import com.toty.base.pagination.PaginationResult;
 import com.toty.post.domain.model.Post;
 import com.toty.post.presentation.dto.response.postdetail.KnowledgePostDetailResponse;
 import com.toty.post.presentation.dto.response.postdetail.PostDetailResponse;
 
 public class KnowledgePostDetailResponseStrategy implements PostDetailResponseStrategy {
     @Override
-    public PostDetailResponse convert(Post post) {
+    public PostDetailResponse convert(Post post, PaginationResult pagedComments) {
         return new KnowledgePostDetailResponse(
                 post.getUser().getNickname(),
                 post.getUser().getProfileImageUrl(),
@@ -17,7 +18,8 @@ public class KnowledgePostDetailResponseStrategy implements PostDetailResponseSt
                 post.getPostImages(),
                 post.getViewCount(),
                 post.getLikeCount(),
-                post.getUpdatedAt()
+                post.getUpdatedAt(),
+                pagedComments
         );
     }
 }

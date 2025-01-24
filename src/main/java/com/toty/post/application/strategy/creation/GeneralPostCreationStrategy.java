@@ -15,7 +15,7 @@ public class GeneralPostCreationStrategy implements PostCreationStrategy {
     @Override
     public Post createPostRequest(PostCreateRequest postCreateRequest, User user) {
         Post post = new Post(user, postCreateRequest.getPostCategory(), postCreateRequest.getTitle(),
-                postCreateRequest.getContent(), 0, 0, null, null);
+                postCreateRequest.getContent(), 0, 0, null, null, null);
 
         // 이미지
         processImages(post, postCreateRequest.getPostImages(), postImageService);

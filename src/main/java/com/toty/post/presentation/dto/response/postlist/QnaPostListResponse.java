@@ -12,12 +12,12 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class QnaPostListResponse extends PostListResponse {
     private List<PostTag> postTags;
-    // private int commentCount;
+    private int commentCount;
 
     public QnaPostListResponse(String nickname, String profileImageUrl, String title, int viewCount,
-                               int likeCount, LocalDateTime earliestTime, List<PostTag> postTags) { // , commentCount
+                               int likeCount, LocalDateTime earliestTime, List<PostTag> postTags, int commentCount) {
         super(nickname, profileImageUrl, title, viewCount, likeCount, earliestTime);
         this.postTags = postTags;
-        // this.commentCount = commentCount;
+        this.commentCount = commentCount;
     }
 }

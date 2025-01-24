@@ -1,9 +1,10 @@
 package com.toty.post.application;
 
-import com.toty.base.exception.UnauthorizedException;
 import com.toty.base.exception.UserNotFoundException;
 import com.toty.base.exception.PostNotFoundException;
 import com.toty.base.pagination.PaginationResult;
+import com.toty.comment.application.CommentService;
+import com.toty.comment.presentation.dto.response.CommentListResponse;
 import com.toty.post.application.strategy.convert.postdetail.PostDetailResponseContext;
 import com.toty.post.application.strategy.convert.postlist.PostListResponseContext;
 import com.toty.post.application.strategy.creation.PostCreationStrategy;
@@ -36,6 +37,7 @@ public class PostService {
     private final PostCreationStrategy postCreationStrategy;
     private final PostUpdateStrategy postUpdateStrategy;
     private final PostPaginationStrategy postPaginationStrategy;
+    private final CommentService commentService;
 
     private static final int PAGE_SIZE = 10;  // 기본 페이지 수
 
@@ -126,11 +128,13 @@ public class PostService {
     }
 
     // 카테고리 별 게시글 상세 보기
-    public PostDetailResponse getPostDetailByCategory(Long id, String postCategory) {
+    public PostDetailResponse getPostDetailByCategory(int page, Long id, String postCategory) {
         Post post = findPostById(id);
-        // 댓글 필요
+        // 댓글 목록 조회
+        PaginationResult pagedComments = commentService.getPagedCommentsByPostId(page, id);
+
         PostDetailResponseContext context = new PostDetailResponseContext(postCategory);
-        return context.convertPost(post);
+        return context.convertPost(post, pagedComments);
     }
 
     // 조회수 증가 (동시성 고려)
@@ -160,9 +164,9 @@ public class PostService {
         );
     }
 
-//    public boolean isOwner(Long postId) {
+//    public boolean isOwner(Long id) {
 //        Long userId = getCurrentUserId(); // 인증된 사용자 ID 가져오기
-//        Post post = findPostById(postId);
+//        Post post = findPostById(id);
 //        return post.getAuthor().getId().equals(userId); // 게시글 작성자와 비교
 //    }
 //
