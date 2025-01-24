@@ -117,7 +117,6 @@ public class PostApiController {
         }
 
         PostDetailResponse response = postService.getPostDetailByCategory(page, id, postCategory);
-        // 댓글 필요
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 "카테고리 별 게시글 상세 보기",
