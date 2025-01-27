@@ -49,7 +49,7 @@ public class FollowService {
     }
 
 
-    public FollowingListResponse listFollowings(Long userId, boolean isToUser,int page) {
+    public FollowingListResponse pagedFollowings(Long userId, boolean isToUser,int page) {
         // isToUser = True 나를 팔로우한 사람 리스트 가져오기 / False면 내가 팔로우하는 사람 리스트 가져오기
         Pageable pageable = PageRequest.of(page-1, PAGE_SIZE);
         Page<Following> followings;

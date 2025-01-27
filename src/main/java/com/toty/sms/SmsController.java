@@ -40,6 +40,4 @@ public class SmsController {
         return ResponseEntity.ok().body(smsResponseDto);
     }
 
-
-    // todo 인증 번호 redis??
 }

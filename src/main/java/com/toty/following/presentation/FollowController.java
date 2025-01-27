@@ -1,9 +1,11 @@
 package com.toty.following.presentation;
 
+import com.toty.annotation.CurrentUser;
 import com.toty.following.application.FollowService;
 import com.toty.following.domain.FollowingRepository;
 import com.toty.following.presentation.dto.request.FollowingRequest;
 import com.toty.following.presentation.dto.response.FollowingListResponse;
+import com.toty.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,40 +25,20 @@ public class FollowController {
 
     private final FollowService followService;
 
+    // 팔로우하기
     @PostMapping("/")
     @ResponseBody
-    public ResponseEntity follow (@RequestBody FollowingRequest followingRequest) {
-        // 본인 정보 long
-//        Long response = followService.follow("본인 id", followingRequest.getId());
-        FollowingListResponse response = null;
-
+    public ResponseEntity follow (@CurrentUser User user, @RequestBody FollowingRequest followingRequest) {
+        Long response = followService.follow(user.getId(), followingRequest.getId());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    // 언팔로우하기
     @DeleteMapping("/")
     @ResponseBody
-    public ResponseEntity unfollow (@RequestBody FollowingRequest followingRequest) {
-        // 본인 정보 long
-//        Long response = followService.unfollow("본인 id", followingRequest.getId());
-        FollowingListResponse response = null;
-
+    public ResponseEntity unfollow (@CurrentUser User user,@RequestBody FollowingRequest followingRequest) {
+        Long response = followService.unfollow(user.getId(), followingRequest.getId());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/{uid}/followers")
-    @ResponseBody
-    public ResponseEntity<FollowingListResponse> followersList(@RequestParam(value = "p", defaultValue = "1") int page) {
-//        FollowingListResponse response = followService.listFollowings("본인 id", true, page);
-        FollowingListResponse response = null;
-
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/{uid}/followings")
-    @ResponseBody
-    public ResponseEntity<FollowingListResponse> followingList(@RequestParam(value = "p", defaultValue = "1") int page) {
-//        FollowingListResponse response = followService.listFollowings("본인 id", false, page);
-        FollowingListResponse response = null;
-        return ResponseEntity.ok(response);
-    }
 }

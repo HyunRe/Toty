@@ -1,6 +1,10 @@
 package com.toty.user.presentation;
 
+import com.toty.annotation.CurrentUser;
+import com.toty.following.application.FollowService;
+import com.toty.following.presentation.dto.response.FollowingListResponse;
 import com.toty.user.application.UserService;
+import com.toty.user.domain.User;
 import com.toty.user.domain.UserRepository;
 import com.toty.user.presentation.dto.request.UserInfoUpdateRequest;
 import com.toty.user.presentation.dto.request.UserSignUpRequest;
@@ -28,11 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserApiController {
 
     private final UserService userService;
-
-    @GetMapping("/signup")
-    public String signUpProc(){
-        return "signup";
-    }
+    private final FollowService followService;
 
     // 회원 가입
     @PostMapping("/")
@@ -43,39 +43,22 @@ public class UserApiController {
         return new ResponseEntity<>(userId, HttpStatus.CREATED);
     }
 
-    // 정보 수정(View)
-    @GetMapping("/edit-form/{id}")
-    public String updateProc(@PathVariable Long id, Model model){
-        // 본인인지 확인 -> 아니면 예외
-
-        // 데이터 DTO에 담기(True)
-        UserInfoResponse userInfo = userService.getUserInfo(id,true); // email은 readonly로..
-        model.addAttribute("userInfo", userInfo);
-        return "update";
-    }
-
     // 정보 수정(api)
-    @PatchMapping(value = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType
+    @PatchMapping(value = "/", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType
             .MULTIPART_FORM_DATA_VALUE})
     @ResponseBody
-        public ResponseEntity<String> postFile(@PathParam("id") Long id, @RequestPart UserInfoUpdateRequest newInfo, @RequestPart
-        MultipartFile imgFile){ // 하나씩 다 쪼개는거..? 태그, 이미지, site -> delete 요청
-        userService.updateUser(id, newInfo, imgFile);
+        public ResponseEntity<String> updateUserInfo(@CurrentUser User user, @RequestPart UserInfoUpdateRequest newInfo, @RequestPart
+        MultipartFile imgFile){
+        userService.updateUser(user.getId(), newInfo, imgFile);
         return ResponseEntity.ok("Done");
     }
 
     // 정보 보기
     @GetMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<UserInfoResponse> getUserInfo(@PathVariable("id") Long id, HttpSession session) {
+    public ResponseEntity<UserInfoResponse> getUserInfo(@CurrentUser User user, @PathVariable("id") Long id, HttpSession session) {
         // 본인인지 아닌지 확인 -> 아니면 약식 정보만 전달
-        Long uid = (Long) session.getAttribute("uid");
-        if (id == uid) {
-            UserInfoResponse userInfo = userService.getUserInfo(id, false);
-        }
-
-        // todo getUserInfo 본인인지 아닌지 여부 필드 추가
-        UserInfoResponse userInfo = userService.getUserInfo(id,true);
+        UserInfoResponse userInfo = userService.getUserInfoResponse(user, id);
         return ResponseEntity.ok(userInfo);
     }
 
@@ -95,19 +78,28 @@ public class UserApiController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    // 회원 탈퇴(view)
-    @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id) {
-        // 본인 확인 로직 -> 아니면 예외
-        userService.deleteUser(id); //soft delete
-        return "redirect:/api/users/custom-login";
-    }
 
     @GetMapping("{uid}/posts")
     @ResponseBody
-    public ResponseEntity getPostByCategory(@PathVariable Long id) {
+    public ResponseEntity getPostByCategory(@PathVariable("uid") Long id) {
         // todo
         Map<String, String> response = new HashMap<>();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    // 팔로워 목록 조회
+    @GetMapping("/{uid}/followers")
+    @ResponseBody
+    public ResponseEntity<FollowingListResponse> followersList(@PathParam("uid") Long id, @RequestParam(value = "p", defaultValue = "1") int page) {
+        FollowingListResponse response = followService.pagedFollowings(id, true, page);
+        return ResponseEntity.ok(response);
+    }
+
+    // 팔로잉 목록 조회
+    @GetMapping("/{uid}/followings")
+    @ResponseBody
+    public ResponseEntity<FollowingListResponse> followingList(@PathParam("uid") Long id, @RequestParam(value = "p", defaultValue = "1") int page) {
+        FollowingListResponse response = followService.pagedFollowings(id, false, page);
+        return ResponseEntity.ok(response);
     }
 }

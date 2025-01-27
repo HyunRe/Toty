@@ -53,8 +53,21 @@ public class UserService {
     }
 
     // 본인 확인
-    public boolean isSelfAccount(){
-        return true;
+    public boolean isSelfAccount(User user, Long id){
+        if (id == user.getId()) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public UserInfoResponse getUserInfoResponse(User user, Long id) {
+        UserInfoResponse userInfo;
+        if (isSelfAccount(user, id)) {
+            return userInfo = getUserInfo(id, true);
+        } else {
+            return userInfo = getUserInfo(id, false);
+        }
     }
 
     public UserInfoResponse getUserInfo(Long userId, boolean isOwner) {
@@ -79,11 +92,19 @@ public class UserService {
         return infoDto;
     }
 
+    public UserInfoResponse getMyInfoForUpdate(User user, Long id) {
+        if (isSelfAccount(user, id)) {
+            // 데이터 DTO에 담기(True)
+            return getUserInfo(id,true); // email은 readonly로..
+        } else {
+            throw new IllegalArgumentException("수정 권한이 없습니다.");
+        }
+    }
+
     @Transactional
     public void updateUser(Long id, UserInfoUpdateRequest newInfo, MultipartFile imgFile) {
         try {
             User foundUser = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-            // todo 본인 확인 로직 -> 아니면 예외
 
             // 서버에 이미지 저장 (원래 이미지가 있었다면 덮어쓰기)
             String name = imgFile.getOriginalFilename();
@@ -124,10 +145,12 @@ public class UserService {
     }
 
 
-    public void deleteUser(Long uid) { // soft delete
-        User user = userRepository.findById(uid).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-        userRepository.softDelete(uid); // Error catch..?
+    public void deleteUser(User user, Long id) { // soft delete
+        User foundUser = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        if (isSelfAccount(user, id)) {
+            userRepository.softDelete(id); // Error catch..?
+        } else {
+            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
+        }
     }
-
-
 }
