@@ -34,13 +34,13 @@ public class User {
     @Column
     private String profileImageUrl;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'USER'")
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role = Role.USER;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'FORM'")
     @Enumerated(EnumType.STRING)
-    private LoginProvider loginProvider;
+    private LoginProvider loginProvider = LoginProvider.FORM;
 
     @Column(nullable = false, columnDefinition = "TINYINT(1) default 0")
     private boolean emailSubscribed = false;
@@ -58,11 +58,12 @@ public class User {
     private LocalDateTime deletedAt;
 
     @Builder
-    public User(String email, String password, String nickname, String phoneNumber) {
+    public User(String email, String password, String nickname, String phoneNumber, LoginProvider loginProvider) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
+        this.loginProvider = loginProvider;
     }
 
     public void updateInfo(UserInfoUpdateRequest newInfo, String imgPath) {

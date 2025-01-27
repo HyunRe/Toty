@@ -2,7 +2,7 @@ package com.toty.user.application;
 
 import com.toty.Tag;
 import com.toty.following.domain.FollowingRepository;
-import com.toty.following.presentation.dto.response.FollowingListResponse;
+import com.toty.user.domain.LoginProvider;
 import com.toty.user.domain.User;
 import com.toty.user.domain.UserLink;
 import com.toty.user.domain.UserLinkRepository;
@@ -14,12 +14,10 @@ import com.toty.user.presentation.dto.request.UserInfoUpdateRequest;
 import com.toty.user.presentation.dto.request.UserSignUpRequest;
 import com.toty.user.presentation.dto.response.UserInfoResponse;
 import jakarta.transaction.Transactional;
-import java.awt.print.Pageable;
 import java.io.File;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,6 +46,7 @@ public class UserService {
                 .password(hashedPwd)
                 .nickname(userSignUpRequest.getNickname())
                 .phoneNumber(userSignUpRequest.getPhoneNumber())
+                .loginProvider(LoginProvider.FORM)
                 .build();
         return userRepository.save(user).getId();
     }
@@ -148,7 +147,7 @@ public class UserService {
     public void deleteUser(User user, Long id) { // soft delete
         User foundUser = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
         if (isSelfAccount(user, id)) {
-            userRepository.softDelete(id); // Error catch..?
+            userRepository.softDeleteById(id); // Error catch..?
         } else {
             throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
         }
