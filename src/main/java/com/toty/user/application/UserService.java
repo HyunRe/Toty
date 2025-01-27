@@ -1,34 +1,133 @@
 package com.toty.user.application;
 
+import com.toty.Tag;
+import com.toty.following.domain.FollowingRepository;
+import com.toty.following.presentation.dto.response.FollowingListResponse;
 import com.toty.user.domain.User;
+import com.toty.user.domain.UserLink;
+import com.toty.user.domain.UserLinkRepository;
 import com.toty.user.domain.UserRepository;
+import com.toty.user.domain.UserTag;
+import com.toty.user.domain.UserTagRepository;
+import com.toty.user.presentation.dto.LinkDto;
+import com.toty.user.presentation.dto.request.UserInfoUpdateRequest;
 import com.toty.user.presentation.dto.request.UserSignUpRequest;
 import com.toty.user.presentation.dto.response.UserInfoResponse;
+import jakarta.transaction.Transactional;
+import java.awt.print.Pageable;
+import java.io.File;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
-//hi
+import org.springframework.web.multipart.MultipartFile;
+
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserTagRepository userTagRepository;
+    private final UserLinkRepository userLinkRepository;
+    private final FollowingRepository followingRepository;
+
+    @Value("${user.img-path}")
+    private String basePath;
 
     public Long signUp(UserSignUpRequest userSignUpRequest) {
         if(userRepository.findByEmail(userSignUpRequest.getEmail()).isPresent()) {
             throw new IllegalArgumentException("이미 가입된 사용자입니다.");
         }
+        String hashedPwd = BCrypt.hashpw(userSignUpRequest.getPassword(), BCrypt.gensalt());
 
         User user = User.builder()
                 .email(userSignUpRequest.getEmail())
-                .password(userSignUpRequest.getPassword())
+                .password(hashedPwd)
+                .nickname(userSignUpRequest.getNickname())
+                .phoneNumber(userSignUpRequest.getPhoneNumber())
                 .build();
         return userRepository.save(user).getId();
     }
 
-    public UserInfoResponse getUserInfo(Long userId) {
+    // 본인 확인
+    public boolean isSelfAccount(){
+        return true;
+    }
+
+    public UserInfoResponse getUserInfo(Long userId, boolean isOwner) {
         User foundUser = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        return new UserInfoResponse(foundUser.getEmail());
+        List<Tag> userTags = userTagRepository.findByUserId(userId).stream().map(userTag -> userTag.getTag()).toList();
+        List<LinkDto> userLinks = userLinkRepository.findAllByUserId(userId).stream().map(userLink -> new LinkDto(userLink.getSite(), userLink.getUrl())).toList();
+
+        UserInfoResponse infoDto = UserInfoResponse.builder()
+                .nickname(foundUser.getNickname())
+                .tags(userTags)
+                .profileImgUrl(foundUser.getProfileImageUrl())
+                .links(userLinks)
+                .followingCount(followingRepository.countFollowingsByUserId(userId))
+                .followerCount(followingRepository.countFollowersByUserId(userId))
+                .email(isOwner ? foundUser.getEmail() : null)
+                .phoneNumber(isOwner ? foundUser.getPhoneNumber() : null)
+                .emailSubscribed(isOwner ? foundUser.isEmailSubscribed() : null)
+                .smsSubscribed(isOwner ? foundUser.isSmsSubscribed() : null)
+                .build();
+        return infoDto;
     }
+
+    @Transactional
+    public void updateUser(Long id, UserInfoUpdateRequest newInfo, MultipartFile imgFile) {
+        try {
+            User foundUser = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+            // todo 본인 확인 로직 -> 아니면 예외
+
+            // 서버에 이미지 저장 (원래 이미지가 있었다면 덮어쓰기)
+            String name = imgFile.getOriginalFilename();
+            System.out.println(imgFile.getOriginalFilename());
+            String savePath = basePath + id;
+            imgFile.transferTo(new File(savePath)); // throws IOException
+
+            // user 정보 수정
+            foundUser.updateInfo(newInfo,savePath);
+            userRepository.save(foundUser);
+
+            // tag와 links 저장
+            userTagRepository.deleteByUserId(id);
+            newInfo.getTags().stream().map(tag -> userTagRepository.save(new UserTag(foundUser, tag))); // 새 객체 생성
+
+            userLinkRepository.deleteAllByUserId(id);
+            newInfo.getLinks().stream().map(site -> userLinkRepository.save(new UserLink(foundUser, site.getSite(), site.getUrl())));
+        } catch (Exception e){ // IOException
+            // todo 예외 시
+            // throw new ExpectedException(ErrorCode.FileIOException);
+        }
+
+
+    }
+
+    public String validateEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("사용할 수 없는 이메일입니다.");
+        }
+        return email;
+    }
+
+    public String validateNickname(String nickname) {
+        if (userRepository.existsByNickname(nickname)) {
+            throw new IllegalArgumentException("사용할 수 없는 이메일입니다.");
+        }
+        return nickname;
+    }
+
+
+    public void deleteUser(Long uid) { // soft delete
+        User user = userRepository.findById(uid).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        userRepository.softDelete(uid); // Error catch..?
+    }
+
+
 }

@@ -45,6 +45,12 @@ dependencies {
 	apiE2ETestImplementation 'io.rest-assured:rest-assured:5.3.1'
 	apiE2ETestImplementation 'com.github.mwiede:jsch:0.2.22'
 
+	// 이메일
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	// sms
+	implementation 'net.nurigo:sdk:4.2.7'
+
 }
 
 sourceSets {
