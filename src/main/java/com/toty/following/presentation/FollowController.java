@@ -6,6 +6,7 @@ import com.toty.following.domain.FollowingRepository;
 import com.toty.following.presentation.dto.request.FollowingRequest;
 import com.toty.following.presentation.dto.response.FollowingListResponse;
 import com.toty.user.domain.User;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,10 +35,10 @@ public class FollowController {
     }
 
     // 언팔로우하기
-    @DeleteMapping("/")
+    @DeleteMapping("/{id}")
     @ResponseBody
-    public ResponseEntity unfollow (@CurrentUser User user,@RequestBody FollowingRequest followingRequest) {
-        Long response = followService.unfollow(user.getId(), followingRequest.getId());
+    public ResponseEntity unfollow (@CurrentUser User user, @PathParam("id") Long id) {
+        Long response = followService.unfollow(user.getId(), id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
