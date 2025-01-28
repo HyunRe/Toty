@@ -36,7 +36,7 @@ public class User {
 
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role = Role.USER;
 
     @Column(name = "provider")
     @Enumerated(EnumType.STRING)
