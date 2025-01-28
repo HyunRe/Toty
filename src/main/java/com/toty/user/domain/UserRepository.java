@@ -18,12 +18,12 @@ public interface UserRepository extends Repository<User, Long> {
 
     User save(User user);
 
-    @Query("SELECT u FROM User u WHERE u.id = :id AND u.deleted = false")
+    @Query("SELECT u FROM User u WHERE u.id = :id AND u.isDeleted = false")
     Optional<User> findById(Long id);
 
     @Transactional
     @Modifying
-    @Query("update User u set u.deleted = true, u.deletedAt = CURRENT_TIMESTAMP where u.id = :id")
+    @Query("update User u set u.isDeleted = true, u.deletedAt = CURRENT_TIMESTAMP where u.id = :id")
     void softDeleteById(@Param("id") Long id);
 
     boolean existsByPhoneNumber(String phoneNumber);

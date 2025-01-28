@@ -85,8 +85,8 @@ public class UserService {
                 .followerCount(followingRepository.countFollowersByUserId(userId))
                 .email(isOwner ? foundUser.getEmail() : null)
                 .phoneNumber(isOwner ? foundUser.getPhoneNumber() : null)
-                .emailSubscribed(isOwner ? foundUser.isEmailSubscribed() : null)
-                .smsSubscribed(isOwner ? foundUser.isSmsSubscribed() : null)
+                .emailSubscribed(isOwner ? foundUser.getSubscribeInfo().isEmailSubscribed() : null)
+                .smsSubscribed(isOwner ? foundUser.getSubscribeInfo().isSmsSubscribed() : null)
                 .build();
         return infoDto;
     }
