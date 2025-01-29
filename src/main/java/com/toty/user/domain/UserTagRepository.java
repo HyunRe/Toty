@@ -4,9 +4,9 @@ import java.util.List;
 import org.springframework.data.repository.Repository;
 
 public interface UserTagRepository extends Repository<UserTag, Long> {
-    List<UserTag> findByUserId(Long uid);
+    List<UserTag> findByUserId(Long userId);
 
-    void deleteByUserId(Long uid);
+    void deleteByUserId(Long userId);
 
     UserTag save(UserTag userTag);
 }

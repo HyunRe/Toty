@@ -3,7 +3,7 @@ package com.toty.user.application;
 import com.toty.user.domain.LoginProvider;
 import com.toty.user.domain.User;
 import com.toty.user.domain.UserRepository;
-import com.toty.user.presentation.dto.request.UserSignUpRequest;
+import com.toty.user.application.dto.request.UserSignUpRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,7 @@ public class UserSignUpService {
 
     public String validateNickname(String nickname) {
         if (userRepository.existsByNickname(nickname)) {
-            throw new IllegalArgumentException("사용할 수 없는 이메일입니다.");
+            throw new IllegalArgumentException("사용할 수 없는 닉네임입니다.");
         }
         return nickname;
     }

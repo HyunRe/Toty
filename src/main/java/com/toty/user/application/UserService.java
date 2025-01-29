@@ -2,15 +2,15 @@ package com.toty.user.application;
 
 import com.toty.Tag;
 import com.toty.following.domain.FollowingRepository;
+import com.toty.user.application.dto.response.UserLinkInfo;
 import com.toty.user.domain.User;
 import com.toty.user.domain.UserLink;
 import com.toty.user.domain.UserLinkRepository;
 import com.toty.user.domain.UserRepository;
 import com.toty.user.domain.UserTag;
 import com.toty.user.domain.UserTagRepository;
-import com.toty.user.presentation.dto.LinkDto;
-import com.toty.user.presentation.dto.request.UserInfoUpdateRequest;
-import com.toty.user.presentation.dto.response.UserInfoResponse;
+import com.toty.user.application.dto.request.UserInfoUpdateRequest;
+import com.toty.user.application.dto.response.UserInfoResponse;
 import jakarta.transaction.Transactional;
 import java.io.File;
 import java.util.List;
@@ -33,57 +33,50 @@ public class UserService {
     private String basePath;
 
     // 본인 확인
-    public boolean isSelfAccount(User user, Long id){
-        if (id == user.getId()) {
-            return true;
-        }
-        return false;
+    private boolean isSelfAccount(User user, Long id){
+        // id의 Null 여부는 presentation에서 검증 필요
+        return user.getId().equals(id);
     }
 
-    public UserInfoResponse getUserInfoResponse(User user, Long id) {
-        UserInfoResponse userInfo;
-        if (isSelfAccount(user, id)) {
-            return userInfo = getUserInfo(id, true);
-        } else {
-            return userInfo = getUserInfo(id, false);
-        }
-    }
-
-    public UserInfoResponse getUserInfo(Long userId, boolean isOwner) {
+    private UserInfoResponse getUserInfoByAccount(Long userId, boolean isOwner) {
         User foundUser = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        List<Tag> userTags = userTagRepository.findByUserId(userId).stream().map(userTag -> userTag.getTag()).toList();
-        List<LinkDto> userLinks = userLinkRepository.findAllByUserId(userId).stream().map(userLink -> new LinkDto(userLink.getSite(), userLink.getUrl())).toList();
+        List<Tag> userTags = userTagRepository.findByUserId(userId)
+                .stream()
+                .map(userTag -> userTag.getTag())
+                .toList();
+        List<UserLinkInfo> userLinks = userLinkRepository.findByUserId(userId)
+                .stream()
+                .map(userLink -> new UserLinkInfo(userLink.getSite(), userLink.getUrl()))
+                .toList();
 
-        UserInfoResponse infoDto = UserInfoResponse.builder()
+        return UserInfoResponse.builder()
+                .email(isOwner ? foundUser.getEmail() : null)
+                .phoneNumber(isOwner ? foundUser.getPhoneNumber() : null)
                 .nickname(foundUser.getNickname())
-                .tags(userTags)
                 .profileImgUrl(foundUser.getProfileImageUrl())
+                .subscribeInfo(isOwner ? foundUser.getSubscribeInfo() : null)
+                .tags(userTags)
                 .links(userLinks)
                 .followingCount(followingRepository.countFollowingsByUserId(userId))
                 .followerCount(followingRepository.countFollowersByUserId(userId))
-                .email(isOwner ? foundUser.getEmail() : null)
-                .phoneNumber(isOwner ? foundUser.getPhoneNumber() : null)
-                .emailSubscribed(isOwner ? foundUser.getSubscribeInfo().isEmailSubscribed() : null)
-                .smsSubscribed(isOwner ? foundUser.getSubscribeInfo().isSmsSubscribed() : null)
                 .build();
-        return infoDto;
     }
 
-    public UserInfoResponse getMyInfoForUpdate(User user, Long id) {
+    public UserInfoResponse getUserInfo(User user, Long id) {
         if (isSelfAccount(user, id)) {
-            // 데이터 DTO에 담기(True)
-            return getUserInfo(id,true); // email은 readonly로..
+            return getUserInfoByAccount(id, true);
         } else {
-            throw new IllegalArgumentException("수정 권한이 없습니다.");
+            return getUserInfoByAccount(id, false);
         }
     }
 
     @Transactional
-    public void updateUser(Long id, UserInfoUpdateRequest newInfo, MultipartFile imgFile) {
+    public void updateUserInfo(Long id, UserInfoUpdateRequest newInfo, MultipartFile imgFile) {
         try {
-            User foundUser = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+            User foundUser = userRepository.findById(id)
+                                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
             // 서버에 이미지 저장 (원래 이미지가 있었다면 덮어쓰기)
             String name = imgFile.getOriginalFilename();
@@ -113,6 +106,15 @@ public class UserService {
             userRepository.softDeleteById(id); // Error catch..?
         } else {
             throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
+        }
+    }
+
+    public UserInfoResponse getMyInfoForUpdate(User user, Long id) {
+        if (isSelfAccount(user, id)) {
+            // 데이터 DTO에 담기(True)
+            return getUserInfoByAccount(id,true); // email은 readonly로..
+        } else {
+            throw new IllegalArgumentException("수정 권한이 없습니다.");
         }
     }
 }

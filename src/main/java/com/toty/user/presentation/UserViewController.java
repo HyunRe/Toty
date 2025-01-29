@@ -3,7 +3,7 @@ package com.toty.user.presentation;
 import com.toty.annotation.CurrentUser;
 import com.toty.user.application.UserService;
 import com.toty.user.domain.User;
-import com.toty.user.presentation.dto.response.UserInfoResponse;
+import com.toty.user.application.dto.response.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -1,7 +1,7 @@
 package com.toty.user.domain;
 
 
-import com.toty.user.presentation.dto.request.UserInfoUpdateRequest;
+import com.toty.user.application.dto.request.UserInfoUpdateRequest;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
