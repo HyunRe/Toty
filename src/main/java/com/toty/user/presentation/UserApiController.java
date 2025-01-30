@@ -1,8 +1,6 @@
 package com.toty.user.presentation;
 
-import com.toty.annotation.CurrentUser;
-import com.toty.following.application.FollowService;
-import com.toty.following.dto.response.FollowingListResponse;
+import com.toty.global.annotation.CurrentUser;
 import com.toty.user.application.UserInfoService;
 import com.toty.user.application.UserService;
 import com.toty.user.application.UserSignUpService;
@@ -10,12 +8,8 @@ import com.toty.user.domain.model.User;
 import com.toty.user.dto.request.UserInfoUpdateRequest;
 import com.toty.user.dto.request.UserSignUpRequest;
 import com.toty.user.dto.response.UserInfoResponse;
-import jakarta.websocket.server.PathParam;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

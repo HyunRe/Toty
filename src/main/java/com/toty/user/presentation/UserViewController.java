@@ -1,14 +1,12 @@
 package com.toty.user.presentation;
 
-import com.toty.annotation.CurrentUser;
+import com.toty.global.annotation.CurrentUser;
 import com.toty.user.application.UserInfoService;
-import com.toty.user.application.UserService;
 import com.toty.user.domain.model.User;
 import com.toty.user.dto.response.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

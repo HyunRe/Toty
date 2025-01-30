@@ -1,15 +1,15 @@
 package com.toty.user.domain.repository;
 
 import com.toty.user.domain.model.User;
-import jakarta.transaction.Transactional;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
 import java.util.Optional;
-import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends Repository<User, Long> {
+
+    @Query("SELECT u FROM User u WHERE u.id = :id AND u.isDeleted = false")
+    Optional<User> findById(Long id);
 
     Optional<User> findByEmail(String email);
 
@@ -18,15 +18,4 @@ public interface UserRepository extends Repository<User, Long> {
     boolean existsByNickname(String nickname);
 
     User save(User user);
-
-    @Query("SELECT u FROM User u WHERE u.id = :id AND u.isDeleted = false")
-    Optional<User> findById(Long id);
-
-    @Transactional
-    @Modifying
-    @Query("update User u set u.isDeleted = true, u.deletedAt = CURRENT_TIMESTAMP where u.id = :id")
-    void softDeleteById(@Param("id") Long id);
-
-    boolean existsByPhoneNumber(String phoneNumber);
-
 }

@@ -106,10 +106,9 @@ public class UserInfoService {
 
     public UserInfoResponse getMyInfoForUpdate(User user, Long id) {
         if (isSelfAccount(user, id)) {
-            return getUserInfoByAccount(id,true); // email은 readonly로..
+            return getUserInfoByAccount(id,true);
         } else {
             throw new IllegalArgumentException("수정 권한이 없습니다.");
         }
     }
-
 }

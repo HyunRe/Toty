@@ -6,10 +6,10 @@ import com.toty.user.domain.model.UserLink;
 import org.springframework.data.repository.Repository;
 
 public interface UserLinkRepository extends Repository<UserLink, Long> {
+
     List<UserLink> findByUserId(Long userId);
 
     void deleteByUserId(Long userId);
 
-    UserLink save(UserLink userTag);
-
+    void save(UserLink userTag);
 }

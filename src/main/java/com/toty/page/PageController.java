@@ -1,4 +1,4 @@
-package com.toty.page.presentation;
+package com.toty.page;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

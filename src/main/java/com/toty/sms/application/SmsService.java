@@ -100,7 +100,7 @@ public class SmsService {
     private User validatedSmsUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 전화번호로 등록된 사용자가 없습니다."));
 
-        if (!user.isSmsSubscribed()) {
+        if (!user.getSubscribeInfo().isSmsSubscribed()) {
             throw new IllegalArgumentException("문자 수신 미동의 회원입니다.");
         }
         if (user.getPhoneNumber() == null) {
