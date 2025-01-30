@@ -32,7 +32,7 @@ public class UserApiController {
     private final UserInfoService userInfoService;
 
     // 회원 가입
-    @PostMapping("/")
+    @PostMapping("/signup")
     public ResponseEntity<Long> signUp(@RequestBody UserSignUpRequest userSignUpRequest) {
         Long userId = userSignUpService.signUp(userSignUpRequest);
         return new ResponseEntity<>(userId, HttpStatus.CREATED);
@@ -61,7 +61,7 @@ public class UserApiController {
 
     // 나의/상대방의 정보 보기
         // 본인인지 아닌지 확인 -> 아니면 약식 정보만 전달
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/info")
     public ResponseEntity<UserInfoResponse> getUserInfo(@CurrentUser User user,
                                                         @PathVariable("id") Long id) {
         UserInfoResponse userInfo = userInfoService.getUserInfo(user, id);
@@ -69,10 +69,10 @@ public class UserApiController {
     }
 
     // 내 정보 수정
-    @PatchMapping(value = "/", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PatchMapping("/info")
     public ResponseEntity<String> updateUserInfo(@CurrentUser User user,
                                                  @RequestPart UserInfoUpdateRequest newInfo,
-                                                 @RequestPart MultipartFile imgFile) {
+                                                 @RequestPart(required = false) MultipartFile imgFile) {
         userInfoService.updateUserInfo(user.getId(), newInfo, imgFile);
         return ResponseEntity.ok("true");
     }

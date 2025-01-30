@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class UserViewController {
 
-    private final UserService userService;
     private final UserInfoService userInfoService;
 
     // 정보 수정(View)

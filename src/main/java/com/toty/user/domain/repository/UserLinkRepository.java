@@ -8,7 +8,7 @@ import org.springframework.data.repository.Repository;
 public interface UserLinkRepository extends Repository<UserLink, Long> {
     List<UserLink> findByUserId(Long userId);
 
-    void deleteAllByUserId(Long userId);
+    void deleteByUserId(Long userId);
 
     UserLink save(UserLink userTag);
 

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -76,36 +77,35 @@ public class UserInfoService {
     }
 
     @Transactional
-    public void updateUserInfo(Long id, UserInfoUpdateRequest newInfo, MultipartFile imgFile) {
-        try {
-            User foundUser = userRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+    public void updateUserInfo(Long userId, UserInfoUpdateRequest newInfo, MultipartFile imgFile) {
+        User foundUser = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-            // 서버에 이미지 저장 (원래 이미지가 있었다면 덮어쓰기)
-            String name = imgFile.getOriginalFilename();
-            System.out.println(imgFile.getOriginalFilename());
-            String savePath = basePath + id;
-            imgFile.transferTo(new File(savePath)); // throws IOException
-
-            // user 정보 수정
-            foundUser.updateInfo(newInfo,savePath);
-            userRepository.save(foundUser);
-
-            // tag와 links 저장
-            userTagRepository.deleteByUserId(id);
-            newInfo.getTags().stream().map(tag -> userTagRepository.save(new UserTag(foundUser, tag))); // 새 객체 생성
-
-            userLinkRepository.deleteAllByUserId(id);
-            newInfo.getLinks().stream().map(site -> userLinkRepository.save(new UserLink(foundUser, site.getSite(), site.getUrl())));
-        } catch (Exception e){ // IOException
-            // todo 예외 시
-            // throw new ExpectedException(ErrorCode.FileIOException);
+        if (imgFile != null && !imgFile.isEmpty()) {
+            try {
+                String savePath = basePath + userId;
+                imgFile.transferTo(new File(savePath));
+                foundUser.updateInfo(newInfo, savePath);
+            } catch (IOException e) {
+                throw new RuntimeException();
+                // todo 예외 시
+                // throw new ExpectedException(ErrorCode.FileIOException);
+            }
         }
+
+        userTagRepository.deleteByUserId(userId);
+        newInfo.getTags().forEach(tags -> {
+            userTagRepository.save(new UserTag(foundUser, tags));
+        });
+
+        userLinkRepository.deleteByUserId(userId);
+        newInfo.getLinks().forEach(links -> {
+            userLinkRepository.save(new UserLink(foundUser, links.getSite(), links.getUrl()));
+        });
     }
 
     public UserInfoResponse getMyInfoForUpdate(User user, Long id) {
         if (isSelfAccount(user, id)) {
-            // 데이터 DTO에 담기(True)
             return getUserInfoByAccount(id,true); // email은 readonly로..
         } else {
             throw new IllegalArgumentException("수정 권한이 없습니다.");
