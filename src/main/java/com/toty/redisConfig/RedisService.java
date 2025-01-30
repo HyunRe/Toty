@@ -15,20 +15,20 @@ public class RedisService {
     private final RedisHandler redisHandler;
     private final RedisConfig redisConfig;
 
-    int setData(String key, Object value) {
+    public int setData(String key, Object value) {
         return redisHandler.executeOperation(() -> redisHandler.getValueOperations().set(key, value));
     }
 
-    int setData(String key, Object value, Duration duration) {
+    public int setData(String key, Object value, Duration duration) {
         return redisHandler.executeOperation(() -> redisHandler.getValueOperations().set(key, value, duration));
     }
 
-    String getData(String key) {
+    public String getData(String key) {
         if (redisHandler.getValueOperations().get(key) == null) return "";
         return String.valueOf(redisHandler.getValueOperations().get(key));
     }
 
-    int deleteData(String key) {
+    public int deleteData(String key) {
         return redisHandler.executeOperation(() -> redisConfig.redisTemplate().delete(key));
     }
 }
