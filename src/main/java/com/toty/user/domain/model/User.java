@@ -70,4 +70,9 @@ public class User {
         this.statusMessage = newInfo.getStatusMessage();
         this.phoneNumber = newInfo.getPhoneNumber();
     }
+
+    public void deleteUser() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+    }
 }

@@ -3,6 +3,7 @@ package com.toty.user.presentation;
 import com.toty.annotation.CurrentUser;
 import com.toty.following.application.FollowService;
 import com.toty.following.dto.response.FollowingListResponse;
+import com.toty.user.application.UserInfoService;
 import com.toty.user.application.UserService;
 import com.toty.user.application.UserSignUpService;
 import com.toty.user.domain.model.User;
@@ -28,7 +29,7 @@ public class UserApiController {
 
     private final UserService userService;
     private final UserSignUpService userSignUpService;
-    private final FollowService followService;
+    private final UserInfoService userInfoService;
 
     // 회원 가입
     @PostMapping("/")
@@ -51,21 +52,28 @@ public class UserApiController {
         return ResponseEntity.ok(response);
     }
 
+    // 회원 탈퇴
+    @DeleteMapping("/")
+    public ResponseEntity<String> delete(@CurrentUser User user) {
+        userService.deleteUser(user.getId());
+        return ResponseEntity.ok("true");
+    }
+
     // 나의/상대방의 정보 보기
         // 본인인지 아닌지 확인 -> 아니면 약식 정보만 전달
     @GetMapping("/{id}")
     public ResponseEntity<UserInfoResponse> getUserInfo(@CurrentUser User user,
                                                         @PathVariable("id") Long id) {
-        UserInfoResponse userInfo = userService.getUserInfo(user, id);
+        UserInfoResponse userInfo = userInfoService.getUserInfo(user, id);
         return ResponseEntity.ok(userInfo);
     }
 
     // 내 정보 수정
     @PatchMapping(value = "/", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-        public ResponseEntity<String> updateUserInfo(@CurrentUser User user,
-                                                     @RequestPart UserInfoUpdateRequest newInfo,
-                                                     @RequestPart MultipartFile imgFile) {
-        userService.updateUserInfo(user.getId(), newInfo, imgFile);
-        return ResponseEntity.ok("Done");
+    public ResponseEntity<String> updateUserInfo(@CurrentUser User user,
+                                                 @RequestPart UserInfoUpdateRequest newInfo,
+                                                 @RequestPart MultipartFile imgFile) {
+        userInfoService.updateUserInfo(user.getId(), newInfo, imgFile);
+        return ResponseEntity.ok("true");
     }
 }
