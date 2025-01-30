@@ -7,17 +7,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/api")
 @RequiredArgsConstructor
 public class PageController {
 
+    // 기본 페이지
     @GetMapping("/home")
     public String home(){
-        return "home";
-    }
-
-    @GetMapping("/signup")
-    public String signUpProc(){
         return "home";
     }
 
@@ -25,6 +20,12 @@ public class PageController {
     @PostMapping("/alert")
     public String loginError() {
         return "common/alertMsg";
+    }
+
+    // 리프레시 토큰 만료 이후 재로그인
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
     }
 
 }

@@ -13,6 +13,8 @@ import com.toty.user.presentation.dto.LinkDto;
 import com.toty.user.presentation.dto.request.UserInfoUpdateRequest;
 import com.toty.user.presentation.dto.request.UserSignUpRequest;
 import com.toty.user.presentation.dto.response.UserInfoResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import java.io.File;
 import java.util.List;
@@ -144,12 +146,23 @@ public class UserService {
     }
 
 
-    public void deleteUser(User user, Long id) { // soft delete
+    public void deleteUser( HttpServletResponse response, User user, Long id) { // soft delete
         User foundUser = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
         if (isSelfAccount(user, id)) {
+            deleteUserAccessToken(response);
             userRepository.softDeleteById(id); // Error catch..?
         } else {
             throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
         }
+    }
+
+    public void deleteUserAccessToken(HttpServletResponse response) {
+        //탈퇴 시 쿠키 제거해 redirection 방지
+        Cookie cookie = new Cookie("accessToken", null);
+        cookie.setMaxAge(0);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
     }
 }

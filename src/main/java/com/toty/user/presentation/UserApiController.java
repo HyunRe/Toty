@@ -5,14 +5,11 @@ import com.toty.following.application.FollowService;
 import com.toty.following.presentation.dto.response.FollowingListResponse;
 import com.toty.user.application.UserService;
 import com.toty.user.domain.User;
-import com.toty.user.domain.UserRepository;
 import com.toty.user.presentation.dto.request.UserInfoUpdateRequest;
 import com.toty.user.presentation.dto.request.UserSignUpRequest;
 import com.toty.user.presentation.dto.response.UserInfoResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.websocket.server.PathParam;
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +31,7 @@ public class UserApiController {
     private final UserService userService;
     private final FollowService followService;
 
-    // 회원 가입
+    // 회원가입
     @PostMapping("/")
     @ResponseBody
     public ResponseEntity<Long> signUp(@RequestBody UserSignUpRequest userSignUpRequest) {
@@ -102,4 +99,6 @@ public class UserApiController {
         FollowingListResponse response = followService.pagedFollowings(id, false, page);
         return ResponseEntity.ok(response);
     }
+
+
 }

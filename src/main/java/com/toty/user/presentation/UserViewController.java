@@ -4,6 +4,7 @@ import com.toty.annotation.CurrentUser;
 import com.toty.user.application.UserService;
 import com.toty.user.domain.User;
 import com.toty.user.presentation.dto.response.UserInfoResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,10 +33,10 @@ public class UserViewController {
 
     // 회원 탈퇴(view)
     @DeleteMapping("/{id}")
-    public String delete(@CurrentUser User user, @PathVariable Long id) {
+    public String delete(@CurrentUser User user, @PathVariable Long id, HttpServletResponse response) {
         // 본인 확인 로직 -> 아니면 예외
-        userService.deleteUser(user,id); //soft delete
-        return "redirect:/api/home";
+        userService.deleteUser(response,user,id); //soft delete
+        return "redirect:/home";
     }
 
 }
