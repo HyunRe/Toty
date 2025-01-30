@@ -22,10 +22,11 @@ public class PageController {
         return "common/alertMsg";
     }
 
-    // 리프레시 토큰 만료 이후 재로그인
-    @GetMapping("/login")
-    public String loginPage() {
-        return "login";
-    }
+    // 현재 /login 경로 security 기본 제공 페이지 사용 중
+//    // 리프레시 토큰 만료 이후 재로그인
+//    @GetMapping("/login")
+//    public String loginPage() {
+//        return "login";
+//    }
 
 }
