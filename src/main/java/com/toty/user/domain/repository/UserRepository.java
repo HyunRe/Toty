@@ -1,5 +1,6 @@
-package com.toty.user.domain;
+package com.toty.user.domain.repository;
 
+import com.toty.user.domain.model.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

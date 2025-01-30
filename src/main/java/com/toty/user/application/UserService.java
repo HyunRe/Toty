@@ -2,15 +2,15 @@ package com.toty.user.application;
 
 import com.toty.Tag;
 import com.toty.following.domain.FollowingRepository;
-import com.toty.user.application.dto.response.UserLinkInfo;
-import com.toty.user.domain.User;
-import com.toty.user.domain.UserLink;
-import com.toty.user.domain.UserLinkRepository;
-import com.toty.user.domain.UserRepository;
-import com.toty.user.domain.UserTag;
-import com.toty.user.domain.UserTagRepository;
-import com.toty.user.application.dto.request.UserInfoUpdateRequest;
-import com.toty.user.application.dto.response.UserInfoResponse;
+import com.toty.user.dto.response.UserLinkInfo;
+import com.toty.user.domain.model.User;
+import com.toty.user.domain.model.UserLink;
+import com.toty.user.domain.repository.UserLinkRepository;
+import com.toty.user.domain.repository.UserRepository;
+import com.toty.user.domain.model.UserTag;
+import com.toty.user.domain.repository.UserTagRepository;
+import com.toty.user.dto.request.UserInfoUpdateRequest;
+import com.toty.user.dto.response.UserInfoResponse;
 import jakarta.transaction.Transactional;
 import java.io.File;
 import java.util.List;
@@ -50,17 +50,20 @@ public class UserService {
                 .stream()
                 .map(userLink -> new UserLinkInfo(userLink.getSite(), userLink.getUrl()))
                 .toList();
+        Long followingCount = followingRepository.countFollowingsByUserId(userId);
+        Long followerCount = followingRepository.countFollowersByUserId(userId);
 
         return UserInfoResponse.builder()
                 .email(isOwner ? foundUser.getEmail() : null)
                 .phoneNumber(isOwner ? foundUser.getPhoneNumber() : null)
                 .nickname(foundUser.getNickname())
                 .profileImgUrl(foundUser.getProfileImageUrl())
-                .subscribeInfo(isOwner ? foundUser.getSubscribeInfo() : null)
+                .emailSubscribed(isOwner ? foundUser.getSubscribeInfo().isEmailSubscribed() : null)
+                .smsSubscribed(isOwner ? foundUser.getSubscribeInfo().isSmsSubscribed() : null)
                 .tags(userTags)
                 .links(userLinks)
-                .followingCount(followingRepository.countFollowingsByUserId(userId))
-                .followerCount(followingRepository.countFollowersByUserId(userId))
+                .followingCount(followingCount)
+                .followerCount(followerCount)
                 .build();
     }
 

@@ -2,22 +2,15 @@ package com.toty.following.presentation;
 
 import com.toty.annotation.CurrentUser;
 import com.toty.following.application.FollowService;
-import com.toty.following.domain.FollowingRepository;
-import com.toty.following.presentation.dto.request.FollowingRequest;
-import com.toty.following.presentation.dto.response.FollowingListResponse;
-import com.toty.user.domain.User;
+import com.toty.following.dto.request.FollowingRequest;
+import com.toty.following.dto.response.FollowingListResponse;
+import com.toty.user.domain.model.User;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/follow")
 @Controller
@@ -40,6 +33,20 @@ public class FollowController {
     public ResponseEntity unfollow (@CurrentUser User user, @PathParam("id") Long id) {
         Long response = followService.unfollow(user.getId(), id);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // 팔로워 목록 조회
+    @GetMapping("/{uid}/followers")
+    public ResponseEntity<FollowingListResponse> followersList(@PathParam("uid") Long id, @RequestParam(value = "p", defaultValue = "1") int page) {
+        FollowingListResponse response = followService.pagedFollowings(id, true, page);
+        return ResponseEntity.ok(response);
+    }
+
+    // 팔로잉 목록 조회
+    @GetMapping("/{uid}/followings")
+    public ResponseEntity<FollowingListResponse> followingList(@PathParam("uid") Long id, @RequestParam(value = "p", defaultValue = "1") int page) {
+        FollowingListResponse response = followService.pagedFollowings(id, false, page);
+        return ResponseEntity.ok(response);
     }
 
 }

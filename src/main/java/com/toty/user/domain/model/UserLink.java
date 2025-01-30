@@ -1,16 +1,15 @@
-package com.toty.user.domain;
+package com.toty.user.domain.model;
 
-import com.toty.Tag;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "user_tags")
+@Table(name = "user_links")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserTag {
+public class UserLink {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,12 +19,16 @@ public class UserTag {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "tag_name")
+    @Column(name = "site")
     @Enumerated(EnumType.STRING)
-    private Tag tag;
+    private Site site;
 
-    public UserTag(User user, Tag tag) {
+    @Column(name = "url")
+    private String url;
+
+    public UserLink(User user, Site site, String url) {
         this.user = user;
-        this.tag = tag;
+        this.site = site;
+        this.url = url;
     }
 }

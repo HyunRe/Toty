@@ -1,9 +1,9 @@
-package com.toty.user.application.dto.request;
+package com.toty.user.dto.request;
 
 import com.toty.Tag;
 import java.util.List;
 
-import com.toty.user.application.dto.response.UserLinkInfo;
+import com.toty.user.dto.response.UserLinkInfo;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,9 +1,9 @@
 package com.toty.user.application;
 
-import com.toty.user.domain.LoginProvider;
-import com.toty.user.domain.User;
-import com.toty.user.domain.UserRepository;
-import com.toty.user.application.dto.request.UserSignUpRequest;
+import com.toty.user.domain.model.LoginProvider;
+import com.toty.user.domain.model.User;
+import com.toty.user.domain.repository.UserRepository;
+import com.toty.user.dto.request.UserSignUpRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;

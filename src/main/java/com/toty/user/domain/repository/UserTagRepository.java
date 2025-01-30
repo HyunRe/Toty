@@ -1,6 +1,8 @@
-package com.toty.user.domain;
+package com.toty.user.domain.repository;
 
 import java.util.List;
+
+import com.toty.user.domain.model.UserTag;
 import org.springframework.data.repository.Repository;
 
 public interface UserTagRepository extends Repository<UserTag, Long> {

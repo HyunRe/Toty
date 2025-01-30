@@ -1,9 +1,10 @@
-package com.toty.user.application.dto.response;
+package com.toty.user.dto.response;
 
 import com.toty.Tag;
 import java.util.List;
 
-import com.toty.user.domain.SubscribeInfo;
+import com.toty.user.domain.model.SubscribeInfo;
+import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,7 +16,9 @@ public class UserInfoResponse {
 
     private String nickname;
 
-    private SubscribeInfo subscribeInfo; // 본인만
+    private boolean emailSubscribed;
+
+    private boolean smsSubscribed;
 
     private String status_message;
 
@@ -31,15 +34,16 @@ public class UserInfoResponse {
 
     private Long followingCount;
 
-
     @Builder
-    public UserInfoResponse(String email, String nickname, SubscribeInfo subscribeInfo,
+    public UserInfoResponse(String email, String nickname,
+                            boolean emailSubscribed, boolean smsSubscribed,
                             String status_message, String phoneNumber, List<Tag> tags,
                             String profileImgUrl, List<UserLinkInfo> links,
                             Long followerCount, Long followingCount) {
         this.email = email;
         this.nickname = nickname;
-        this.subscribeInfo = subscribeInfo;
+        this.emailSubscribed = emailSubscribed;
+        this.smsSubscribed = smsSubscribed;
         this.status_message = status_message;
         this.phoneNumber = phoneNumber;
         this.tags = tags;

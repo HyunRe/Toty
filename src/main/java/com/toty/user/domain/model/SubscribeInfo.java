@@ -1,4 +1,4 @@
-package com.toty.user.domain;
+package com.toty.user.domain.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

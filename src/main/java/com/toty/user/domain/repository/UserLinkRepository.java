@@ -1,6 +1,8 @@
-package com.toty.user.domain;
+package com.toty.user.domain.repository;
 
 import java.util.List;
+
+import com.toty.user.domain.model.UserLink;
 import org.springframework.data.repository.Repository;
 
 public interface UserLinkRepository extends Repository<UserLink, Long> {

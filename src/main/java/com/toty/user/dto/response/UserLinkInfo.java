@@ -1,8 +1,7 @@
-package com.toty.user.application.dto.response;
+package com.toty.user.dto.response;
 
-import com.toty.user.domain.Site;
+import com.toty.user.domain.model.Site;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
