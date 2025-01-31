@@ -1,5 +1,6 @@
 package com.toty.post.presentation.controller.api;
 
+import com.toty.annotation.CurrentUser;
 import com.toty.base.pagination.PaginationResult;
 import com.toty.base.response.SuccessResponse;
 import com.toty.post.application.PostService;
@@ -7,6 +8,7 @@ import com.toty.post.domain.model.Post;
 import com.toty.post.presentation.dto.request.PostCreateRequest;
 import com.toty.post.presentation.dto.request.PostUpdateRequest;
 import com.toty.post.presentation.dto.response.postdetail.PostDetailResponse;
+import com.toty.user.domain.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -107,20 +109,30 @@ public class PostApiController {
     @GetMapping("/{id}/detail")
     public ResponseEntity<?> postDetail(@PathVariable Long id,
                                         @RequestParam(name = "page", defaultValue = "1") int page,
-                                        @RequestParam(name = "likeAction", required = false) String likeAction,
                                         @RequestParam(name = "postCategory", required = false) String postCategory) {
         postService.incrementViewCount(id);
-        if ("like".equals(likeAction)) {
-            postService.incrementLikeCount(id);
-        } else {
-            postService.decrementLikeCount(id);
-        }
 
         PostDetailResponse response = postService.getPostDetailByCategory(page, id, postCategory);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 "카테고리 별 게시글 상세 보기",
                 response
+        );
+
+        return ResponseEntity.ok(successResponse);
+    }
+
+    // 게시글 좋아요 토글(증감소)
+    @PostMapping("/{id}/like")
+    public ResponseEntity<?> toggleLike(@PathVariable Long id,
+                                        @CurrentUser User user,
+                                        @RequestParam(name = "likeAction", required = false) String likeAction) {
+        Boolean isLiked = postService.toggleLikeAction(id, user.getId(), likeAction);
+
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "게시글 좋아요 토글",
+                isLiked
         );
 
         return ResponseEntity.ok(successResponse);

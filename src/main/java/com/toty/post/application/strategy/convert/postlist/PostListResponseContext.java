@@ -6,7 +6,7 @@ import com.toty.post.presentation.dto.response.postlist.PostListResponse;
 import java.util.List;
 
 public class PostListResponseContext {
-    private PostListResponseStrategy strategy;
+    private final PostListResponseStrategy strategy;
 
     public PostListResponseContext(String postCategory) {
         if ("general".equals(postCategory)) {

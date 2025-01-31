@@ -14,10 +14,4 @@ public interface PostRepository extends BaseRepository<Post, Long>, JpaSpecifica
     @Transactional
     @Query("UPDATE Post p SET p.viewCount = p.viewCount + 1 WHERE p.id = :id")
     void updateViewCount(@Param("id") Long id);
-
-    // 좋아요 증감 (동시성 고려)
-    @Modifying
-    @Transactional
-    @Query("UPDATE Post p SET p.likeCount = p.likeCount + :delta WHERE p.id = :id AND p.likeCount + :delta >= 0")
-    void updateLikeCount(@Param("id") Long id, @Param("delta") int delta);
 }

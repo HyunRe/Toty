@@ -31,7 +31,7 @@ public class QnaPostUpdateStrategy implements PostUpdateStrategy {
         }
 
         Post updatedPost = new Post(post.getUser(), post.getPostCategory(), postUpdateRequest.getTitle(), postUpdateRequest.getContent(),
-                post.getViewCount(), post.getLikeCount(), null, null, postUpdateRequest.getPostTags());
+                post.getViewCount(), post.getLikeCount(), post.getComments(), null, postUpdateRequest.getPostTags());
 
         // 태그
         for (PostTag postTag: postTags) {
@@ -40,8 +40,6 @@ public class QnaPostUpdateStrategy implements PostUpdateStrategy {
 
         // 이미지
         synchronizeImages(updatedPost, postUpdateRequest.getPostImages(), postImageService);
-
-        // 댓글
 
         return updatedPost;
     }

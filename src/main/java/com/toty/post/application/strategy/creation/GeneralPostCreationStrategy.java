@@ -20,8 +20,6 @@ public class GeneralPostCreationStrategy implements PostCreationStrategy {
         // 이미지
         processImages(post, postCreateRequest.getPostImages(), postImageService);
 
-        // 댓글
-
         return post;
     }
 }

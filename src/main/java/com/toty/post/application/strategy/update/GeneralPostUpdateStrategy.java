@@ -15,12 +15,10 @@ public class GeneralPostUpdateStrategy implements PostUpdateStrategy {
     @Override
     public Post updatePostRequest(PostUpdateRequest postUpdateRequest, Post post) {
         Post updatedPost = new Post(post.getUser(), post.getPostCategory(), postUpdateRequest.getTitle(), postUpdateRequest.getContent(),
-                post.getViewCount(), post.getLikeCount(), null, null, null);
+                post.getViewCount(), post.getLikeCount(), post.getComments(), null, null);
 
         // 이미지
         synchronizeImages(updatedPost, postUpdateRequest.getPostImages(), postImageService);
-
-        // 댓글
 
         return updatedPost;
     }

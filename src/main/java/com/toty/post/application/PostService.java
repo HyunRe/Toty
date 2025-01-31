@@ -4,13 +4,14 @@ import com.toty.base.exception.UserNotFoundException;
 import com.toty.base.exception.PostNotFoundException;
 import com.toty.base.pagination.PaginationResult;
 import com.toty.comment.application.CommentService;
-import com.toty.comment.presentation.dto.response.CommentListResponse;
 import com.toty.post.application.strategy.convert.postdetail.PostDetailResponseContext;
 import com.toty.post.application.strategy.convert.postlist.PostListResponseContext;
 import com.toty.post.application.strategy.creation.PostCreationStrategy;
 import com.toty.post.application.strategy.update.PostUpdateStrategy;
 import com.toty.post.domain.model.Post;
+import com.toty.post.domain.model.PostLike;
 import com.toty.post.domain.pagination.PostPaginationStrategy;
+import com.toty.post.domain.repository.PostLikeRepository;
 import com.toty.post.domain.repository.PostRepository;
 import com.toty.post.domain.repository.PostSpecifications;
 import com.toty.post.presentation.dto.request.PostCreateRequest;
@@ -20,6 +21,7 @@ import com.toty.post.presentation.dto.response.postlist.GeneralPostListResponse;
 import com.toty.post.presentation.dto.response.postlist.PostListResponse;
 import com.toty.user.domain.User;
 import com.toty.user.domain.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,12 +30,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final PostLikeRepository postLikeRepository;
     private final PostCreationStrategy postCreationStrategy;
     private final PostUpdateStrategy postUpdateStrategy;
     private final PostPaginationStrategy postPaginationStrategy;
@@ -47,6 +51,7 @@ public class PostService {
     }
 
     // 게시글 작성
+    @Transactional
     public Post createPost(Long userId, PostCreateRequest postCreateRequest) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
@@ -54,6 +59,7 @@ public class PostService {
     }
 
     // 게시글 수정
+    @Transactional
     public Post updatePost(Long id, PostUpdateRequest postUpdateRequest) {
         // 내 게시글 인지 확인 필요
 //        if (!isOwner(id)) {
@@ -65,6 +71,7 @@ public class PostService {
     }
 
     // 게시글 삭제
+    @Transactional
     public void deletePost(Long id) {
         Post post = findPostById(id);
         // 내 게시글 인지 확인 필요
@@ -77,6 +84,7 @@ public class PostService {
     }
 
     // 전체 게시글 목록 조회 (수정시간 기준으로 최신순 정렬 - 오늘 / 이번 주 / 이번 딜)
+    @Transactional(readOnly = true)
     public PaginationResult getPagedPosts(int page, String filter) {
         Specification<Post> specification = PostSpecifications.isNotDeleted();
         if ("today".equals(filter)) {
@@ -99,6 +107,7 @@ public class PostService {
     }
 
     // 사용자 ID로 필터링된 게시글 목록 조회
+    @Transactional(readOnly = true)
     public PaginationResult getPagedPostsByUserId(int page, Long userId, String postCategory) {
         PageRequest pageRequest = PageRequest.of(page - 1, PAGE_SIZE, Sort.by(Sort.Order.asc("updatedAt")));
         Page<Post> posts = postRepository.findAll(
@@ -114,6 +123,7 @@ public class PostService {
     }
 
     // 카테고리로 필터링된 게시글 목록 조회
+    @Transactional(readOnly = true)
     public PaginationResult getPagedPostsByCategory(int page, String postCategory) {
         PageRequest pageRequest = PageRequest.of(page - 1, PAGE_SIZE, Sort.by(Sort.Order.asc("updatedAt")));
         Page<Post> posts = postRepository.findAll(
@@ -128,6 +138,7 @@ public class PostService {
     }
 
     // 카테고리 별 게시글 상세 보기
+    @Transactional(readOnly = true)
     public PostDetailResponse getPostDetailByCategory(int page, Long id, String postCategory) {
         Post post = findPostById(id);
         // 댓글 목록 조회
@@ -138,18 +149,44 @@ public class PostService {
     }
 
     // 조회수 증가 (동시성 고려)
+    @Transactional
     public void incrementViewCount(Long id) {
         postRepository.updateViewCount(id);
     }
 
-    // 좋아요 증가 (동시성 고려)
-    public void incrementLikeCount(Long id) {
-        postRepository.updateLikeCount(id, 1);
+    // 좋아요 토글 (증감소)
+    @Transactional
+    public Boolean toggleLikeAction(Long postId, Long userId, String likeAction) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+
+        boolean isLiked = false;
+
+        if ("like".equals(likeAction)) { // 좋아요 추가
+            PostLike existingLike = postLikeRepository.findByUserAndPost(user, post).orElse(null);
+            if (existingLike == null) {
+                PostLike newLike = new PostLike(user, post);
+                postLikeRepository.save(newLike);
+                isLiked = true;
+            }
+        }
+        if ("unlike".equals(likeAction)) { // 좋아요 취소
+            postLikeRepository.findByUserAndPost(user, post).ifPresent(postLikeRepository::delete);
+        }
+
+        // 좋아요 개수 갱신
+        int likeCount = postLikeRepository.countPostLikesByPost(post);
+        post.updateLikeCount(likeCount);
+
+        return isLiked;
     }
 
-    // 좋아요 감소 (동시성 고려)
-    public void decrementLikeCount(Long id) {
-        postRepository.updateLikeCount(id, -1);
+
+    // 게시물의 좋아요 개수 가져오기
+    @Transactional(readOnly = true)
+    public int getLikeCount(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        return postLikeRepository.countPostLikesByPost(post);
     }
 
     // Post -> PostListResponse
@@ -159,7 +196,7 @@ public class PostService {
                 post.getUser().getProfileImageUrl(),            // 프로필 이미지 URL
                 post.getTitle(),                                // 제목
                 post.getViewCount(),                            // 조회수
-                post.getLikeCount(),                            // 좋아요 수
+                getLikeCount(post.getId()),                     // 좋아요 수
                 post.getUpdatedAt()                             // 생성 일시과 수정 일시 중 더 나중에 된 시간
         );
     }

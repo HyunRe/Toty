@@ -1,24 +1,40 @@
 package com.toty.post.presentation.controller.view;
 
+import com.toty.annotation.CurrentUser;
 import com.toty.base.pagination.PaginationResult;
-import com.toty.base.response.SuccessResponse;
 import com.toty.post.application.PostService;
+import com.toty.post.domain.model.Post;
+import com.toty.post.presentation.dto.request.PostCreateRequest;
 import com.toty.post.presentation.dto.response.postdetail.PostDetailResponse;
+import com.toty.user.domain.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/view/posts")
 @RequiredArgsConstructor
 public class PostViewController {
     private final PostService postService;
+
+    @GetMapping("/create")
+    public String createPostForm() {
+        return "post/create";
+    }
+
+    @PostMapping("/create")
+    public String createPost(@RequestParam("userId") Long userId,
+                             @Valid @RequestBody PostCreateRequest postCreateRequest) {
+        postService.createPost(userId, postCreateRequest);
+        return "redirect:/view/posts/myList";
+    }
+
+    @GetMapping("/update")
+    public String updatePostForm() {
+        return "post/update";
+    }
 
     // 전체 게시글 목록 조회
     @GetMapping("/list")
@@ -27,6 +43,7 @@ public class PostViewController {
                            Model model) {
         PaginationResult result = postService.getPagedPosts(page, filter);
         model.addAttribute("result", result);
+        model.addAttribute("filter", filter);
 
         return "post/list";
     }
@@ -39,6 +56,7 @@ public class PostViewController {
                              Model model) {
         PaginationResult result = postService.getPagedPostsByUserId(page, userId, postCategory);
         model.addAttribute("result", result);
+        model.addAttribute("postCategory", postCategory);
 
         return "post/myList";
     }
@@ -50,6 +68,7 @@ public class PostViewController {
                                    Model model) {
         PaginationResult result = postService.getPagedPostsByCategory(page, postCategory);
         model.addAttribute("result", result);
+        model.addAttribute("postCategory", postCategory);
 
         return "post/categoryList";
     }
@@ -57,19 +76,18 @@ public class PostViewController {
     // 카테고리 별 게시글 상세 보기
     @GetMapping("/{id}/detail")
     public String postDetail(@PathVariable Long id,
+                             @CurrentUser User user,
                              @RequestParam(name = "page", defaultValue = "1") int page,
                              @RequestParam(name = "likeAction", required = false) String likeAction,
                              @RequestParam(name = "postCategory", required = false) String postCategory,
                              Model model) {
         postService.incrementViewCount(id);
-        if ("like".equals(likeAction)) {
-            postService.incrementLikeCount(id);
-        } else {
-            postService.decrementLikeCount(id);
-        }
-
         PostDetailResponse response = postService.getPostDetailByCategory(page, id, postCategory);
+        Boolean isLiked = postService.toggleLikeAction(id, user.getId(), likeAction);
         model.addAttribute("result", response);
+        model.addAttribute("isLiked", isLiked);
+        model.addAttribute("likeAction", likeAction);
+        model.addAttribute("postCategory", postCategory);
 
         return "post/detail";
     }

@@ -71,6 +71,10 @@ public class Post extends BaseTime {
         addRelatedEntity(this.postImages, postImage, PostImage::setPost);
     }
 
+    public void updateLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+
     public Post(User user, PostCategory postCategory, String title, String content, int viewCount, int likeCount,
                 List<Comment> comments, List<PostImage> postImages, List<PostTag> postTags) {
         this.user = user;
