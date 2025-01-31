@@ -2,11 +2,11 @@ package com.toty.following.application;
 
 import com.toty.following.domain.Following;
 import com.toty.following.domain.FollowingRepository;
-import com.toty.following.presentation.dto.response.FollowingListResponse;
-import com.toty.following.presentation.dto.response.FollowingListResponse.PageInfo;
-import com.toty.following.presentation.dto.response.FollowingListResponse.Summary;
-import com.toty.user.domain.User;
-import com.toty.user.domain.UserRepository;
+import com.toty.following.dto.response.FollowingListResponse;
+import com.toty.following.dto.response.FollowingListResponse.PageInfo;
+import com.toty.following.dto.response.FollowingListResponse.Summary;
+import com.toty.user.domain.model.User;
+import com.toty.user.domain.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

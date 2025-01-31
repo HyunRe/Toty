@@ -1,9 +1,9 @@
 package com.toty.security.authentication;
 
 import com.toty.user.application.UserService;
-import com.toty.user.domain.LoginProvider;
-import com.toty.user.domain.User;
-import com.toty.user.domain.UserRepository;
+import com.toty.user.domain.model.LoginProvider;
+import com.toty.user.domain.model.User;
+import com.toty.user.domain.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

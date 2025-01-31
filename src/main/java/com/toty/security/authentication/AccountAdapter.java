@@ -1,8 +1,9 @@
 package com.toty.security.authentication;
 
-import com.toty.user.domain.User;
 import java.util.Collection;
 import java.util.List;
+
+import com.toty.user.domain.model.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 
