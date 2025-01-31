@@ -1,7 +1,7 @@
-package com.toty.user.domain;
+package com.toty.user.domain.model;
 
 
-import com.toty.user.presentation.dto.request.UserInfoUpdateRequest;
+import com.toty.user.dto.request.UserInfoUpdateRequest;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -9,14 +9,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,47 +25,33 @@ public class User {
     @Column(name = "password")
     private String password;
 
-
-    @Column
+    @Column(name = "phone_number")
     private String phoneNumber; // 폼 로그인 시 필수값
 
-    @Column(nullable = false)
+    @Column(name = "nickname")
     private String nickname; // 필수값
 
-    @Column
+    @Column(name = "profile_image")
     private String profileImageUrl;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserScrape> userScrapes = new ArrayList<>();
-
-    public void addUserScrape(UserScrape userScrape) {
-        if (this.userScrapes == null)
-            this.userScrapes = new ArrayList<>();
-        this.userScrapes.add(userScrape);
-        userScrape.setUser(this);
-    }
-
-    @Column(nullable = false, columnDefinition = "varchar(255) default 'USER'")
+    @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
-    @Column(nullable = false, columnDefinition = "varchar(255) default 'FORM'")
+    @Column(name = "provider")
     @Enumerated(EnumType.STRING)
-    private LoginProvider loginProvider = LoginProvider.FORM;
+    private LoginProvider loginProvider;
 
-    @Column(nullable = false, columnDefinition = "TINYINT(1) default 0")
-    private boolean emailSubscribed = false;
+    @Embedded
+    private SubscribeInfo subscribeInfo;
 
-    @Column(nullable = false, columnDefinition = "TINYINT(1) default 0")
-    private boolean smsSubscribed = false;
-
-    @Column
+    @Column(name = "status_message")
     private String statusMessage;
 
-    @Column(nullable = false, columnDefinition = "TINYINT(1) default 0")
-    private boolean deleted = false;
+    @Column(name = "is_deleted")
+    private boolean isDeleted = false;
 
-    @Column
+    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
     @Builder
@@ -82,9 +66,13 @@ public class User {
     public void updateInfo(UserInfoUpdateRequest newInfo, String imgPath) {
         this.nickname = newInfo.getNickname();
         this.profileImageUrl = imgPath;
-        this.emailSubscribed = newInfo.isEmailSubscribed();
-        this.smsSubscribed = newInfo.isSmsSubscribed();
+        this.subscribeInfo = new SubscribeInfo(newInfo.isEmailSubscribed(), newInfo.isSmsSubscribed());
         this.statusMessage = newInfo.getStatusMessage();
         this.phoneNumber = newInfo.getPhoneNumber();
+    }
+
+    public void deleteUser() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
     }
 }

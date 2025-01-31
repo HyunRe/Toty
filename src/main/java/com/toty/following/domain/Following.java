@@ -1,8 +1,7 @@
 package com.toty.following.domain;
 
 
-import com.toty.user.domain.User;
-import jakarta.persistence.Column;
+import com.toty.user.domain.model.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;

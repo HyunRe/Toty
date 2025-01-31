@@ -8,9 +8,8 @@ import com.toty.sms.presentation.request.PostReplyNotificationRequest;
 import com.toty.sms.presentation.request.PostReplyNotificationRequest.Type;
 import com.toty.sms.presentation.response.SmsAuthCodeResponse;
 import com.toty.sms.presentation.response.SmsResponse;
-import com.toty.user.application.UserService;
-import com.toty.user.domain.User;
-import com.toty.user.domain.UserRepository;
+import com.toty.user.domain.model.User;
+import com.toty.user.domain.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -25,7 +24,6 @@ import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -102,7 +100,7 @@ public class SmsService {
     private User validatedSmsUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 전화번호로 등록된 사용자가 없습니다."));
 
-        if (!user.isSmsSubscribed()) {
+        if (!user.getSubscribeInfo().isSmsSubscribed()) {
             throw new IllegalArgumentException("문자 수신 미동의 회원입니다.");
         }
         if (user.getPhoneNumber() == null) {

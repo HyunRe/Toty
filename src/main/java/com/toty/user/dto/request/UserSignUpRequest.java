@@ -1,4 +1,4 @@
-package com.toty.user.presentation.dto.request;
+package com.toty.user.dto.request;
 
 import lombok.AccessLevel;
 import lombok.Getter;

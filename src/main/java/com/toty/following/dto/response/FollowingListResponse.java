@@ -1,4 +1,4 @@
-package com.toty.following.presentation.dto.response;
+package com.toty.following.dto.response;
 
 import java.util.List;
 import lombok.AccessLevel;
