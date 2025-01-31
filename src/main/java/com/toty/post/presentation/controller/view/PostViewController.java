@@ -1,13 +1,13 @@
 package com.toty.post.presentation.controller.view;
 
-import com.toty.annotation.CurrentUser;
 import com.toty.base.pagination.PaginationResult;
+import com.toty.global.annotation.CurrentUser;
 import com.toty.post.application.PostService;
 import com.toty.post.domain.model.Post;
 import com.toty.post.presentation.dto.request.PostCreateRequest;
 import com.toty.post.presentation.dto.request.PostUpdateRequest;
 import com.toty.post.presentation.dto.response.postdetail.PostDetailResponse;
-import com.toty.user.domain.User;
+import com.toty.user.domain.model.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

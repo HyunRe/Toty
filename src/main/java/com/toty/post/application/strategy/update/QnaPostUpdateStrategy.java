@@ -5,7 +5,6 @@ import com.toty.post.domain.model.Post;
 import com.toty.post.domain.model.PostTag;
 import com.toty.post.domain.repository.PostTagRepository;
 import com.toty.post.presentation.dto.request.PostUpdateRequest;
-import com.toty.user.domain.User;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

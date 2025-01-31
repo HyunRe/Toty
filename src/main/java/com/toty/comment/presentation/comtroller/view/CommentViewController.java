@@ -2,8 +2,8 @@ package com.toty.comment.presentation.comtroller.view;
 
 import com.toty.comment.application.CommentService;
 import com.toty.comment.presentation.dto.request.CommentCreateUpdateRequest;
+import com.toty.post.application.PostService;
 import com.toty.post.domain.model.Post;
-import com.toty.post.presentation.dto.request.PostCreateRequest;
 import com.toty.post.presentation.dto.request.PostUpdateRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CommentViewController {
     private final CommentService commentService;
+    private final PostService postService;
 
     @GetMapping("/create")
     public String createPostForm() {
