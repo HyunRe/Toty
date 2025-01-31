@@ -1,0 +1,89 @@
+.post-list-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+.post-list-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+.post-list-item .details {
+    flex-grow: 1;
+    margin-left: 15px;
+}
+.post-list-item .details a {
+    text-decoration: none;
+    font-weight: bold;
+}
+.post-list-item .details .nickname {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 5px;
+}
+.post-list-item .info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+}
+.post-list-item .info p {
+    margin: 0;
+}
+.post-list-item .tags span {
+    display: inline-block;
+    margin-right: 5px;
+    background-color: #f1f1f1;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+.page-title {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+.category-menu {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+.category-menu select {
+    max-width: 150px;
+    font-size: 0.9rem;
+}
+
+/* 버튼 그룹 스타일 */
+.btn-group-sm .btn {
+    margin: 0 5px;
+}
+
+/* 수직선 스타일 */
+.border-left {
+    position: fixed; /* 화면에 고정 */
+    top: 0;           /* 상단에 고정 */
+    left: 25%;         /* 왼쪽 메뉴와 오른쪽 게시글 사이의 위치 (약간의 여백을 두기 위해 설정) */
+    height: 100vh;     /* 화면 높이에 맞게 수직선 길이 설정 */
+    border-left: 2px solid #ccc; /* 수직선 스타일 */
+    z-index: 10;       /* 다른 요소보다 위에 표시되도록 설정 */
+}
+
+/* 왼쪽 메뉴 위치 설정 */
+.row > .col-md-3 {
+    position: relative; /* 왼쪽 메뉴에 고정된 레이아웃을 적용 */
+}
+
+/* 왼쪽 메뉴 활성화 스타일 */
+.active-menu {
+    font-weight: bold;
+    color: #007bff;
+}
+
+ /* 페이지네이션 스타일 */
+ .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}

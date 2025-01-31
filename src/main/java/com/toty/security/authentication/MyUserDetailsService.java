@@ -1,10 +1,9 @@
 package com.toty.security.authentication;
 
 import com.toty.user.application.UserService;
-import com.toty.user.domain.LoginProvider;
-import com.toty.user.domain.User;
-import com.toty.user.domain.UserRepository;
-import lombok.RequiredArgsConstructor;
+import com.toty.user.domain.model.LoginProvider;
+import com.toty.user.domain.model.User;
+import com.toty.user.domain.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,9 +13,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class MyUserDetailsService implements UserDetailsService {
-    private final UserRepository userRepository;
+    @Autowired
+    private UserService userService;
+    private UserRepository userRepository;
 
     // 폼로그인 예외처리
     @Override

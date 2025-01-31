@@ -1,0 +1,44 @@
+$(document).ready(function () {
+    // Summernote 초기화
+    $('#content').summernote({
+        height: 300,
+        placeholder: '여기에 내용을 작성하세요...',
+        callbacks: {
+            onImageUpload: function (files) {
+                for (let i = 0; i < files.length; i++) {
+                    uploadImage(files[i]);
+                }
+            }
+        }
+    });
+
+    function uploadImage(file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        $.ajax({
+            url: '/upload-image', // 이미지 업로드 엔드포인트
+            method: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (url) {
+                $('#content').summernote('insertImage', url);
+            },
+            error: function () {
+                alert('이미지 업로드 실패');
+            }
+        });
+    }
+
+    // 카테고리 선택 시 태그 활성화/비활성화
+    $('#postCategory').on('change', function () {
+        var category = $(this).val();
+        if (category === 'Qna') {
+            $('#tagsContainer').show();
+            $('#postTags').prop('disabled', false);
+        } else {
+            $('#tagsContainer').hide();
+            $('#postTags').prop('disabled', true);
+        }
+    });
+});
