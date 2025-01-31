@@ -5,12 +5,14 @@ import com.toty.base.pagination.PaginationResult;
 import com.toty.post.application.PostService;
 import com.toty.post.domain.model.Post;
 import com.toty.post.presentation.dto.request.PostCreateRequest;
+import com.toty.post.presentation.dto.request.PostUpdateRequest;
 import com.toty.post.presentation.dto.response.postdetail.PostDetailResponse;
 import com.toty.user.domain.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -26,14 +28,31 @@ public class PostViewController {
 
     @PostMapping("/create")
     public String createPost(@RequestParam("userId") Long userId,
-                             @Valid @RequestBody PostCreateRequest postCreateRequest) {
+                             @ModelAttribute @Valid PostCreateRequest postCreateRequest,
+                             BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "post/create"; // 유효성 검사 실패 시, 다시 폼을 반환
+        }
         postService.createPost(userId, postCreateRequest);
         return "redirect:/view/posts/myList";
     }
 
-    @GetMapping("/update")
-    public String updatePostForm() {
+    @GetMapping("/update/{id}")
+    public String updatePostForm(@PathVariable Long id, Model model) {
+        Post post = postService.findPostById(id);
+        model.addAttribute("post", post);
         return "post/update";
+    }
+
+    @PatchMapping("/{id}")
+    public String updatePost(@PathVariable Long id,
+                             @ModelAttribute @Valid PostUpdateRequest postUpdateRequest,
+                             BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "post/update"; // 유효성 검사 실패 시, 다시 폼을 반환
+        }
+        postService.updatePost(id, postUpdateRequest);
+        return "redirect:/view/posts/myList";
     }
 
     // 전체 게시글 목록 조회
