@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -38,6 +39,7 @@ public class CommentService {
     }
 
     // 댓글 작성
+    @Transactional
     public Comment createComment(Long userId, Long postId, CommentCreateUpdateRequest commentCreateUpdateRequest) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
@@ -48,6 +50,7 @@ public class CommentService {
     }
 
     // 댓글 수정
+    @Transactional
     public Comment updateComment(Long id, CommentCreateUpdateRequest commentCreateUpdateRequest) {
         Comment comment = findByCommentId(id);
         // 내 댓글 인지 확인 필요
@@ -61,6 +64,7 @@ public class CommentService {
     }
 
     // 댓글 삭제
+    @Transactional
     public void deleteComment(Long id) {
         Comment comment = findByCommentId(id);
         // 내 댓글 인지 확인 필요
@@ -73,6 +77,7 @@ public class CommentService {
     }
 
     // 게시글 내의 댓글 목록 조회
+    @Transactional(readOnly = true)
     public PaginationResult getPagedCommentsByPostId(int page, Long postId) {
         PageRequest pageRequest = PageRequest.of(page - 1, PAGE_SIZE, Sort.by(Sort.Order.asc("updatedAt")));
         Page<Comment> comments = commentRepository.findAll(
