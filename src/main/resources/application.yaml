@@ -3,4 +3,3 @@ spring:
     group:
       local:
       deploy:
-      test:
