@@ -6,7 +6,7 @@ import com.toty.post.presentation.dto.request.PostUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@Service
+//@Service
 @RequiredArgsConstructor
 public class KnowledgePostUpdateStrategy implements PostUpdateStrategy {
     private final PostImageService postImageService;

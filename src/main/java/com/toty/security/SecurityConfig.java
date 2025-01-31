@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -19,6 +20,7 @@ import org.springframework.security.web.savedrequest.CookieRequestCache;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableWebSecurity
 public class SecurityConfig {
 
     private final AuthenticationSuccessHandler authSuccessHandler;
@@ -36,11 +38,11 @@ public class SecurityConfig {
         http.csrf(auth -> auth.disable())       // CSRF 방어 기능 비활성화
                 .headers(x -> x.frameOptions(y -> y.disable()))
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers(HttpMethod.POST, "").hasRole(String.valueOf(Role.USER))
-                        .requestMatchers("").hasRole(String.valueOf(Role.USER))
-                        .requestMatchers(HttpMethod.POST, "").hasRole(String.valueOf(Role.MENTOR))
-                        .requestMatchers("").hasRole(String.valueOf(Role.MENTOR))
-                        .requestMatchers("").hasRole(String.valueOf(Role.ADMIN))
+                        .requestMatchers(HttpMethod.POST, "/").hasRole(String.valueOf(Role.USER))
+                        .requestMatchers("/").hasRole(String.valueOf(Role.USER))
+                        .requestMatchers(HttpMethod.POST, "/").hasRole(String.valueOf(Role.MENTOR))
+                        .requestMatchers("/").hasRole(String.valueOf(Role.MENTOR))
+                        .requestMatchers("/").hasRole(String.valueOf(Role.ADMIN))
                         .anyRequest().permitAll()
                 )
                 .formLogin(auth -> auth
@@ -85,5 +87,10 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public CookieRequestCache requestCache() {
+        return new CookieRequestCache();
     }
 }

@@ -3,10 +3,12 @@ package com.toty.comment.domain.pagination;
 import com.toty.base.pagination.PaginationResult;
 import com.toty.base.pagination.PaginationStrategy;
 import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class CommentPaginationStrategy implements PaginationStrategy {
     @Override
     public PaginationResult getPaginationResult(Page<?> page, int pageSize, List<?> content) {

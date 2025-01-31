@@ -7,7 +7,7 @@ import com.toty.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@Service
+//@Service
 @RequiredArgsConstructor
 public class GeneralPostCreationStrategy implements PostCreationStrategy {
     private final PostImageService postImageService;
