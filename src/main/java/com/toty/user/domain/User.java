@@ -9,12 +9,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,6 +27,7 @@ public class User {
     @Column(name = "password")
     private String password;
 
+
     @Column
     private String phoneNumber; // 폼 로그인 시 필수값
 
@@ -33,6 +36,16 @@ public class User {
 
     @Column
     private String profileImageUrl;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserScrape> userScrapes = new ArrayList<>();
+
+    public void addUserScrape(UserScrape userScrape) {
+        if (this.userScrapes == null)
+            this.userScrapes = new ArrayList<>();
+        this.userScrapes.add(userScrape);
+        userScrape.setUser(this);
+    }
 
     @Column(nullable = false, columnDefinition = "varchar(255) default 'USER'")
     @Enumerated(EnumType.STRING)

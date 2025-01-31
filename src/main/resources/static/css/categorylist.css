@@ -1,0 +1,70 @@
+/* 게시글 리스트 항목 스타일 */
+.post-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.post-list-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.post-list-item .details {
+    flex-grow: 1;
+    margin-left: 15px;
+}
+
+.post-list-item .details a {
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.post-list-item .details p {
+    margin: 0;
+    color: #666;
+}
+
+/* 헤더 스타일 */
+.header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.pagination {
+    justify-content: center;
+}
+
+.header-bar .btn {
+    margin-right: 15px;
+}
+
+/* 새로 추가된 스타일 */
+.btn-create-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 15px;
+}
+
+.sort-wrapper {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.top-bar {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-create-wrapper img {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}

@@ -1,0 +1,31 @@
+.left-menu {
+    width: 250px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-right: 2px solid #ccc;
+    position: fixed;
+    height: 100vh;
+}
+.left-menu h5 {
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+.left-menu ul {
+    padding: 0;
+    list-style-type: none;
+}
+.left-menu ul li {
+    margin-bottom: 10px;
+}
+.left-menu ul li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 1rem;
+}
+.left-menu ul li a:hover {
+    color: #007bff;
+}
+.active-menu {
+    font-weight: bold;
+    color: #007bff;
+}
