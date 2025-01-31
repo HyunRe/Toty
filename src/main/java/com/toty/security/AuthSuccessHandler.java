@@ -46,5 +46,4 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         request.getRequestDispatcher("/alert").forward(request, response);
     }
 
-
 }
