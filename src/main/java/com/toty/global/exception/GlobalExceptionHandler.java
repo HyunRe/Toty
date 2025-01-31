@@ -39,4 +39,13 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(TotyResponse.error(HttpStatus.BAD_REQUEST, builder.toString()));
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<TotyResponse> handleUnExpectedException(Exception ex) {
+        // 추후 ex.getMessage() 로깅 추가 필요
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(TotyResponse.error(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."));
+    }
 }
