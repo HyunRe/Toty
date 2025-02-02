@@ -31,7 +31,7 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         System.out.println("AuthSuccessHandler.onAuthenticationSuccess");
         // * accessToken, refreshToken 발급
         String accessToken = jwtTokenUtil.generateToken(authentication.getName(), ACCESS_TOKEN_TTL);
-        String refreshToken = jwtTokenUtil.generateRefreshToken(REFRESH_TOKEN_TTL);
+        String refreshToken = jwtTokenUtil.generateToken(authentication.getName(),REFRESH_TOKEN_TTL);
 
         // * 헤더에 쿠키를 포함해 클라이언트에게 전달
         response.addCookie(jwtTokenUtil.createCookie("accessToken", accessToken, false));
@@ -44,6 +44,9 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         request.setAttribute("msg", "로그인에 성공했습니다.");
         request.setAttribute("url", "/home");
         request.getRequestDispatcher("/alert").forward(request, response);
+
+        System.out.println("accessToken: "+ accessToken);
+        System.out.println("refreshToken: "+ refreshToken);
     }
 
 }

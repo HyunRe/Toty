@@ -2,7 +2,9 @@ package com.toty.security;
 
 import com.toty.jwt.CustomAuthenticationEntryPoint;
 import com.toty.jwt.JwtRequestFilter;
-import com.toty.jwt.RefreshTokenValidationFilter;
+import com.toty.jwt.JwtTokenUtil;
+import com.toty.jwt.RefreshTokenAuthenticationFilter;
+import com.toty.jwt.RefreshTokenValidationFilter2;
 import com.toty.user.domain.model.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -10,20 +12,22 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.savedrequest.CookieRequestCache;
 
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
 
     // 추가 예정
 //    @Autowired
@@ -33,25 +37,24 @@ public class SecurityConfig {
 
     private final AuthenticationSuccessHandler authSuccessHandler;
     private final JwtRequestFilter jwtRequestFilter;
-    private final RefreshTokenValidationFilter refreshTokenValidationFilter;
+    private final RefreshTokenValidationFilter2 refreshTokenValidationFilter2;
+    private final JwtTokenUtil jwtTokenUtil;
     private final CookieRequestCache cookieRequestCache;
 
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager am) throws Exception {
         http.csrf(auth -> auth.disable())       // CSRF 방어 기능 비활성화
                 .headers(x -> x.frameOptions(y -> y.disable()))
                 .authorizeHttpRequests(requests -> requests
 //                        .requestMatchers(HttpMethod.POST, "").hasRole(String.valueOf(Role.USER))
-//                        .requestMatchers("").hasRole(String.valueOf(Role.USER))
+                        .requestMatchers("/api/users/test").hasRole(String.valueOf(Role.USER))
 //                        .requestMatchers(HttpMethod.POST, "").hasRole(String.valueOf(Role.MENTOR))
 //                        .requestMatchers("").hasRole(String.valueOf(Role.MENTOR))
 //                        .requestMatchers("").hasRole(String.valueOf(Role.ADMIN))
-
                         .anyRequest().permitAll()
                 )
                 .formLogin(auth -> auth
-                        .loginPage("/home") // template return url
+//                        .loginPage("/home") // template return url
                         .loginProcessingUrl("/api/users/sign-in")  // post 엔드포인트
                         .usernameParameter("email")
                         .passwordParameter("pwd")
@@ -76,21 +79,31 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                ) // 세션 비활성화
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .requestCache(requestCache -> requestCache
                         .requestCache(cookieRequestCache));
 
         // 토큰 관련 Filter 추가
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // /api/users/sign-in, /api/auth/refresh 제외 모든 경로
-        http.addFilterBefore(refreshTokenValidationFilter, JwtRequestFilter.class); // /api/auth/refresh 경로만
+//        http.addFilterBefore(refreshTokenAuthenticationFilter(am), UsernamePasswordAuthenticationFilter.class); // /api/auth/refresh 만
+        http.addFilterAfter(refreshTokenValidationFilter2, ExceptionTranslationFilter.class); // /api/auth/refresh 경로만 -> ok면
 
         return http.build();
     }
 
+    // 방화벽
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.httpFirewall(defaultHttpFirewall());
+    }
+
+    @Bean
+    public HttpFirewall defaultHttpFirewall() {
+        return new DefaultHttpFirewall();
+    }
+
+    @Bean
+    public RefreshTokenAuthenticationFilter refreshTokenAuthenticationFilter(AuthenticationManager authenticationManager) {
+        return new RefreshTokenAuthenticationFilter(authenticationManager, jwtTokenUtil);
     }
 }

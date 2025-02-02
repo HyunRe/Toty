@@ -1,22 +1,26 @@
 package com.toty.jwt;
 
+import com.toty.redisConfig.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.Cookie;
+import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 // * 리프레시 토큰 발행 메서드 추가, createCookie 메서드 jwtRequestFilter에서 여기로 옮겨옴
 @Component
+@RequiredArgsConstructor
 public class JwtTokenUtil {
     private String SECRET_KEY = "BESP2JupiterELASTICSEARCHPROJECTWOWOWOWOWOWOWOWOWOWOWO";
-
+    private final RedisService redisService;
     // * TTL 설정
-    public static final long ACCESS_TOKEN_TTL = 1000*60*60; // 액세스 토큰 수명 1시간
+    public static final long ACCESS_TOKEN_TTL = 1000*10; // 액세스 토큰 수명 1시간
     public static final long REFRESH_TOKEN_TTL = 1000*60*60*24*14; // 액세스 토큰 수명 2주
 
     private Claims extractAllClaims(String token) {
@@ -54,6 +58,7 @@ public class JwtTokenUtil {
                 .compact();
     }
 
+    // 삭제 예정 -> 만료된 액세스 토큰에서 사용자 이름 추출 불가능함
     private String createRefreshToken(long TTL) {
         return Jwts.builder()
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -91,6 +96,10 @@ public class JwtTokenUtil {
         }
         cookie.setHttpOnly(true);
         return cookie;
+    }
+
+    void storeRefreshToken(String username, String newRefreshToken){
+        redisService.setData(username, newRefreshToken, Duration.ofMillis(REFRESH_TOKEN_TTL));
     }
 
 }
