@@ -48,19 +48,20 @@ public class User {
     @Column(name = "status_message")
     private String statusMessage;
 
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted", columnDefinition = "TINYINT(0)")
     private boolean isDeleted = false;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
     @Builder
-    public User(String email, String password, String nickname, String phoneNumber, LoginProvider loginProvider) {
+    public User(String email, String password, String nickname, String phoneNumber, LoginProvider loginProvider, boolean isDeleted) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
         this.loginProvider = loginProvider;
+        this.isDeleted = isDeleted;
     }
 
     public void updateInfo(UserInfoUpdateRequest newInfo, String imgPath) {

@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Getter
 public class SubscribeInfo {
 
-    @Column(name = "email_subscribed")
+    @Column(name = "email_subscribed", columnDefinition = "TINYINT(0)")
     private boolean emailSubscribed;
 
-    @Column(name = "sms_subscribed")
+    @Column(name = "sms_subscribed", columnDefinition = "TINYINT(0)")
     private boolean smsSubscribed;
 
     public SubscribeInfo(boolean emailSubscribed, boolean smsSubscribed) {
