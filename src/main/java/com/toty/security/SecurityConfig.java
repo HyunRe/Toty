@@ -4,13 +4,11 @@ import com.toty.jwt.CustomAuthenticationEntryPoint;
 import com.toty.jwt.JwtRequestFilter;
 import com.toty.jwt.JwtTokenUtil;
 import com.toty.jwt.RefreshTokenAuthenticationFilter;
-import com.toty.jwt.RefreshTokenValidationFilter2;
+import com.toty.jwt.AccessTokenValidationFilter;
 import com.toty.user.domain.model.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -37,7 +35,7 @@ public class SecurityConfig {
 
     private final AuthenticationSuccessHandler authSuccessHandler;
     private final JwtRequestFilter jwtRequestFilter;
-    private final RefreshTokenValidationFilter2 refreshTokenValidationFilter2;
+    private final AccessTokenValidationFilter accessTokenValidationFilter;
     private final JwtTokenUtil jwtTokenUtil;
     private final CookieRequestCache cookieRequestCache;
 
@@ -86,7 +84,7 @@ public class SecurityConfig {
         // 토큰 관련 Filter 추가
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // /api/users/sign-in, /api/auth/refresh 제외 모든 경로
 //        http.addFilterBefore(refreshTokenAuthenticationFilter(am), UsernamePasswordAuthenticationFilter.class); // /api/auth/refresh 만
-        http.addFilterAfter(refreshTokenValidationFilter2, ExceptionTranslationFilter.class); // /api/auth/refresh 경로만 -> ok면
+        http.addFilterAfter(accessTokenValidationFilter, ExceptionTranslationFilter.class); // /api/auth/refresh 경로만 -> ok면
 
         return http.build();
     }
