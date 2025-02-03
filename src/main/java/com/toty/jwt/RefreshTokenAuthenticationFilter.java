@@ -3,22 +3,18 @@ package com.toty.jwt;
 import static com.toty.jwt.JwtTokenUtil.ACCESS_TOKEN_TTL;
 import static com.toty.jwt.JwtTokenUtil.REFRESH_TOKEN_TTL;
 
-import com.toty.redisConfig.RedisService;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLOutput;
-import java.time.Duration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.savedrequest.CookieRequestCache;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +23,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class RefreshTokenAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-//    private final TokenProvider jwtTokenProvider;
     private final JwtTokenUtil jwtTokenUtil;
 
     private String username;
@@ -35,7 +30,12 @@ public class RefreshTokenAuthenticationFilter extends AbstractAuthenticationProc
     public RefreshTokenAuthenticationFilter(TokenProvider authenticationManager, JwtTokenUtil jwtTokenUtil) {
         super(new AntPathRequestMatcher("/api/auth/refresh", "GET")); // 특정 요청만 필터링
         setAuthenticationManager(new ProviderManager(authenticationManager));
-//        this.jwtTokenProvider = jwtTokenProvider;
+
+        SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
+        successHandler.setRequestCache(new CookieRequestCache());
+
+        setAuthenticationSuccessHandler(successHandler);
+
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
@@ -74,6 +74,10 @@ public class RefreshTokenAuthenticationFilter extends AbstractAuthenticationProc
     protected void successfulAuthentication(HttpServletRequest request,
             HttpServletResponse response, FilterChain chain, Authentication authResult)
             throws IOException, ServletException {
+        System.out.println("--------------requestCache 내 내용---------------");
+
+
+
         // 새로 발급하고 response에 넣는 과정
         String newAccessToken = jwtTokenUtil.generateToken(username, ACCESS_TOKEN_TTL);
         String newRefreshToken = jwtTokenUtil.generateToken(username, REFRESH_TOKEN_TTL);
