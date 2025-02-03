@@ -48,23 +48,21 @@ public class RefreshTokenAuthenticationFilter extends AbstractAuthenticationProc
         // 쿠키에 있는 리프레시 + 인증 토큰
         // 인증토큰 -> 만료 확인, username까지 있는거 확인 -> refresh를 token으로 해서 넣기
         Cookie[] cookies = request.getCookies();
-        String accessToken = "";
         String refreshToken = "";
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("accessToken")) {
-                    accessToken = cookie.getValue();
-                } else if (cookie.getName().equals("refreshToken")) {
+                if (cookie.getName().equals("refreshToken")) {
                     refreshToken = cookie.getValue();
                 }
             }
         }
 
-        String foundRefreshToken = "";
+        if (refreshToken.isBlank()) {
+            throw new RefreshTokenExpiredException("쿠키에 저장된 리프레시 토큰 없음");
+        }
 
         username = jwtTokenUtil.extractUsername(refreshToken);
         System.out.println("username = " + username);
-
 
         // 리프레시 토큰 유효성 검사
         System.out.println("RefreshTokenAuthenticationFilter.attemptAuthentication");

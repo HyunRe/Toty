@@ -27,21 +27,20 @@ public class TokenProvider implements AuthenticationProvider {
         String username = (String) authentication.getPrincipal();
         String refreshToken = (String) authentication.getCredentials();
 
-        // refresh 유효한지 확인
+        // refresh 유효성 확인
         String foundRefreshToken = redisService.getData(username);
-//        String foundRefreshToken = redisService.getData("username");
         if (foundRefreshToken == null) {
-            throw new RefreshTokenExpiredException("refreshToken 만료됨.");
-        }
-        if (!foundRefreshToken.equals(refreshToken)) {
-            throw new BadCredentialsException("refreshToken이 일치하지 않음.");
+            throw new RefreshTokenExpiredException("db에 "+ username + " 리프레시 토큰 없음");
         }
 
         try {
             boolean isExpired = jwtTokenUtil.isTokenExpired(foundRefreshToken);
         } catch (ExpiredJwtException ex) {
-            // todo
-            // throw new RefreshTokenExpiredException("refreshToken 만료됨.");
+             throw new RefreshTokenExpiredException("refreshToken 만료됨.");
+        }
+
+        if (!foundRefreshToken.equals(refreshToken)) {
+            throw new BadCredentialsException("리프레시 토큰 일치하지 않음.");
         }
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(username); // throw usernamenotfoundException
