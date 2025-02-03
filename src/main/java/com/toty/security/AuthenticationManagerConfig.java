@@ -21,8 +21,10 @@ public class AuthenticationManagerConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+
+    // 폼로그인용 provider
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider formLoginAuthenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(bCryptPasswordEncoder);

@@ -37,7 +37,7 @@ public class AccessTokenValidationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain chain) throws ServletException, IOException {
 
-        System.out.println("RefreshTokenValidationFilter2---------");
+        System.out.println("AccessTokenValidationFilter---------");
         String accessToken = "";
 
         Cookie[] cookies = request.getCookies();

@@ -1,19 +1,14 @@
 package com.toty.jwt;
 
-import static com.toty.jwt.JwtTokenUtil.ACCESS_TOKEN_TTL;
-import static com.toty.jwt.JwtTokenUtil.REFRESH_TOKEN_TTL;
-
 import com.toty.redisConfig.RedisService;
-import com.toty.security.authentication.MyUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
-import java.time.Duration;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 //인증논리 구현하는 부분.
@@ -23,7 +18,7 @@ public class TokenProvider implements AuthenticationProvider {
 
     private final JwtTokenUtil jwtTokenUtil;
     private final RedisService redisService;
-    private final MyUserDetailsService myUserDetailsService;
+    private final UserDetailsService userDetailsService;
 
     @Override
     public Authentication authenticate(Authentication authentication)
@@ -41,14 +36,15 @@ public class TokenProvider implements AuthenticationProvider {
         if (!foundRefreshToken.equals(refreshToken)) {
             throw new BadCredentialsException("refreshToken이 일치하지 않음.");
         }
+
         try {
-            // todo refresh 토큰에 username 넣어서 논리 구체적으로 구현
             boolean isExpired = jwtTokenUtil.isTokenExpired(foundRefreshToken);
         } catch (ExpiredJwtException ex) {
-            throw new RefreshTokenExpiredException("refreshToken 만료됨.");
+            // todo
+            // throw new RefreshTokenExpiredException("refreshToken 만료됨.");
         }
 
-        UserDetails userDetails = myUserDetailsService.loadUserByUsername(username); // throw usernamenotfoundException
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username); // throw usernamenotfoundException
         return new TokenAuthentication(userDetails, null,
                 userDetails.getAuthorities());
     }

@@ -3,7 +3,6 @@ package com.toty.security;
 import com.toty.jwt.CustomAuthenticationEntryPoint;
 import com.toty.jwt.JwtRequestFilter;
 import com.toty.jwt.JwtTokenUtil;
-import com.toty.jwt.RefreshTokenAuthenticationFilter;
 import com.toty.jwt.AccessTokenValidationFilter;
 import com.toty.user.domain.model.Role;
 import lombok.RequiredArgsConstructor;
@@ -100,8 +99,4 @@ public class SecurityConfig {
         return new DefaultHttpFirewall();
     }
 
-    @Bean
-    public RefreshTokenAuthenticationFilter refreshTokenAuthenticationFilter(AuthenticationManager authenticationManager) {
-        return new RefreshTokenAuthenticationFilter(authenticationManager, jwtTokenUtil);
-    }
 }
