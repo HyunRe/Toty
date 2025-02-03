@@ -15,6 +15,7 @@ import java.sql.SQLOutput;
 import java.time.Duration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -23,7 +24,7 @@ import org.springframework.stereotype.Component;
 
 
 // 액세스 토큰 만료 시 리프레시 토큰 갱신 필터
-//@Component
+@Component
 public class RefreshTokenAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
 //    private final TokenProvider jwtTokenProvider;
@@ -31,9 +32,9 @@ public class RefreshTokenAuthenticationFilter extends AbstractAuthenticationProc
 
     private String username;
 
-    public RefreshTokenAuthenticationFilter(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil) {
+    public RefreshTokenAuthenticationFilter(TokenProvider authenticationManager, JwtTokenUtil jwtTokenUtil) {
         super(new AntPathRequestMatcher("/api/auth/refresh", "GET")); // 특정 요청만 필터링
-        setAuthenticationManager(authenticationManager);
+        setAuthenticationManager(new ProviderManager(authenticationManager));
 //        this.jwtTokenProvider = jwtTokenProvider;
         this.jwtTokenUtil = jwtTokenUtil;
     }
@@ -58,18 +59,13 @@ public class RefreshTokenAuthenticationFilter extends AbstractAuthenticationProc
             }
         }
 
-        username = "";
         String foundRefreshToken = "";
 
-        try {
-            username = jwtTokenUtil.extractUsername(refreshToken);
-            System.out.println("username = " + username);
-        } catch (ExpiredJwtException e) {
-            username = "sarah23162@naver.com";
-        }
+        username = jwtTokenUtil.extractUsername(refreshToken);
+        System.out.println("username = " + username);
+
 
         // 리프레시 토큰 유효성 검사
-        //Authentication auth = jwtTokenProvider.authenticate(new TokenAuthentication(username, refreshToken));
         System.out.println("RefreshTokenAuthenticationFilter.attemptAuthentication");
         return getAuthenticationManager().authenticate(new TokenAuthentication(username, refreshToken));
     }
