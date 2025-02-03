@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .headers(x -> x.frameOptions(y -> y.disable()))
                 .authorizeHttpRequests(requests -> requests
 //                        .requestMatchers(HttpMethod.POST, "").hasRole(String.valueOf(Role.USER))
-                        .requestMatchers("/api/users/test").hasRole(String.valueOf(Role.USER))
+                        .requestMatchers("/api/users/test").hasAuthority("USER")
 //                        .requestMatchers(HttpMethod.POST, "").hasRole(String.valueOf(Role.MENTOR))
 //                        .requestMatchers("").hasRole(String.valueOf(Role.MENTOR))
 //                        .requestMatchers("").hasRole(String.valueOf(Role.ADMIN))
