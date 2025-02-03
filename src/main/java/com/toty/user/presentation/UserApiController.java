@@ -24,6 +24,12 @@ public class UserApiController {
     private final UserSignUpService userSignUpService;
     private final UserInfoService userInfoService;
 
+    @GetMapping("/test")
+    public ResponseEntity test(@CurrentUser User user) {
+        System.out.println("arrive");
+        return ResponseEntity.ok(user);
+    }
+
     // 회원 가입
     @PostMapping("/signup")
     public ResponseEntity<Long> signUp(@RequestBody UserSignUpRequest userSignUpRequest) {
