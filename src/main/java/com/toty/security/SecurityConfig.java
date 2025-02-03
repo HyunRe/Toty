@@ -40,7 +40,7 @@ public class SecurityConfig {
     private final CookieRequestCache cookieRequestCache;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager am) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(auth -> auth.disable())       // CSRF 방어 기능 비활성화
                 .headers(x -> x.frameOptions(y -> y.disable()))
                 .authorizeHttpRequests(requests -> requests

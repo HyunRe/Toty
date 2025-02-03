@@ -1,6 +1,5 @@
 package com.toty.security.authentication;
 
-import com.toty.user.application.UserService;
 import com.toty.user.domain.model.LoginProvider;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.repository.UserRepository;
