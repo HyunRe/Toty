@@ -3,8 +3,9 @@ package com.toty.jwt;
 import java.util.Collection;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
-public class TokenAuthentication extends UsernamePasswordAuthenticationToken {
+public class TokenAuthentication extends PreAuthenticatedAuthenticationToken {
 
     public TokenAuthentication(Object principal, Object credentials) {
         super(principal, credentials);
