@@ -20,7 +20,7 @@ public class JwtTokenUtil {
     private String SECRET_KEY = "BESP2JupiterELASTICSEARCHPROJECTWOWOWOWOWOWOWOWOWOWOWO";
     private final RedisService redisService;
     // * TTL 설정
-    public static final long ACCESS_TOKEN_TTL = 1000*60*60; // 액세스 토큰 수명 1시간
+    public static final long ACCESS_TOKEN_TTL = 1000*5; // 액세스 토큰 수명 1시간
     public static final long REFRESH_TOKEN_TTL = 1000*60*60*24*14; // 액세스 토큰 수명 2주
 
     private Claims extractAllClaims(String token) {
@@ -98,7 +98,7 @@ public class JwtTokenUtil {
         return cookie;
     }
 
-    void storeRefreshToken(String username, String newRefreshToken){
+    public void storeRefreshToken(String username, String newRefreshToken){
         redisService.setData(username, newRefreshToken, Duration.ofMillis(REFRESH_TOKEN_TTL));
     }
 

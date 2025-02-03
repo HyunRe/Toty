@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.savedrequest.CookieRequestCache;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
@@ -27,15 +28,15 @@ public class RefreshTokenAuthenticationFilter extends AbstractAuthenticationProc
 
     private String username;
 
-    public RefreshTokenAuthenticationFilter(TokenProvider authenticationManager, JwtTokenUtil jwtTokenUtil) {
+    public RefreshTokenAuthenticationFilter(TokenProvider authenticationManager, JwtTokenUtil jwtTokenUtil, SimpleUrlAuthenticationFailureHandler failurehandler) {
         super(new AntPathRequestMatcher("/api/auth/refresh", "GET")); // 특정 요청만 필터링
         setAuthenticationManager(new ProviderManager(authenticationManager));
 
         SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
         successHandler.setRequestCache(new CookieRequestCache());
-
         setAuthenticationSuccessHandler(successHandler);
 
+        setAuthenticationFailureHandler(failurehandler);
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
@@ -75,8 +76,6 @@ public class RefreshTokenAuthenticationFilter extends AbstractAuthenticationProc
             HttpServletResponse response, FilterChain chain, Authentication authResult)
             throws IOException, ServletException {
         System.out.println("--------------requestCache 내 내용---------------");
-
-
 
         // 새로 발급하고 response에 넣는 과정
         String newAccessToken = jwtTokenUtil.generateToken(username, ACCESS_TOKEN_TTL);
