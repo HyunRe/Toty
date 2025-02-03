@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequiredArgsConstructor
@@ -16,9 +15,9 @@ public class PageController {
         return "home";
     }
 
-    // 로그인 오류 시 메세지 띄우기
+    // 로그인 시 메세지 띄우기
     @PostMapping("/alert")
-    public String loginError() {
+    public String alert() {
         return "common/alertMsg";
     }
 
