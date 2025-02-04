@@ -1,7 +1,7 @@
 package com.toty.user.presentation;
 
 import com.toty.user.application.UserService;
-import com.toty.user.domain.User;
+import com.toty.user.domain.model.User;
 import com.toty.user.presentation.dto.request.UserSignUpRequest;
 import com.toty.user.presentation.dto.response.UserInfoResponse;
 import lombok.RequiredArgsConstructor;

@@ -2,7 +2,7 @@ package com.toty.post.domain.repository;
 
 import com.toty.post.domain.model.Post;
 import com.toty.post.domain.model.PostLike;
-import com.toty.user.domain.User;
+import com.toty.user.domain.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

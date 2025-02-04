@@ -32,7 +32,19 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	// valid
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	// redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	// firebase
+	implementation 'com.google.firebase:firebase-admin:6.8.1'
+	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
+	// email
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	// sms
+	implementation 'net.nurigo:sdk:4.2.7'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'io.rest-assured:rest-assured:5.3.1'

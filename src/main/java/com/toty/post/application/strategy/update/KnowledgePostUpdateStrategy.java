@@ -3,7 +3,6 @@ package com.toty.post.application.strategy.update;
 import com.toty.post.application.PostImageService;
 import com.toty.post.domain.model.Post;
 import com.toty.post.presentation.dto.request.PostUpdateRequest;
-import com.toty.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

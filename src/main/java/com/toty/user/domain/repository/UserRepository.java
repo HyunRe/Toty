@@ -1,5 +1,6 @@
-package com.toty.user.domain;
+package com.toty.user.domain.repository;
 
+import com.toty.user.domain.model.User;
 import org.springframework.data.repository.Repository;
 
 import java.util.Optional;

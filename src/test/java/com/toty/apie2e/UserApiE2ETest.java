@@ -1,7 +1,7 @@
 package com.toty.apie2e;
 
-import com.toty.user.domain.User;
-import com.toty.user.domain.UserRepository;
+import com.toty.user.domain.model.User;
+import com.toty.user.domain.repository.UserRepository;
 import com.toty.user.presentation.dto.request.UserSignUpRequest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;

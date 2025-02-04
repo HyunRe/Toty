@@ -1,4 +1,4 @@
-package com.toty.user.domain;
+package com.toty.user.domain.model;
 
 
 import jakarta.persistence.*;
@@ -27,8 +27,18 @@ public class User {
     @Column(nullable = false)
     private String nickname; // 필수값
 
+    @Column(name = "phone_number")
+    private String phoneNumber; // 폼 로그인 시 필수값
+
     @Column
     private String profileImageUrl;
+
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
+
+    @Embedded
+    private SubscribeInfo subscribeInfo;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserScrape> userScrapes = new ArrayList<>();

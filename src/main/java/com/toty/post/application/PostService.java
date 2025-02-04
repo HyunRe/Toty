@@ -19,8 +19,8 @@ import com.toty.post.presentation.dto.request.PostUpdateRequest;
 import com.toty.post.presentation.dto.response.postdetail.PostDetailResponse;
 import com.toty.post.presentation.dto.response.postlist.GeneralPostListResponse;
 import com.toty.post.presentation.dto.response.postlist.PostListResponse;
-import com.toty.user.domain.User;
-import com.toty.user.domain.UserRepository;
+import com.toty.user.domain.model.User;
+import com.toty.user.domain.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,7 +30,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

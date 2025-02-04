@@ -8,7 +8,7 @@ import com.toty.post.domain.model.Post;
 import com.toty.post.presentation.dto.request.PostCreateRequest;
 import com.toty.post.presentation.dto.request.PostUpdateRequest;
 import com.toty.post.presentation.dto.response.postdetail.PostDetailResponse;
-import com.toty.user.domain.User;
+import com.toty.user.domain.model.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
