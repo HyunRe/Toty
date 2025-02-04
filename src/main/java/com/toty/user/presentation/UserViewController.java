@@ -19,6 +19,7 @@ public class UserViewController {
     private final UserSignUpService userSignUpService;
     private final UserInfoService userInfoService;
 
+    // 회원 가입 페이지 반환
     @GetMapping("/signup")
     public String signup(){
         return "user/signup";
@@ -28,7 +29,7 @@ public class UserViewController {
     @PostMapping("/signup")
     public String signUp(@RequestBody UserSignUpRequest userSignUpRequest, Model model) {
         userSignUpService.signUp(userSignUpRequest);
-        return "redirect:/home";
+        return "redirect:/api/users/home";
     }
 
     // 정보 수정(View)
