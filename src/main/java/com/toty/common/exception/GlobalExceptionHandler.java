@@ -1,6 +1,6 @@
-package com.toty.global.exception;
+package com.toty.common.exception;
 
-import com.toty.global.response.TotyResponse;
+import com.toty.common.response.TotyResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;

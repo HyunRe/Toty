@@ -1,6 +1,6 @@
-package com.toty.global.response;
+package com.toty.common.response;
 
-import com.toty.global.exception.ErrorCode;
+import com.toty.common.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,6 @@
 package com.toty.user.presentation;
 
-import com.toty.global.annotation.CurrentUser;
-import com.toty.user.dto.response.SmsAuthCodeResponse;
+import com.toty.common.annotation.CurrentUser;
 import com.toty.user.application.UserInfoService;
 import com.toty.user.application.UserService;
 import com.toty.user.application.UserSignUpService;

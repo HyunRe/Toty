@@ -1,6 +1,6 @@
 package com.toty.following.presentation;
 
-import com.toty.global.annotation.CurrentUser;
+import com.toty.common.annotation.CurrentUser;
 import com.toty.following.application.FollowService;
 import com.toty.following.dto.request.FollowingRequest;
 import com.toty.following.dto.response.FollowingListResponse;

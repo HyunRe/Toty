@@ -1,4 +1,4 @@
-package com.toty.global.exception;
+package com.toty.common.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

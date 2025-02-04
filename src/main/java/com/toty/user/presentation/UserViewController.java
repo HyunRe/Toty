@@ -1,6 +1,6 @@
 package com.toty.user.presentation;
 
-import com.toty.global.annotation.CurrentUser;
+import com.toty.common.annotation.CurrentUser;
 import com.toty.user.application.UserInfoService;
 import com.toty.user.application.UserSignUpService;
 import com.toty.user.domain.model.User;
