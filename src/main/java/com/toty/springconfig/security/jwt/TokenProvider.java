@@ -1,6 +1,6 @@
-package com.toty.jwt;
+package com.toty.springconfig.security.jwt;
 
-import com.toty.redisConfig.RedisService;
+import com.toty.springconfig.redis.RedisService;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;

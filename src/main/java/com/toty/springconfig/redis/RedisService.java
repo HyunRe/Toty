@@ -1,4 +1,4 @@
-package com.toty.redisConfig;
+package com.toty.springconfig.redis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

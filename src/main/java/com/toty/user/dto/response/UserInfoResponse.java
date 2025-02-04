@@ -3,8 +3,6 @@ package com.toty.user.dto.response;
 import com.toty.Tag;
 import java.util.List;
 
-import com.toty.user.domain.model.SubscribeInfo;
-import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Getter;
 

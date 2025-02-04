@@ -1,6 +1,5 @@
 package com.toty;
 
-import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

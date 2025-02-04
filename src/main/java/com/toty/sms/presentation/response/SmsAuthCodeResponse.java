@@ -1,6 +1,5 @@
 package com.toty.sms.presentation.response;
 
-import com.toty.sms.application.SmsService.PostCategory;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

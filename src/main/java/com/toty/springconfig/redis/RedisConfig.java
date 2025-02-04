@@ -1,4 +1,4 @@
-package com.toty.redisConfig;
+package com.toty.springconfig.redis;
 
 
 import org.springframework.beans.factory.annotation.Value;

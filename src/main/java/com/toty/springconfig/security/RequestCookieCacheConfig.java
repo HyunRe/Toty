@@ -1,4 +1,4 @@
-package com.toty.security;
+package com.toty.springconfig.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

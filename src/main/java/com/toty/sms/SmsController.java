@@ -39,5 +39,4 @@ public class SmsController {
         MultipleDetailMessageSentResponse smsResponseDto = smsService.sendChatRoomGroup(request);
         return ResponseEntity.ok().body(smsResponseDto);
     }
-
 }

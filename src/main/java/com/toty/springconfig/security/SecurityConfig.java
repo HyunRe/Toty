@@ -1,10 +1,8 @@
-package com.toty.security;
+package com.toty.springconfig.security;
 
-import com.toty.jwt.CustomAuthenticationEntryPoint;
-import com.toty.jwt.JwtRequestFilter;
-import com.toty.jwt.JwtTokenUtil;
-import com.toty.jwt.AccessTokenValidationFilter;
-import com.toty.user.domain.model.Role;
+import com.toty.springconfig.security.jwt.CustomAuthenticationEntryPoint;
+import com.toty.springconfig.security.jwt.JwtRequestFilter;
+import com.toty.springconfig.security.jwt.AccessTokenValidationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

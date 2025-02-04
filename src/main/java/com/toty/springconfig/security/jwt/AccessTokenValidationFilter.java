@@ -1,7 +1,7 @@
-package com.toty.jwt;
+package com.toty.springconfig.security.jwt;
 
-import com.toty.redisConfig.RedisService;
-import com.toty.security.authentication.MyUserDetailsService;
+import com.toty.springconfig.redis.RedisService;
+import com.toty.springconfig.security.authentication.MyUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

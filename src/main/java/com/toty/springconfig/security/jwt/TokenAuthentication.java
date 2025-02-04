@@ -1,7 +1,7 @@
-package com.toty.jwt;
+package com.toty.springconfig.security.jwt;
 
 import java.util.Collection;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 

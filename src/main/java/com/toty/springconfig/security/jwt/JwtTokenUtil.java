@@ -1,6 +1,6 @@
-package com.toty.jwt;
+package com.toty.springconfig.security.jwt;
 
-import com.toty.redisConfig.RedisService;
+import com.toty.springconfig.redis.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

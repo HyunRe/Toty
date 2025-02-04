@@ -1,4 +1,4 @@
-package com.toty.security.authentication;
+package com.toty.springconfig.security.authentication;
 
 import java.util.Collection;
 import java.util.List;

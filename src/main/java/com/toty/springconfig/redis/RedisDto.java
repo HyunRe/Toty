@@ -1,4 +1,4 @@
-package com.toty.redisConfig;
+package com.toty.springconfig.redis;
 
 import java.time.Duration;
 import lombok.AccessLevel;

@@ -1,4 +1,4 @@
-package com.toty.jwt;
+package com.toty.springconfig.security.jwt;
 
 import org.springframework.security.core.AuthenticationException;
 

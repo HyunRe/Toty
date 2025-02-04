@@ -1,7 +1,7 @@
-package com.toty.jwt;
+package com.toty.springconfig.security.jwt;
 
-import static com.toty.jwt.JwtTokenUtil.ACCESS_TOKEN_TTL;
-import static com.toty.jwt.JwtTokenUtil.REFRESH_TOKEN_TTL;
+import static com.toty.springconfig.security.jwt.JwtTokenUtil.ACCESS_TOKEN_TTL;
+import static com.toty.springconfig.security.jwt.JwtTokenUtil.REFRESH_TOKEN_TTL;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

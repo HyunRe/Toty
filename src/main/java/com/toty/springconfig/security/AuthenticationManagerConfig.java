@@ -1,4 +1,4 @@
-package com.toty.security;
+package com.toty.springconfig.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

@@ -6,7 +6,6 @@ import com.toty.post.domain.model.PostCategory;
 import com.toty.post.presentation.dto.request.PostCreateRequest;
 import com.toty.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 //@Service
 @RequiredArgsConstructor
