@@ -14,27 +14,26 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatRoom {
+public class ChatParticipant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    // 단톡방 개설자
+    // 소속된 단톡방
     @ManyToOne
-    @JoinColumn(name = "mento_id")
-    private User01 mentor;
+    @JoinColumn(name = "room_id")
+    private ChatRoom room;
 
-    // 단톡방 이름
-    private String roomName;
+    // 참석자 이름
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User01 chatter;
 
-    // 참여 제한 인원
-    private int userLimit;
-
-    // 생성 시간
+    // 입장시간
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", insertable = false)
-    private LocalDateTime createdAt; // insertable = false 안해주면 db에 null로 들어감, 아마 jpa가 필드 값을 명시적으로 설정하지 않으면 null로 처리해서 그런듯
+    private LocalDateTime enterAt;
 
-    // 종료 시간
+    // 퇴장시간
     @Column(columnDefinition = "TIMESTAMP")
-    private LocalDateTime endedAt;
+    private LocalDateTime exitAt;
 }

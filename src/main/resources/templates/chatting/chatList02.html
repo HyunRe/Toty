@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- jQuery( JavaScript 라이브러리 ) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <title>Title</title>
+
+    <link href="/css/chatting/chatEx01.css" rel="stylesheet">
+    <link href="/css/chatting/mallList.css" rel="stylesheet">
+    <script src="/js/chatting/chatList02.js"></script>
+
+</head>
+<body>
+    <h1 th:if="${session?.loginUser}">로그인됨 : [[${session.loginUser.userName}]]</h1>
+    <input th:if="${session?.loginUser}" type="hidden" name="uid" class="userId" th:value="${session.loginUser?.uid}">
+    
+    <div class="container">
+        <div class="row">
+
+            <div class="col-4">
+                <h3>회원 추가</h3>
+                <form action="/v02/user" method="post">
+                    <input type="text" name="userName"> <button type="submit">일반 회원</button>
+                </form>
+                <form action="/v02/mentor" method="post">
+                    <input type="text" name="userName"> <button type="submit">멘토</button>
+                </form>
+                <hr>
+                <h2>유저 목록</h2>
+                <table>
+                    <tr>
+                        <th>이름(클릭하면 로그인됨)</th>
+                       
+                        <th>역할</th>
+                        <th>단톡방 개설</th>
+                    </tr>
+                    <tr th:each="user: ${userList}">
+                        <td>
+                            <button class="loginBtn" th:data-user-id="${user.uid}">[[${user.userName}]]</button>
+                        </td>
+                      
+                        <td th:text="${user.role}"></td>
+                        <td>
+                            <div th:if="${user.role.name() == 'MENTOR'}">
+                                <input type="text" th:class="'roomName-' + ${user.uid}" placeholder="단톡방 이름">
+                                <input type="text" th:class="'userLimit-' + ${user.uid}" placeholder="인원 제한">
+                                <button class="createRoom" th:data-user-id="${user.uid}">단톡방 생성</button>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="col-8">
+                <h2>단톡방 목록</h2>
+                <button onclick="fetchRoomList()">채팅방 불러오기</button>
+                
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td style="width: 20%; text-align: center;">
+                                <div>멘토 이름</div>
+                            </td>
+                            <td style="width: 45%;">
+                                <span style="font-weight: bold;" >단톡방 이름</span> <!-- th:text="${user.uname}" -->
+                                <!-- 
+
+                                 <input type="hidden" id="userId" > 
+                                th:value="${user.uid}" -->
+                            </td>
+                            <td style="width: 20%; text-align: right;">
+                                <div>제한인원</div>
+                            </td>
+                            <td style="width: 20%;">
+                                채팅 참석
+                            </td>
+                        </tr>
+                    </thead>
+
+                    <!-- js파일에 있음, Room List( 동적으로 바뀜 ) -->
+                    <tbody></tbody>
+
+                </table>
+                <div class="row">
+                    <div class="col-3">
+                      <div class="card mb-2" >
+                        <div class="row">
+                            <div class="col-4">
+                                <img alt="">
+                            </div>
+                            <div class="col-8">
+                                <p>멘토이름</p>
+                            </div>
+                        </div>
+                        <h4>단톡 주제</h4>
+                        <div>개설된 시간</div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>현재인원/제한인원 </span>
+                            <button class="btn btn-primary btn-small">단톡방 참여</a>
+                        </div>
+                        
+                      </div>
+                    </div>
+                    <div class="col-3"></div>
+                    <div class="col-3"></div>
+                    <div class="col-3"></div>
+                </div>
+                <div class="row">
+                    <div class="col-3"></div>
+                    <div class="col-3">
+                        <div class="card mb-2" >
+                          <img class="card-img-top" alt="Card image">
+                          <div class="card-body">
+                            <h4 class="card-title" >책 제목</h4>
+                            <p class="card-text" >저자</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                              <span >가격</span>
+                              <button class="btn btn-primary btn-small">카트에 담기</a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    <div class="col-3"></div>
+                    <div class="col-3"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    
+
+</body>
+<script>
+
+
+
+    /*
+// <ul id="chatRoomList"></ul>
+    function loadChatRooms() {
+        $.ajax({
+            url: '/v01/api/rooms',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                let chatRoomList = $('#chatRoomList');
+                chatRoomList.empty();  // 기존 목록 초기화
+
+                // response는 서버에서 받아온 JSON 데이터( List<GroupChatRoom01> )
+                // room은 response 배열의 개별 요소(객체)를 나타냄
+                // room 객체는 GroupChatRoom01 클래스의 JSON 표현
+
+                response.forEach(room => {
+                    chatRoomList.append('<li>' + room.mentor.userName + ' - ' + room.roomName + ' - 제한인원: ' + room.limitNumber  + '</li>');
+                });
+            },
+            error: function() {
+                alert('채팅방 정보를 불러오는 데 실패했습니다.');
+            }
+        });
+    }
+    */
+
+    
+
+
+</script>
+</html>
