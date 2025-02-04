@@ -1,11 +1,14 @@
 package com.toty.user.application;
 
+import com.toty.springconfig.redis.RedisService;
+import com.toty.user.domain.model.SubscribeInfo;
 import com.toty.user.dto.response.SmsAuthCodeResponse;
 import com.toty.user.domain.model.LoginProvider;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.repository.UserRepository;
 import com.toty.user.dto.request.UserSignUpRequest;
 import jakarta.annotation.PostConstruct;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
@@ -25,7 +28,7 @@ import java.util.Random;
 public class UserSignUpService {
 
     private final UserRepository userRepository;
-
+    private final RedisService redisService;
     private DefaultMessageService messageService;
 
     @PostConstruct
@@ -51,10 +54,12 @@ public class UserSignUpService {
         User user = User.builder()
                 .email(userSignUpRequest.getEmail())
                 .password(hashedPwd)
+                .username(userSignUpRequest.getUsername())
                 .nickname(userSignUpRequest.getNickname())
                 .phoneNumber(userSignUpRequest.getPhoneNumber())
                 .loginProvider(LoginProvider.FORM)
                 .build();
+
         return userRepository.save(user).getId();
     }
 
@@ -91,6 +96,8 @@ public class UserSignUpService {
         String text = ("[Toty] 인증번호[" + authCode + "]를 입력하세요.");
         Message message = createMessage(phoneNumber, text);
 
+        redisService.setData(phoneNumber, authCode, Duration.ofMinutes(5));
+
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
         return authCode;
     }
@@ -101,5 +108,10 @@ public class UserSignUpService {
         message.setTo(to);
         message.setText(text);
         return message;
+    }
+
+    public boolean checkAuthCode(String phoneNumber, String authCode) {
+        String redisAuthCode = redisService.getData(phoneNumber);
+        return authCode.equals(redisAuthCode);
     }
 }
