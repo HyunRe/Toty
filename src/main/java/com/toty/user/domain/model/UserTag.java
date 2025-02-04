@@ -1,6 +1,6 @@
 package com.toty.user.domain.model;
 
-import com.toty.Tag;
+import com.toty.base.domain.model.Tag;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

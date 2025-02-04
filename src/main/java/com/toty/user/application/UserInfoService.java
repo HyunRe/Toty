@@ -1,6 +1,6 @@
 package com.toty.user.application;
 
-import com.toty.Tag;
+import com.toty.base.domain.model.Tag;
 import com.toty.following.domain.FollowingRepository;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.model.UserLink;
