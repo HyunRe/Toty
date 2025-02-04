@@ -58,12 +58,13 @@ public class User {
     private LocalDateTime deletedAt;
 
     @Builder
-    public User(String email, String password, String nickname, String phoneNumber, LoginProvider loginProvider, boolean isDeleted) {
+    public User(String email, String password, String nickname, String phoneNumber, LoginProvider loginProvider, boolean isDeleted, String username) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
         this.loginProvider = loginProvider;
+        this.username = username;
         this.isDeleted = isDeleted;
     }
 
