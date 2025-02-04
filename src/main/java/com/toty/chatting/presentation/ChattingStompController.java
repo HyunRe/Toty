@@ -2,8 +2,8 @@ package com.toty.chatting.presentation;
 
 
 import com.toty.chatting.application.ChatMessageService;
-import com.toty.chatting.dto.RecieveMessage02DTO;
-import com.toty.chatting.dto.SendMessage02DTO;
+import com.toty.chatting.dto.message.RecieveMessage;
+import com.toty.chatting.dto.message.SendMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 
 @Controller
 @Slf4j
-public class Stomp02Controller {
+public class ChattingStompController {
     @Autowired private ChatMessageService chatMessageService;
 
     /*
@@ -23,16 +23,16 @@ public class Stomp02Controller {
      */
     @MessageMapping("/{roomId}")
     @SendTo("/chatRoom/{roomId}/message")
-    public RecieveMessage02DTO hello(SendMessage02DTO sendMessage02DTO
+    public RecieveMessage hello(SendMessage sendMessage
                                 , @DestinationVariable("roomId") long roomId) {
 
-        long senderId = sendMessage02DTO.getSenderId();
-        String sender = sendMessage02DTO.getSender();
-        String message = sendMessage02DTO.getMessage();
+        long senderId = sendMessage.getSenderId();
+        String sender = sendMessage.getSender();
+        String message = sendMessage.getMessage();
 
         chatMessageService.saveMessage(roomId, senderId, message);
 
-        RecieveMessage02DTO msg = RecieveMessage02DTO.builder()
+        RecieveMessage msg = RecieveMessage.builder()
                 .content(message).sender(sender).sendedAt(LocalDateTime.now())
                 .build();
 

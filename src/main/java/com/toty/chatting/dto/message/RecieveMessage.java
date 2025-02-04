@@ -1,4 +1,4 @@
-package com.toty.chatting.dto;
+package com.toty.chatting.dto.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RecieveMessage02DTO {
+public class RecieveMessage {
     private String content;
     private String sender;
     private LocalDateTime sendedAt;

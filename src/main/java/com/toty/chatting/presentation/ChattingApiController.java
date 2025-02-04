@@ -15,7 +15,7 @@ import java.util.List;
 @Slf4j
 @Controller
 @RequestMapping("/v02/api")
-public class Api02Controller {
+public class ChattingApiController {
 
     @Autowired private ChatRoomService chatRoomService;
     @Autowired private User01Service user01Service;

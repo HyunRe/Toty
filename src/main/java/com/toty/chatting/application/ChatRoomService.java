@@ -6,7 +6,7 @@ import com.toty.chatting.domain.model.User01;
 import com.toty.chatting.domain.repository.ChatParticipantRepository;
 import com.toty.chatting.domain.repository.ChatRoomRepository;
 import com.toty.chatting.domain.repository.User01Repository;
-import com.toty.chatting.dto.Participant02DTO;
+import com.toty.chatting.dto.message.ParticipantMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -65,7 +65,7 @@ public class ChatRoomService {
                 long chatter01Id = chatParticipant02.getId();
                 String chatterName = chatParticipant02.getChatter().getUserName();
 
-                Participant02DTO participantDTO = Participant02DTO.builder()
+                ParticipantMessage participantDTO = ParticipantMessage.builder()
                         .chatterId(chatter01Id).chatterName(chatterName).access(0)
                         .build();
 
@@ -97,7 +97,7 @@ public class ChatRoomService {
                 long chatterId = savedChatter.getId();
                 String chatterName = savedChatter.getChatter().getUserName();
 
-                Participant02DTO participantDTO = Participant02DTO.builder()
+                ParticipantMessage participantDTO = ParticipantMessage.builder()
                         .chatterId(chatterId).chatterName(chatterName).access(1)
                         .build();
 

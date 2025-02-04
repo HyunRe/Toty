@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/v02")
-public class View02Controller {
+public class ChattingViewController {
 
     @Autowired
     private User01Repository user01Repository;

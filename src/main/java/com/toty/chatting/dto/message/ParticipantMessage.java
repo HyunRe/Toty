@@ -1,4 +1,4 @@
-package com.toty.chatting.dto;
+package com.toty.chatting.dto.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Participant02DTO {
+public class ParticipantMessage {
     private long chatterId;
     private String chatterName;
     private int access; // 1: 입장,  0: 퇴장
