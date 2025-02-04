@@ -2,21 +2,36 @@ package com.toty.user.presentation;
 
 import com.toty.global.annotation.CurrentUser;
 import com.toty.user.application.UserInfoService;
+import com.toty.user.application.UserSignUpService;
 import com.toty.user.domain.model.User;
+import com.toty.user.dto.request.UserSignUpRequest;
 import com.toty.user.dto.response.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserViewController {
 
+    private final UserSignUpService userSignUpService;
     private final UserInfoService userInfoService;
+
+    @GetMapping("/signup")
+    public String home(){
+        return "user/signup";
+    }
+
+    // 회원 가입
+    @PostMapping("/signup")
+    public String signUp(@RequestBody UserSignUpRequest userSignUpRequest, Model model) {
+        userSignUpService.signUp(userSignUpRequest);
+        return "redirect:/home";
+    }
 
     // 정보 수정(View)
     @GetMapping("/edit-form/{id}")
