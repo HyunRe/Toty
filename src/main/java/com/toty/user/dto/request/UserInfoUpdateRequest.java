@@ -14,6 +14,7 @@ public class UserInfoUpdateRequest {
     private String nickname;
     private boolean emailSubscribed;
     private boolean smsSubscribed;
+    private boolean notification;
     private String statusMessage; // nullable
     private String phoneNumber; // nullable(social)
     private List<Tag> tags; // nullable

@@ -48,7 +48,7 @@ public class User {
     @Column(name = "status_message")
     private String statusMessage;
 
-    @Column(name = "is_deleted", columnDefinition = "TINYINT(0)")
+    @Column(name = "is_deleted", columnDefinition = "TINYINT(1) DEFAULT 0")
     private boolean isDeleted = false;
 
     @Column(name = "deleted_at")
@@ -67,7 +67,7 @@ public class User {
     public void updateInfo(UserInfoUpdateRequest newInfo, String imgPath) {
         this.nickname = newInfo.getNickname();
         this.profileImageUrl = imgPath;
-        this.subscribeInfo = new SubscribeInfo(newInfo.isEmailSubscribed(), newInfo.isSmsSubscribed());
+        this.subscribeInfo = new SubscribeInfo(newInfo.isEmailSubscribed(), newInfo.isSmsSubscribed(), newInfo.isSmsSubscribed());
         this.statusMessage = newInfo.getStatusMessage();
         this.phoneNumber = newInfo.getPhoneNumber();
     }
