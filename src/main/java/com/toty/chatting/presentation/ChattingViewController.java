@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/v02")
+@RequestMapping("/view/chatting")
 public class ChattingViewController {
 
     @Autowired
@@ -34,13 +34,13 @@ public class ChattingViewController {
     public String chatList(Model model) {
         List<User01> userList = user01Repository.findAll();
         model.addAttribute("userList", userList);
-        return "chatting/chatList02";
+        return "chatting/chatList";
     }
 
     /*
         단통방 화면
      */
-    @RequestMapping("/chatRoom")
+    @RequestMapping("/room")
     public String aachr(@RequestParam("rid") long rid, Model model) {
         Optional<ChatRoom> room = chatRoom02Repository.findById(rid);
 
@@ -50,7 +50,7 @@ public class ChattingViewController {
             model.addAttribute("room", room.get());
         }
 
-        return "chatting/chatRoom02";
+        return "chatting/chatRoom";
     }
 
 
@@ -68,7 +68,7 @@ public class ChattingViewController {
                 .build();
 
         user01Repository.save(uu);
-        return "redirect:/v02/list";
+        return "redirect:/view/chatting/list";
     }
 
     /*
@@ -83,7 +83,7 @@ public class ChattingViewController {
                 .build();
 
         user01Repository.save(uu);
-        return "redirect:/v02/list";
+        return "redirect:/view/chatting/list";
     }
 
 }

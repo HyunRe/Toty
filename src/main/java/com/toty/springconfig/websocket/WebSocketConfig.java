@@ -1,4 +1,4 @@
-package com.toty.chatting;
+package com.toty.springconfig.websocket;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
