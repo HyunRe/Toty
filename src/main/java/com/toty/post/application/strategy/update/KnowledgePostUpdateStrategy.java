@@ -4,7 +4,6 @@ import com.toty.post.application.PostImageService;
 import com.toty.post.domain.model.Post;
 import com.toty.post.presentation.dto.request.PostUpdateRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 //@Service
 @RequiredArgsConstructor

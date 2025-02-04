@@ -1,20 +1,17 @@
 package com.toty.user.presentation;
 
-import com.toty.global.annotation.CurrentUser;
+import com.toty.common.annotation.CurrentUser;
 import com.toty.user.application.UserInfoService;
 import com.toty.user.application.UserService;
 import com.toty.user.application.UserSignUpService;
 import com.toty.user.domain.model.User;
 import com.toty.user.dto.request.UserInfoUpdateRequest;
-import com.toty.user.dto.request.UserSignUpRequest;
 import com.toty.user.dto.response.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-// 컨트롤러 요소 빠진 것 없는지,
 //
 @RestController
 @RequestMapping("/api/users")
@@ -24,13 +21,6 @@ public class UserApiController {
     private final UserService userService;
     private final UserSignUpService userSignUpService;
     private final UserInfoService userInfoService;
-
-    // 회원 가입
-    @PostMapping("/signup")
-    public ResponseEntity<Long> signUp(@RequestBody UserSignUpRequest userSignUpRequest) {
-        Long userId = userSignUpService.signUp(userSignUpRequest);
-        return new ResponseEntity<>(userId, HttpStatus.CREATED);
-    }
 
     // 회원가입 - 이메일 중복 확인
     @GetMapping("/check-email")
@@ -43,6 +33,13 @@ public class UserApiController {
     @GetMapping("/check-nickname")
     public ResponseEntity<String> nicknameValidation(@RequestParam(name = "nickname") String nickname) {
         String response = userSignUpService.validateNickname(nickname);
+        return ResponseEntity.ok(response);
+    }
+
+    // 회원가입 - 휴대폰 인증번호 요청
+    @PostMapping("/authcode")
+    public ResponseEntity<String> sendAuthCode(@RequestParam(name = "phoneNumber") String phoneNumber) {
+        String response = userSignUpService.sendAuthCodeMessage(phoneNumber);
         return ResponseEntity.ok(response);
     }
 

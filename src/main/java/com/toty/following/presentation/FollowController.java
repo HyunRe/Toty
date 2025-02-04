@@ -1,15 +1,13 @@
 package com.toty.following.presentation;
 
-import com.toty.global.annotation.CurrentUser;
+import com.toty.common.annotation.CurrentUser;
 import com.toty.following.application.FollowService;
 import com.toty.following.dto.request.FollowingRequest;
 import com.toty.following.dto.response.FollowingListResponse;
 import com.toty.user.domain.model.User;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/follow")

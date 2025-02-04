@@ -2,7 +2,7 @@ package com.toty.post.presentation.controller.api;
 
 import com.toty.base.pagination.PaginationResult;
 import com.toty.base.response.SuccessResponse;
-import com.toty.global.annotation.CurrentUser;
+import com.toty.common.annotation.CurrentUser;
 import com.toty.post.application.PostService;
 import com.toty.post.domain.model.Post;
 import com.toty.post.presentation.dto.request.PostCreateRequest;

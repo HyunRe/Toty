@@ -25,11 +25,14 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "phone_number")
-    private String phoneNumber; // 폼 로그인 시 필수값
+    @Column(name = "username")
+    private String username;
 
     @Column(name = "nickname")
     private String nickname; // 필수값
+
+    @Column(name = "phone_number")
+    private String phoneNumber; // 폼 로그인 시 필수값
 
     @Column(name = "profile_image")
     private String profileImageUrl;
@@ -48,25 +51,26 @@ public class User {
     @Column(name = "status_message")
     private String statusMessage;
 
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted", columnDefinition = "TINYINT(1) DEFAULT 0")
     private boolean isDeleted = false;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
     @Builder
-    public User(String email, String password, String nickname, String phoneNumber, LoginProvider loginProvider) {
+    public User(String email, String password, String nickname, String phoneNumber, LoginProvider loginProvider, boolean isDeleted) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
         this.loginProvider = loginProvider;
+        this.isDeleted = isDeleted;
     }
 
     public void updateInfo(UserInfoUpdateRequest newInfo, String imgPath) {
         this.nickname = newInfo.getNickname();
         this.profileImageUrl = imgPath;
-        this.subscribeInfo = new SubscribeInfo(newInfo.isEmailSubscribed(), newInfo.isSmsSubscribed());
+        this.subscribeInfo = new SubscribeInfo(newInfo.isEmailSubscribed(), newInfo.isSmsSubscribed(), newInfo.isSmsSubscribed());
         this.statusMessage = newInfo.getStatusMessage();
         this.phoneNumber = newInfo.getPhoneNumber();
     }
