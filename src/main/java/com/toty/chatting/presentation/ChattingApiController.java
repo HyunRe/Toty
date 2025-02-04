@@ -14,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @Controller
-@RequestMapping("/v02/api")
+@RequestMapping("/api/chatting")
 public class ChattingApiController {
 
     @Autowired private ChatRoomService chatRoomService;
@@ -29,7 +29,7 @@ public class ChattingApiController {
         chatRoomService.userEnterRoom(rid, uid);
 
         reAtr.addAttribute("rid", rid);
-        return "redirect:/v02/chatRoom";
+        return "redirect:/view/chatting/room";
     }
 
     /*

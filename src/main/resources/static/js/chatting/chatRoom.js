@@ -4,7 +4,7 @@ let roomMentorId, roomId; // 단톡방 정보
 
 function socketSetting() {
     stompClient = new StompJs.Client({ // 웹소켓 url
-        brokerURL: 'ws://localhost:8070/chatRoom-v02-websocket'
+        brokerURL: 'ws://localhost:8070/websocket-chatRoom'
     });
 
     // 로그인한 사용자 정보 
@@ -151,10 +151,10 @@ function exitRoom() {
 
     $.ajax({
         type:"PATCH",
-        url:"/v02/api/rooms/" + roomId + "/" + userId,
+        url:"/api/chatting/rooms/" + roomId + "/" + userId,
         success:async function(response) {
             await disconnect();
-            location.href="/v02/list";
+            location.href="/view/chatting/list";
         },
         error:function(xhr) {
             let response = xhr.responseJSON;
@@ -169,7 +169,7 @@ function endRoom() {
     if (userId === roomMentorId) {
         $.ajax({
             type:"PATCH",
-            url:"/v02/api/rooms/" + roomId ,
+            url:"/api/chatting/rooms/" + roomId ,
             success:async function(response) { },
             error:function(xhr) {
                 let response = xhr.responseJSON;

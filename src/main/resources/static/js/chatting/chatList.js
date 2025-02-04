@@ -2,7 +2,7 @@
 async function fetchRoomList() {
     try {
         const loginId = $(".userId").val();
-        const response = await fetch(`/v02/api/rooms`);
+        const response = await fetch(`/api/chatting/rooms`);
         if (response.ok) {
             const chatterList = await response.json();
             updateRoomList(chatterList, loginId);
@@ -33,7 +33,7 @@ function updateRoomList(roomList, loginId) {
                 </span>
             </td>
             <td>
-                <form action="/v02/api/participant/${room.id}/${loginId}" 
+                <form action="/api/chatting/participant/${room.id}/${loginId}" 
                     method="post">
                     <button type="submit"> 단톡 참석 </button>
                 </form>
@@ -55,7 +55,7 @@ $(document).ready(function() {
     
         $.ajax({
             type:"get",
-            url:"/v02/api/login/" + userId,
+            url:"/api/chatting/login/" + userId,
             success:function(response) {
                 // $(".userId").val(userId);
                 alert(response);
@@ -78,7 +78,7 @@ $(document).ready(function() {
                       }
         $.ajax({
             type:"post",
-            url:"/v02/api/room/" + mId,
+            url:"/api/chatting/room/" + mId,
             data: params,
             success:function(response) {
     
