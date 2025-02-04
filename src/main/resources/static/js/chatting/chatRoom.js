@@ -170,11 +170,11 @@ function endRoom() {
         $.ajax({
             type:"PATCH",
             url:"/api/chatting/rooms/" + roomId ,
-            success:async function(response) { },
+            success:function(response) { },
             error:function(xhr) {
                 let response = xhr.responseJSON;
                 console.log(response);
-                alert("단톡방 종료 오류발생 \n" + response.message);
+                alert("단톡방 종료 오류발생 \n" + response.errorMessage);
             }
         });
     }

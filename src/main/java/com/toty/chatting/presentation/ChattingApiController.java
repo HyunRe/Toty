@@ -6,7 +6,7 @@ import com.toty.chatting.domain.model.ChatRoom;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -26,7 +26,6 @@ public class ChattingApiController {
                 단톡방 입장하기
         단톡방 목록에서
         단톡방별로, 버튼(참여)을 눌러야만 동작하게 설계되있음
-        ( 버튼별로 url 고정되있음 > validatioin필요x, 예외처리에서 처리됨 )
      */
     @PostMapping("/participant/{rid}/{uid}")
     public String enterRoom(@PathVariable("rid") long rid, @PathVariable("uid") long uid
@@ -38,9 +37,8 @@ public class ChattingApiController {
     }
 
     /*
-        채팅방 나가기
+                채팅방 나가기
         단톡방에서 버튼(나가기)을 눌러야만 동작하게 설계되있음
-        ( 매개변수들 동적으로 정해짐, 사용자 입력값이x  >  validatioin필요x, 예외처리에서 처리됨 )
      */
     @PatchMapping("/rooms/{roomId}/{chatterId}")
     @ResponseBody
@@ -49,7 +47,8 @@ public class ChattingApiController {
     }
 
     /*
-        채팅방 종료, 서버에서 클라이언트 웺소켓 종료하는거 시간 걸릴수도
+                채팅방 종료
+        단톡방에서 해당방을 개설한 멘토만 동작 가능
      */
     @PatchMapping("/rooms/{roomId}")
     @ResponseBody
@@ -57,19 +56,9 @@ public class ChattingApiController {
         chatRoomService.mentorEndRoom(roomId);
     }
 
-
     /*
-        사용자 로그인
-     */
-    @GetMapping("/login/{id}")
-    @ResponseBody
-    public String userLogin(HttpSession session, @PathVariable("id") long id) {
-        String result = user01Service.findUserAndLogin(session, id);
-        return result;
-    }
-
-    /*
-        단체 채팅방 생성
+                단체 채팅방 생성
+        validaton필요?
      */
     @PostMapping("/room/{mid}")
     @ResponseBody
@@ -87,5 +76,13 @@ public class ChattingApiController {
         return chatRoomService.getChatRoomList();
     }
 
+
+    // 나중에 삭제할꺼, 사용자 로그인
+    @GetMapping("/login/{id}")
+    @ResponseBody
+    public String userLogin(HttpSession session, @PathVariable("id") long id) {
+        String result = user01Service.findUserAndLogin(session, id);
+        return result;
+    }
 
 }
