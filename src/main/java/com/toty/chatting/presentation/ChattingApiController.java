@@ -21,7 +21,10 @@ public class ChattingApiController {
     @Autowired private User01Service user01Service;
 
     /*
-        단톡방 입장하기
+                단톡방 입장하기
+        단톡방 목록에서
+        단톡방별로, 버튼(참여)을 눌러야만 동작하게 설계되있음
+        ( 버튼별로 url 고정되있음 > validatioin필요x, 예외처리에서 처리됨 )
      */
     @PostMapping("/participant/{rid}/{uid}")
     public String enterRoom(@PathVariable("rid") long rid, @PathVariable("uid") long uid

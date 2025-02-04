@@ -8,6 +8,7 @@ import com.toty.chatting.domain.model.User01;
 import com.toty.chatting.domain.repository.ChatParticipantRepository;
 import com.toty.chatting.domain.repository.ChatRoomRepository;
 import com.toty.chatting.domain.repository.User01Repository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,12 +21,12 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/view/chatting")
+@RequiredArgsConstructor
 public class ChattingViewController {
 
-    @Autowired
-    private User01Repository user01Repository;
-    @Autowired private ChatParticipantRepository chatParticipant02Repository;
-    @Autowired private ChatRoomRepository chatRoom02Repository;
+    private final User01Repository user01Repository;
+    private final ChatParticipantRepository chatParticipant02Repository;
+    private final ChatRoomRepository chatRoom02Repository;
 
     /*
         유저, 단톡방 목록 화면
@@ -38,7 +39,10 @@ public class ChattingViewController {
     }
 
     /*
-        단통방 화면
+                단통방 화면
+        단톡방 목록에서
+        단톡방별로, 버튼(참여)을 눌러야만 입장가능하도록 설계되있음
+        @PostMapping("/participant/{rid}/{uid}")에서 redirect:/view/chatting/room 됨
      */
     @RequestMapping("/room")
     public String aachr(@RequestParam("rid") long rid, Model model) {
@@ -54,11 +58,10 @@ public class ChattingViewController {
     }
 
 
-
     /*
-        프론트에서 form태그 쓰면 브라우저 url이 바뀌어서 redirect해줘야함
-        회원가입(user)
+        아래 2개는 나중에 삭제할꺼
      */
+    // 회원가입(user)
     @PostMapping("/user")
     public String aa12 (@RequestParam("userName") String userName) {
         Role userRole = Role.USER;
@@ -71,9 +74,7 @@ public class ChattingViewController {
         return "redirect:/view/chatting/list";
     }
 
-    /*
-        회원가입(mentor)
-     */
+    // 회원가입(mentor)
     @PostMapping("/mentor")
     public String aa (@RequestParam("userName") String userName) {
         Role userRole = Role.MENTOR;
