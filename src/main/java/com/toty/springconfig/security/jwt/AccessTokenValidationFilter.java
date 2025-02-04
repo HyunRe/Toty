@@ -30,7 +30,7 @@ public class AccessTokenValidationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return path.equals("/api/auth/refresh") || path.equals("/login");
+        return path.equals("/api/auth/refresh") || path.equals("/api/users/login");
     }
 
     @Override
