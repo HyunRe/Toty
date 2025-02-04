@@ -25,11 +25,14 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "phone_number")
-    private String phoneNumber; // 폼 로그인 시 필수값
+    @Column(name = "username")
+    private String username;
 
     @Column(name = "nickname")
     private String nickname; // 필수값
+
+    @Column(name = "phone_number")
+    private String phoneNumber; // 폼 로그인 시 필수값
 
     @Column(name = "profile_image")
     private String profileImageUrl;
