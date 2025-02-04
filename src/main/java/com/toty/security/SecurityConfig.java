@@ -2,21 +2,23 @@ package com.toty.security;
 
 import com.toty.jwt.CustomAuthenticationEntryPoint;
 import com.toty.jwt.JwtRequestFilter;
-import com.toty.jwt.RefreshTokenValidationFilter;
+import com.toty.jwt.JwtTokenUtil;
+import com.toty.jwt.AccessTokenValidationFilter;
 import com.toty.user.domain.model.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.savedrequest.CookieRequestCache;
 
 @RequiredArgsConstructor
@@ -24,40 +26,37 @@ import org.springframework.security.web.savedrequest.CookieRequestCache;
 @EnableWebSecurity
 public class SecurityConfig {
 
-
     // 추가 예정
 //    @Autowired
 //    private AuthenticationFailureHandler failureHandler;
 //    @Autowired
 //    private MyOAuth2UserService myOAuth2UserService;
 
-    private final AuthenticationSuccessHandler authSuccessHandler;
+    private final SavedRequestAwareAuthenticationSuccessHandler formloginsuccess;
     private final JwtRequestFilter jwtRequestFilter;
-    private final RefreshTokenValidationFilter refreshTokenValidationFilter;
+    private final AccessTokenValidationFilter accessTokenValidationFilter;
     private final CookieRequestCache cookieRequestCache;
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(auth -> auth.disable())       // CSRF 방어 기능 비활성화
                 .headers(x -> x.frameOptions(y -> y.disable()))
                 .authorizeHttpRequests(requests -> requests
-//                        .requestMatchers(HttpMethod.POST, "").hasRole(String.valueOf(Role.USER))
-//                        .requestMatchers("").hasRole(String.valueOf(Role.USER))
-//                        .requestMatchers(HttpMethod.POST, "").hasRole(String.valueOf(Role.MENTOR))
-//                        .requestMatchers("").hasRole(String.valueOf(Role.MENTOR))
-//                        .requestMatchers("").hasRole(String.valueOf(Role.ADMIN))
-
+                        // 테스트 엔드포인트
+                        .requestMatchers("/api/users/test").hasAuthority("USER")
+                        //멘토만 접근 가능한 url
+//                        .requestMatchers(HttpMethod.POST, "").hasAuthority("MENTOR")
+                        //관리자만 접근 가능한 url
+//                        .requestMatchers("").hasAuthority("ADMIN")
                         .anyRequest().permitAll()
                 )
                 .formLogin(auth -> auth
-                        .loginPage("/home") // template return url
+                        .loginPage("/common/home") // template 이하 경로
                         .loginProcessingUrl("/api/users/sign-in")  // post 엔드포인트
                         .usernameParameter("email")
                         .passwordParameter("pwd")
-                        //.defaultSuccessUrl("/api/home", true)
-                        .successHandler(authSuccessHandler)
-//                        .failureHandler(failureHandler)
+                        .successHandler(formloginsuccess)
+                        .failureHandler(loginFailureHandler())
                         .permitAll()
                 )
                 .logout(auth -> auth
@@ -76,21 +75,35 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                ) // 세션 비활성화
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .requestCache(requestCache -> requestCache
                         .requestCache(cookieRequestCache));
 
         // 토큰 관련 Filter 추가
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // /api/users/sign-in, /api/auth/refresh 제외 모든 경로
-        http.addFilterBefore(refreshTokenValidationFilter, JwtRequestFilter.class); // /api/auth/refresh 경로만
+//        http.addFilterBefore(refreshTokenAuthenticationFilter(am), UsernamePasswordAuthenticationFilter.class); // /api/auth/refresh 만
+        http.addFilterAfter(accessTokenValidationFilter, ExceptionTranslationFilter.class); // /api/auth/refresh 경로만 -> ok면
 
         return http.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public SimpleUrlAuthenticationFailureHandler loginFailureHandler() {
+        SimpleUrlAuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
+        failureHandler.setDefaultFailureUrl("/login");
+        failureHandler.setAllowSessionCreation(false);
+        return failureHandler;
     }
+
+    // 방화벽
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.httpFirewall(defaultHttpFirewall());
+    }
+
+    @Bean
+    public HttpFirewall defaultHttpFirewall() {
+        return new DefaultHttpFirewall();
+    }
+
 }

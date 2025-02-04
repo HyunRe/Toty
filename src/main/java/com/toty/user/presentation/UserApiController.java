@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-// 컨트롤러 요소 빠진 것 없는지,
 //
 @RestController
 @RequestMapping("/api/users")
