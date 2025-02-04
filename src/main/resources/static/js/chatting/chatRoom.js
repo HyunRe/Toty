@@ -159,7 +159,7 @@ function exitRoom() {
         error:function(xhr) {
             let response = xhr.responseJSON;
             console.log(response);
-            alert("단톡방 나가기 실패 \n" + response.message);
+            alert("단톡방 나가기 실패 \n" + response.errorMessage);
         }
     });
 }

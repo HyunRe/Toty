@@ -4,6 +4,7 @@ import com.toty.chatting.application.ChatRoomService;
 import com.toty.chatting.application.User01Service;
 import com.toty.chatting.domain.model.ChatRoom;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,10 +16,11 @@ import java.util.List;
 @Slf4j
 @Controller
 @RequestMapping("/api/chatting")
+@RequiredArgsConstructor
 public class ChattingApiController {
 
-    @Autowired private ChatRoomService chatRoomService;
-    @Autowired private User01Service user01Service;
+    private final ChatRoomService chatRoomService;
+    private final User01Service user01Service;
 
     /*
                 단톡방 입장하기
@@ -37,6 +39,8 @@ public class ChattingApiController {
 
     /*
         채팅방 나가기
+        단톡방에서 버튼(나가기)을 눌러야만 동작하게 설계되있음
+        ( 매개변수들 동적으로 정해짐, 사용자 입력값이x  >  validatioin필요x, 예외처리에서 처리됨 )
      */
     @PatchMapping("/rooms/{roomId}/{chatterId}")
     @ResponseBody
