@@ -1,4 +1,4 @@
-package com.toty.sms.presentation.response;
+package com.toty.user.dto.response;
 
 import lombok.AccessLevel;
 import lombok.Getter;

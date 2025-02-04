@@ -1,6 +1,7 @@
 package com.toty.user.presentation;
 
 import com.toty.global.annotation.CurrentUser;
+import com.toty.user.dto.response.SmsAuthCodeResponse;
 import com.toty.user.application.UserInfoService;
 import com.toty.user.application.UserService;
 import com.toty.user.application.UserSignUpService;
@@ -33,6 +34,13 @@ public class UserApiController {
     @GetMapping("/check-nickname")
     public ResponseEntity<String> nicknameValidation(@RequestParam(name = "nickname") String nickname) {
         String response = userSignUpService.validateNickname(nickname);
+        return ResponseEntity.ok(response);
+    }
+
+    // 회원가입 - 휴대폰 인증번호 요청
+    @PostMapping("/authcode")
+    public ResponseEntity<String> sendAuthCode(@RequestParam(name = "phoneNumber") String phoneNumber) {
+        String response = userSignUpService.sendAuthCodeMessage(phoneNumber);
         return ResponseEntity.ok(response);
     }
 
