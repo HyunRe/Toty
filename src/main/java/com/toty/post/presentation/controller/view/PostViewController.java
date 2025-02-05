@@ -1,6 +1,6 @@
 package com.toty.post.presentation.controller.view;
 
-import com.toty.base.pagination.PaginationResult;
+import com.toty.common.pagination.PaginationResult;
 import com.toty.common.annotation.CurrentUser;
 import com.toty.post.application.PostService;
 import com.toty.post.domain.model.Post;

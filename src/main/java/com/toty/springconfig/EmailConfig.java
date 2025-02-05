@@ -1,4 +1,4 @@
-package com.toty.config;
+package com.toty.springconfig;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

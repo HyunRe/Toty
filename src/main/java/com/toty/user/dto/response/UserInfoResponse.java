@@ -2,7 +2,7 @@ package com.toty.user.dto.response;
 
 import java.util.List;
 
-import com.toty.base.domain.model.Tag;
+import com.toty.common.domain.Tag;
 import lombok.Builder;
 import lombok.Getter;
 

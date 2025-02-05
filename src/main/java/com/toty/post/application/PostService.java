@@ -2,7 +2,7 @@ package com.toty.post.application;
 
 import com.toty.base.exception.UserNotFoundException;
 import com.toty.base.exception.PostNotFoundException;
-import com.toty.base.pagination.PaginationResult;
+import com.toty.common.pagination.PaginationResult;
 import com.toty.comment.application.CommentService;
 import com.toty.post.application.strategy.convert.postdetail.PostDetailResponseContext;
 import com.toty.post.application.strategy.convert.postlist.PostListResponseContext;

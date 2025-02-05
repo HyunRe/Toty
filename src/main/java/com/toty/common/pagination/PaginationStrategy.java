@@ -1,4 +1,4 @@
-package com.toty.base.pagination;
+package com.toty.common.pagination;
 
 
 import org.springframework.data.domain.Page;

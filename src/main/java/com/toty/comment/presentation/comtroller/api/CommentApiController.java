@@ -1,6 +1,6 @@
 package com.toty.comment.presentation.comtroller.api;
 
-import com.toty.base.pagination.PaginationResult;
+import com.toty.common.pagination.PaginationResult;
 import com.toty.base.response.SuccessResponse;
 import com.toty.comment.application.CommentService;
 import com.toty.comment.domain.model.Comment;

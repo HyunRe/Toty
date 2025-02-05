@@ -1,6 +1,6 @@
 package com.toty.post.domain.repository;
 
-import com.toty.base.domain.repository.BaseRepository;
+import com.toty.common.pagination.BaseRepository;
 import com.toty.post.domain.model.Post;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
