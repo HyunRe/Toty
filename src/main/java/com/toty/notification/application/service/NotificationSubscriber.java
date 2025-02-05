@@ -16,13 +16,13 @@ import java.nio.charset.StandardCharsets;
 @Service
 @RequiredArgsConstructor
 public class NotificationSubscriber {
-    private final NotificationService notificationService;
+    private final NotificationCreationService notificationCreationService;
 
     @EventListener
-    public void onMessage(Message message, byte[] pattern) throws FirebaseMessagingException, MessagingException {
+    public void onMessage(Message message) throws FirebaseMessagingException, MessagingException {
         String body = new String(message.getBody(), StandardCharsets.UTF_8);
         NotificationSendRequest notificationSendRequest = convertFromJson(body);
-        notificationService.createNotification(notificationSendRequest);
+        notificationCreationService.createNotification(notificationSendRequest);
     }
 
     private NotificationSendRequest convertFromJson(String json) {

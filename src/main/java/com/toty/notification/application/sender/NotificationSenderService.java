@@ -2,7 +2,9 @@ package com.toty.notification.application.sender;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.toty.base.exception.*;
+import com.toty.notification.application.service.NotificationPublisher;
 import com.toty.notification.domain.model.Notification;
+import com.toty.notification.presentation.dto.request.NotificationSendRequest;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.repository.UserRepository;
 import jakarta.mail.MessagingException;
@@ -16,9 +18,11 @@ import java.util.stream.Collectors;
 public class NotificationSenderService {
     private final Map<String, NotificationSender> senderMap;
     private final UserRepository userRepository;
+    private final NotificationPublisher notificationPublisher;
 
-    public NotificationSenderService(List<NotificationSender> senders, UserRepository userRepository) {
+    public NotificationSenderService(List<NotificationSender> senders, UserRepository userRepository, NotificationPublisher notificationPublisher) {
         this.userRepository = userRepository;
+        this.notificationPublisher = notificationPublisher;
         this.senderMap = senders.stream().collect(Collectors.toMap(
                 sender -> getNotificationType(sender.getClass()), sender -> sender
         ));
@@ -40,14 +44,28 @@ public class NotificationSenderService {
         } else {
             throw new UnsupportedNotificationTypeException(type);
         }
+
+        // Redis Pub/Sub을 통해 다른 서버로 알림 전송
+        NotificationSendRequest sendRequest = convertToSendRequest(notification);
+        notificationPublisher.publish(sendRequest);
+    }
+
+    public NotificationSendRequest convertToSendRequest(Notification notification) {
+        return new NotificationSendRequest(
+                notification.getReceiverId(),
+                notification.getSenderId(),
+                notification.getSenderNickname(),
+                notification.getType(),
+                notification.getUrl()
+        );
     }
 
     // 전략 패턴에 따라 다른 알림 전송
     private String getNotificationType(Class<?> clazz) {
-        if (clazz == SseNotificationSender.class) return "LIST";
-        if (clazz == FcmNotificationSender.class) return "PUSH";
-        if (clazz == EmailNotificationSender.class) return "EMAIL";
-        if (clazz == SmsNotificationSender.class) return "MESSAGE";
+        if (clazz == SseNotificationSender.class) return "Follow, Comment, Like";
+        if (clazz == FcmNotificationSender.class) return "ChatRoom, GroupChatRoom, Knowledge, GroupKnowledge, Q/A";
+        if (clazz == EmailNotificationSender.class) return "Mento";
+        if (clazz == SmsNotificationSender.class) return "Mento";
         return null;
     }
 }

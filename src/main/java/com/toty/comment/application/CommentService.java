@@ -31,7 +31,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final CommentPaginationStrategy commentPaginationStrategy;
 
-    private static final int PAGE_SIZE = 10;  // 기본 페이지 수
+    private static final int PAGE_SIZE = 10;  // 기본 페이지
 
     // 댓글 가져 오기
     public Comment findByCommentId(Long id) {
