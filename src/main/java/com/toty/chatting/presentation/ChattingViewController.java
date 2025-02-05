@@ -1,6 +1,7 @@
 package com.toty.chatting.presentation;
 
 
+import com.toty.chatting.application.ChatRoomService;
 import com.toty.chatting.domain.model.ChatParticipant;
 import com.toty.chatting.domain.model.ChatRoom;
 import com.toty.chatting.domain.model.Role;
@@ -27,6 +28,7 @@ public class ChattingViewController {
     private final User01Repository user01Repository;
     private final ChatParticipantRepository chatParticipant02Repository;
     private final ChatRoomRepository chatRoom02Repository;
+    private final ChatRoomService chatRoomService;
 
     /*
         유저, 단톡방 목록 화면
@@ -34,7 +36,10 @@ public class ChattingViewController {
     @RequestMapping("/list")
     public String chatList(Model model) {
         List<User01> userList = user01Repository.findAll();
+        List<ChatRoom> chatRoomList = chatRoomService.getChatRoomList();
         model.addAttribute("userList", userList);
+        model.addAttribute("chatRoomList", chatRoomList);
+        model.addAttribute("rowCount", (chatRoomList.size() / 4) + 1);
         return "chatting/chatList";
     }
 
