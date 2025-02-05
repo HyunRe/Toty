@@ -5,8 +5,8 @@ async function fetchRoomList() {
         const response = await fetch(`/api/chatting/rooms`);
         if (response.ok) {
             const roomList = await response.json();
-            updateRoomListTb(chatterList, loginId); 
-            // updateRoomListCd(roomList, loginId);
+            // updateRoomListTb(chatterList, loginId); 
+            updateRoomListCd(roomList, loginId);
         }
     } catch (error) {
         console.error('Failed to fetch roomList:', error);
@@ -18,42 +18,53 @@ function updateRoomListCd(roomList, loginId) {
     // 한줄에 몇개 넣을건지에 따라 결정되는 row수
     var rowCount = Math.ceil(roomCount/4); // 수 올림
 
-    for (let i = 0; i < rowCount; i++) { 
-        // 여기서 slice로 잘라서 부분배열들마다 row아래에 col-3으로 넣어주는 로직해야함
-        alert(i);
-    }
-
     const cardBox = document.querySelector('#chatRoomListBox');
     cardBox.innerHTML = ''; // 기존 내용을 초기화
 
-    roomList.forEach(room => {
-        const cardRow = document.createElement('div');
-        cardRow.className = "row";
-        cardRow.innerHTML = `           
-            <div class="col-3">
-                <div class="card mb-2" >
-                    <div class="row">
-                        <div class="col-4">
-                            <img alt="IMG">
-                        </div>
-                        <div class="col-8">
-                            <p>${room.mentor.userName}</p>
-                        </div>
+    // 일단 하나만 해보는거
+    let cardRow = document.createElement('div');
+    cardRow.className = "row";
+
+    let partList = roomList.slice(0,4);
+
+    partList.forEach(room => {
+        let roomComponent = document.createElement('div');
+        roomComponent.className = "col-3";
+        roomComponent.innerHTML = `           
+            <div class="card mb-2" >
+                <div class="row">
+                    <div class="col-4">
+                        <img alt="IMG">
                     </div>
-                    <h4>${room.roomName}</h4>
-                    <div>${room.createdAt}</div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span>현재인원/${room.userLimit} </span>
-                        <form action="/api/chatting/participant/${room.id}/${loginId}" 
-                            method="post">
-                            <button type="submit"> 단톡 참석 </button>
-                        </form>
+                    <div class="col-8">
+                        <p>${room.mentor.userName}</p>
                     </div>
+                </div>
+                <h4>${room.roomName}</h4>
+                <div>${room.createdAt}</div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>현재인원/${room.userLimit} </span>
+                    <form action="/api/chatting/participant/${room.id}/${loginId}" 
+                        method="post">
+                        <button type="submit"> 단톡 참석 </button>
+                    </form>
                 </div>
             </div>
         `;
-        cardBox.appendChild(cardRow);
+        cardRow.appendChild(roomComponent);
     });
+
+    cardBox.appendChild(cardRow);
+
+
+    for (let i = 0; i < rowCount; i++) { 
+        // 여기서 slice로 잘라서 부분배열들마다 row아래에 col-3으로 넣어주는 로직해야함
+       
+
+        //cardBox.appendChild(cardRow);
+    }
+    
+
 }
 
 
