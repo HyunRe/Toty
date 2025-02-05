@@ -2,9 +2,13 @@ package com.toty.notification.application.sender;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.toty.base.exception.*;
-import com.toty.notification.application.service.NotificationPublisher;
+import com.toty.springconfig.redis.RedisPublisher;
 import com.toty.notification.domain.model.Notification;
-import com.toty.notification.presentation.dto.request.NotificationSendRequest;
+import com.toty.notification.dto.request.NotificationSendRequest;
+import com.toty.springconfig.email.EmailNotificationSender;
+import com.toty.springconfig.fcm.FcmNotificationSender;
+import com.toty.springconfig.sms.SmsNotificationSender;
+import com.toty.springconfig.sse.SseNotificationSender;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.repository.UserRepository;
 import jakarta.mail.MessagingException;
@@ -18,11 +22,11 @@ import java.util.stream.Collectors;
 public class NotificationSenderService {
     private final Map<String, NotificationSender> senderMap;
     private final UserRepository userRepository;
-    private final NotificationPublisher notificationPublisher;
+    private final RedisPublisher redisPublisher;
 
-    public NotificationSenderService(List<NotificationSender> senders, UserRepository userRepository, NotificationPublisher notificationPublisher) {
+    public NotificationSenderService(List<NotificationSender> senders, UserRepository userRepository, RedisPublisher redisPublisher) {
         this.userRepository = userRepository;
-        this.notificationPublisher = notificationPublisher;
+        this.redisPublisher = redisPublisher;
         this.senderMap = senders.stream().collect(Collectors.toMap(
                 sender -> getNotificationType(sender.getClass()), sender -> sender
         ));
@@ -47,7 +51,7 @@ public class NotificationSenderService {
 
         // Redis Pub/Sub을 통해 다른 서버로 알림 전송
         NotificationSendRequest sendRequest = convertToSendRequest(notification);
-        notificationPublisher.publish(sendRequest);
+        redisPublisher.publish(sendRequest);
     }
 
     public NotificationSendRequest convertToSendRequest(Notification notification) {

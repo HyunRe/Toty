@@ -1,7 +1,6 @@
 package com.toty.springconfig.redis;
 
 
-import com.toty.notification.application.service.NotificationSubscriber;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -102,7 +101,7 @@ public class RedisConfig {
     // Redis Pub/Sub 메시지를 자동으로 수신하여 NotificationService로 전달
     @Bean
     public RedisMessageListenerContainer redisContainer(RedisConnectionFactory connectionFactory,
-                                                        NotificationSubscriber subscriber) {
+                                                        RedisSubscriber subscriber) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.addMessageListener(new MessageListenerAdapter(subscriber), new ChannelTopic("notifications"));
