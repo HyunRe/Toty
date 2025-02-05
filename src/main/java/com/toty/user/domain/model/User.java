@@ -71,7 +71,7 @@ public class User {
     public void updateInfo(UserInfoUpdateRequest newInfo, String imgPath) {
         this.nickname = newInfo.getNickname();
         this.profileImageUrl = imgPath;
-        this.subscribeInfo = new SubscribeInfo(newInfo.isEmailSubscribed(), newInfo.isSmsSubscribed(), newInfo.isSmsSubscribed());
+        this.subscribeInfo = new SubscribeInfo(newInfo.isEmailSubscribed(), newInfo.isSmsSubscribed(), newInfo.isNotificationAllowed());
         this.statusMessage = newInfo.getStatusMessage();
         this.phoneNumber = newInfo.getPhoneNumber();
     }
