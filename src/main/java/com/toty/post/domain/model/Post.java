@@ -1,6 +1,6 @@
 package com.toty.post.domain.model;
 
-import com.toty.base.domain.model.BaseTime;
+import com.toty.common.domain.BaseTime;
 import com.toty.user.domain.model.User;
 import jakarta.persistence.*;
 import lombok.*;

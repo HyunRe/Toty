@@ -1,6 +1,6 @@
 package com.toty.comment.presentation.dto.response;
 
-import com.toty.base.domain.model.BaseTime;
+import com.toty.common.domain.BaseTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,7 +1,7 @@
 package com.toty.comment.domain.pagination;
 
-import com.toty.base.pagination.PaginationResult;
-import com.toty.base.pagination.PaginationStrategy;
+import com.toty.common.pagination.PaginationResult;
+import com.toty.common.pagination.PaginationStrategy;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 

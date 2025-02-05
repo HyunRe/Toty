@@ -1,4 +1,4 @@
-package com.toty.base.domain.model;
+package com.toty.common.domain;
 
 import java.time.LocalDateTime;
 

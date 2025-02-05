@@ -1,6 +1,6 @@
 package com.toty.post.presentation.dto.response.postdetail;
 
-import com.toty.base.pagination.PaginationResult;
+import com.toty.common.pagination.PaginationResult;
 import com.toty.post.domain.model.PostCategory;
 import com.toty.post.domain.model.PostImage;
 import lombok.AccessLevel;

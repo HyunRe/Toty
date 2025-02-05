@@ -1,6 +1,6 @@
 package com.toty.post.presentation.dto.response.postlist;
 
-import com.toty.base.domain.model.BaseTime;
+import com.toty.common.domain.BaseTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

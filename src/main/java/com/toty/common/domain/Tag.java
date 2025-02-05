@@ -1,4 +1,4 @@
-package com.toty.base.domain.model;
+package com.toty.common.domain;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
