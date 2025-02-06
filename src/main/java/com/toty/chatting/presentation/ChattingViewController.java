@@ -9,6 +9,7 @@ import com.toty.chatting.domain.model.User01;
 import com.toty.chatting.domain.repository.ChatParticipantRepository;
 import com.toty.chatting.domain.repository.ChatRoomRepository;
 import com.toty.chatting.domain.repository.User01Repository;
+import com.toty.chatting.dto.response.ChatRoomListResponse;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,8 +28,8 @@ import java.util.Optional;
 public class ChattingViewController {
 
     private final User01Repository user01Repository;
-    private final ChatParticipantRepository chatParticipant02Repository;
-    private final ChatRoomRepository chatRoom02Repository;
+    private final ChatParticipantRepository chatParticipantRepository;
+    private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomService chatRoomService;
 
     /*
@@ -36,10 +38,28 @@ public class ChattingViewController {
     @RequestMapping("/list")
     public String chatList(Model model) {
         List<User01> userList = user01Repository.findAll();
-        List<ChatRoom> chatRoomList = chatRoomService.getChatRoomList();
+        List<ChatRoom> chatRoomEntityList = chatRoomService.getChatRoomList();
+
+        List<ChatRoomListResponse> chatRoomList = new LinkedList<>();
+
+        for (ChatRoom chatRoomEntity :chatRoomEntityList) {
+
+            // count메서드로 바꿔야함
+            List<ChatParticipant> currentParticipants = chatParticipantRepository.findAllByRoomAndExitAt(chatRoomEntity, null);
+
+
+            ChatRoomListResponse chatRoom = ChatRoomListResponse.builder()
+                    .id(chatRoomEntity.getId())
+                    .mentor(chatRoomEntity.getMentor().getUserName())
+                    .roomName(chatRoomEntity.getRoomName()).createdAt(chatRoomEntity.getCreatedAt())
+                    .userLimit(chatRoomEntity.getUserLimit()).userCount(currentParticipants.size())
+                    .build();
+            chatRoomList.add(chatRoom);
+        }
+
         model.addAttribute("userList", userList);
         model.addAttribute("chatRoomList", chatRoomList);
-        model.addAttribute("rowCount", (chatRoomList.size() / 4) + 1);
+//        model.addAttribute("rowCount", (chatRoomList.size() / 4) + 1);
         return "chatting/chatList";
     }
 
@@ -51,10 +71,10 @@ public class ChattingViewController {
      */
     @RequestMapping("/room")
     public String aachr(@RequestParam("rid") long rid, Model model) {
-        Optional<ChatRoom> room = chatRoom02Repository.findById(rid);
+        Optional<ChatRoom> room = chatRoomRepository.findById(rid);
 
         if (!room.isEmpty()) {
-            List<ChatParticipant> chatterList = chatParticipant02Repository.findAllByRoomAndExitAt(room.get(), null);
+            List<ChatParticipant> chatterList = chatParticipantRepository.findAllByRoomAndExitAt(room.get(), null);
             model.addAttribute("chatterList", chatterList);
             model.addAttribute("room", room.get());
         }
