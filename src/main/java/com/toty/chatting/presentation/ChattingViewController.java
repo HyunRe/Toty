@@ -37,29 +37,14 @@ public class ChattingViewController {
      */
     @RequestMapping("/list")
     public String chatList(Model model) {
-        List<User01> userList = user01Repository.findAll();
-        List<ChatRoom> chatRoomEntityList = chatRoomService.getChatRoomList();
 
-        List<ChatRoomListResponse> chatRoomList = new LinkedList<>();
-
-        for (ChatRoom chatRoomEntity :chatRoomEntityList) {
-
-            // count메서드로 바꿔야함
-            List<ChatParticipant> currentParticipants = chatParticipantRepository.findAllByRoomAndExitAt(chatRoomEntity, null);
-
-
-            ChatRoomListResponse chatRoom = ChatRoomListResponse.builder()
-                    .id(chatRoomEntity.getId())
-                    .mentor(chatRoomEntity.getMentor().getUserName())
-                    .roomName(chatRoomEntity.getRoomName()).createdAt(chatRoomEntity.getCreatedAt())
-                    .userLimit(chatRoomEntity.getUserLimit()).userCount(currentParticipants.size())
-                    .build();
-            chatRoomList.add(chatRoom);
-        }
-
-        model.addAttribute("userList", userList);
+        List<ChatRoomListResponse> chatRoomList = chatRoomService.getChatRoomListView();
         model.addAttribute("chatRoomList", chatRoomList);
-//        model.addAttribute("rowCount", (chatRoomList.size() / 4) + 1);
+
+        // 삭제 예정
+        List<User01> userList = user01Repository.findAll();
+        model.addAttribute("userList", userList);
+
         return "chatting/chatList";
     }
 

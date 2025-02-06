@@ -1,5 +1,6 @@
 package com.toty.chatting.presentation;
 
+import com.toty.chatting.application.ChatParticipanceService;
 import com.toty.chatting.application.ChatRoomService;
 import com.toty.chatting.application.User01Service;
 import com.toty.chatting.domain.model.ChatRoom;
@@ -20,6 +21,7 @@ import java.util.List;
 public class ChattingApiController {
 
     private final ChatRoomService chatRoomService;
+    private final ChatParticipanceService chatParticipanceService;
     private final User01Service user01Service;
 
     /*
@@ -30,7 +32,7 @@ public class ChattingApiController {
     @PostMapping("/participant/{rid}/{uid}")
     public String enterRoom(@PathVariable("rid") long rid, @PathVariable("uid") long uid
             , RedirectAttributes reAtr) {
-        chatRoomService.userEnterRoom(rid, uid);
+        chatParticipanceService.userEnterRoom(rid, uid);
 
         reAtr.addAttribute("rid", rid);
         return "redirect:/view/chatting/room";
@@ -43,7 +45,7 @@ public class ChattingApiController {
     @PatchMapping("/rooms/{roomId}/{chatterId}")
     @ResponseBody
     public void exitRoom(@PathVariable("roomId") long roomId, @PathVariable("chatterId") long chatterId) {
-        chatRoomService.chatterExitRoom(roomId, chatterId);
+        chatParticipanceService.chatterExitRoom(roomId, chatterId);
     }
 
     /*
