@@ -83,8 +83,7 @@
                 <hr>
                 <h3>카드 ui</h3>
                 <div id="chatRoomListBox">
-                <!-- 타임리프로 구현해야함 -->
-                    <div class="row" th:each="cardRow : ${#numbers.sequence(0, rowCount-1)}">
+                    <div class="row" th:each="cardRow : ${#numbers.sequence(0, (chatRoomList.size() / 4) + 1)}">
                         <div class="col-3" th:each="chatRoom : ${chatRoomList.subList( cardRow * 4, (cardRow + 1) * 4 )}">
                             <div class="card mb-2">
                                 <div class="row">
@@ -92,15 +91,17 @@
                                         <img alt="IMG">
                                     </div>
                                     <div class="col-8">
-                                        <p>[[${room.mentor.userName}]]</p>
+                                        <p>[[${chatRoom.mentor.userName}]]</p>
                                     </div>
                                 </div>
-                                <h4>[[${room.roomName}]]</h4>
-                                <div>[[${room.createdAt}]]</div>
+                                <h4>[[${chatRoom.roomName}]]</h4>
+                                <div>[[${chatRoom.createdAt}]]</div>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span>현재인원/[[${room.userLimit}]] </span>
-                                    <form th:action="@{/api/chatting/participant/{roomId}/{loginId}(roomId=${room.id}, loginId=${loginId})}" 
-                                        method="post">
+                                    <span>현재인원</span>/<span>[[${chatRoom.userLimit}]] </span>
+                                    
+                                    <form th:if="${session?.loginUser}"
+                                          th:action="@{/api/chatting/participant/{roomId}/{loginId}(roomId=${chatRoom.id}, loginId=${session.loginUser?.uid})}"
+                                          method="post">
                                         <button type="submit"> 단톡 참석 </button>
                                     </form>
                                 </div>
