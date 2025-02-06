@@ -39,7 +39,7 @@ public class ChattingViewController {
         List<ChatRoom> chatRoomList = chatRoomService.getChatRoomList();
         model.addAttribute("userList", userList);
         model.addAttribute("chatRoomList", chatRoomList);
-//        model.addAttribute("rowCount", (chatRoomList.size() / 4) + 1);
+        model.addAttribute("rowCount", (chatRoomList.size() / 4) + 1);
         return "chatting/chatList";
     }
 

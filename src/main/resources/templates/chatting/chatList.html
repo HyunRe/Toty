@@ -83,7 +83,7 @@
                 <hr>
                 <h3>카드 ui</h3>
                 <div id="chatRoomListBox">
-                    <div class="row" th:each="cardRow : ${#numbers.sequence(0, (chatRoomList.size() / 4) + 1)}">
+                    <div class="row" th:each="cardRow : ${#numbers.sequence(0, rowCount)}">
                         <div class="col-3" th:each="chatRoom : ${chatRoomList.subList( cardRow * 4, (cardRow + 1) * 4 )}">
                             <div class="card mb-2">
                                 <div class="row">
@@ -97,11 +97,13 @@
                                 <h4>[[${chatRoom.roomName}]]</h4>
                                 <div>[[${chatRoom.createdAt}]]</div>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span>현재인원</span>/<span>[[${chatRoom.userLimit}]] </span>
+                                    <div>
+                                        <span>현재인원</span>/<span>[[${chatRoom.userLimit}]] </span>
+                                    </div>
                                     
                                     <form th:if="${session?.loginUser}"
-                                          th:action="@{/api/chatting/participant/{roomId}/{loginId}(roomId=${chatRoom.id}, loginId=${session.loginUser?.uid})}"
-                                          method="post">
+                                        th:action="@{/api/chatting/participant/{roomId}/{loginId}(roomId=${chatRoom.id}, loginId=${session.loginUser?.uid})}"
+                                        method="post">
                                         <button type="submit"> 단톡 참석 </button>
                                     </form>
                                 </div>
