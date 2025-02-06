@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FcmService {
     private final UserRepository userRepository;
-    private final FirebaseMessaging firebaseMessaging;
+//    private final FirebaseMessaging firebaseMessaging;
     private final FcmTokenRepository fcmTokenRepository;
 
     // 토큰 리스트 가져 오기
@@ -50,7 +50,7 @@ public class FcmService {
                 .build();
 
         try {
-            firebaseMessaging.send(message);
+//            firebaseMessaging.send(message);
         } catch (Exception e) {
             throw new NotificationSendException(e);
         }
@@ -70,7 +70,7 @@ public class FcmService {
                 .build();
 
         try {
-            firebaseMessaging.sendMulticast(message);
+//            firebaseMessaging.sendMulticast(message);
         } catch (Exception e) {
             throw new NotificationSendException(e);
         }

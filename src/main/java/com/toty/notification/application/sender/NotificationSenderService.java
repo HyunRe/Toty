@@ -20,16 +20,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class NotificationSenderService {
-    private final Map<String, NotificationSender> senderMap;
+//    private final Map<String, NotificationSender> senderMap;
     private final UserRepository userRepository;
     private final RedisPublisher redisPublisher;
 
-    public NotificationSenderService(List<NotificationSender> senders, UserRepository userRepository, RedisPublisher redisPublisher) {
+    public NotificationSenderService(UserRepository userRepository, RedisPublisher redisPublisher) {
         this.userRepository = userRepository;
         this.redisPublisher = redisPublisher;
-        this.senderMap = senders.stream().collect(Collectors.toMap(
-                sender -> getNotificationType(sender.getClass()), sender -> sender
-        ));
+//        this.senderMap = senders.stream().collect(Collectors.toMap(
+//                sender -> getNotificationType(sender.getClass()), sender -> sender
+//        ));
     }
 
     public void send(Notification notification) throws FirebaseMessagingException, MessagingException {
@@ -42,12 +42,12 @@ public class NotificationSenderService {
             throw new NotificationDisabledException();
         }
 
-        NotificationSender sender = senderMap.get(type);
-        if (sender != null) {
-            sender.send(notification);
-        } else {
-            throw new UnsupportedNotificationTypeException(type);
-        }
+//        NotificationSender sender = senderMap.get(type);
+//        if (sender != null) {
+//            sender.send(notification);
+//        } else {
+//            throw new UnsupportedNotificationTypeException(type);
+//        }
 
         // Redis Pub/Sub을 통해 다른 서버로 알림 전송
         NotificationSendRequest sendRequest = convertToSendRequest(notification);
