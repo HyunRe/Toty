@@ -37,9 +37,16 @@ public class UserApiController {
     }
 
     // 회원가입 - 휴대폰 인증번호 요청
-    @PostMapping("/authcode")
+    @PostMapping("/authCode")
     public ResponseEntity<String> sendAuthCode(@RequestParam(name = "phoneNumber") String phoneNumber) {
         String response = userSignUpService.sendAuthCodeMessage(phoneNumber);
+        return ResponseEntity.ok(response);
+    }
+
+    // 회원가입 - 휴대폰 인증번호 확인
+    @PostMapping("/check-authCode")
+    public ResponseEntity<Boolean> checkAuthCode(@RequestParam(name = "authCode") String authCode, @RequestParam(name = "phoneNumber") String phoneNumber) {
+        Boolean response = userSignUpService.checkAuthCode(phoneNumber, authCode);
         return ResponseEntity.ok(response);
     }
 

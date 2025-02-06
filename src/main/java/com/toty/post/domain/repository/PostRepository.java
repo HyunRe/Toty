@@ -1,6 +1,6 @@
 package com.toty.post.domain.repository;
 
-import com.toty.base.domain.repository.BaseRepository;
+import com.toty.common.pagination.PaginationRepository;
 import com.toty.post.domain.model.Post;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface PostRepository extends BaseRepository<Post, Long>, JpaSpecificationExecutor<Post> {
+public interface PostRepository extends PaginationRepository<Post, Long>, JpaSpecificationExecutor<Post> {
     // 조회수 증가 (동시성 고려)
     @Modifying
     @Transactional

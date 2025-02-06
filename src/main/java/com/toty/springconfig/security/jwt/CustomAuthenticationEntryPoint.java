@@ -19,7 +19,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         } else {
             // 리프레시 토큰 만료 시 로그인 페이지 이동
             System.out.println("CustomAuthenticationEntryPoint(로그인 필요 시) ------------ ");
-            response.sendRedirect("/login");
+            response.sendRedirect("/api/users/login");
         }
     }
 }

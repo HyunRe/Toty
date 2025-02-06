@@ -9,6 +9,9 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
@@ -93,5 +96,15 @@ public class RedisConfig {
             System.out.println("Redis 작업 오류 발생 :: " + e.getMessage());
             return 0;
         }
+    }
+
+    // Redis Pub/Sub 메시지를 자동으로 수신하여 NotificationService로 전달
+    @Bean
+    public RedisMessageListenerContainer redisContainer(RedisConnectionFactory connectionFactory,
+                                                        RedisSubscriber subscriber) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(new MessageListenerAdapter(subscriber), new ChannelTopic("notifications"));
+        return container;
     }
 }
