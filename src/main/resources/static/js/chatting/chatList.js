@@ -1,15 +1,24 @@
 let eventSource = new EventSource("/emitter"); // controller 경로
 
 eventSource.addEventListener("countUp", (event) => {
-    // alert( event.data);
-    // console.log("Received message:", event.data);
-    var userId = $(this).data("roomUserCount-id");
+    upUserCount(event.data);
 });
 
 eventSource.addEventListener("countDown", (event) => {
-    alert( event.data);
-    console.log("Received message:", event.data);
+    downUserCount(event.data)
 });
+
+function upUserCount(roomId) {
+    $(".roomUserCount-" + roomId).text(
+        Number($(".roomUserCount-" + roomId).text()) + 1
+    );
+}
+
+function downUserCount(roomId) {
+    $(".roomUserCount-" + roomId).text(
+        Number($(".roomUserCount-" + roomId).text()) - 1
+    );
+}
 
 async function fetchRoomList() {
     try {

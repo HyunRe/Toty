@@ -21,7 +21,10 @@ public class ChatParticipanceService {
     private final User01Repository user01Repository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatParticipantRepository chatParticipantRepository;
+
     private final SimpMessagingTemplate messagingTemplate;
+
+    private final ChatListSseService chatListSseService;
 
     /*
         채팅방 참석자가, 해당방 나가는 기능
@@ -47,6 +50,9 @@ public class ChatParticipanceService {
                 // 해당 방에 퇴장 알리기
                 String destination = "/chatRoom/" + roomId + "/door";
                 messagingTemplate.convertAndSend(destination, participantDTO);
+
+                // 채팅방 목록에서 현재인원 1 감소
+                chatListSseService.sendEventCountDown(roomId);
             }
         }
     }
@@ -79,6 +85,9 @@ public class ChatParticipanceService {
                 // 해당 방에 입장 알리기
                 messagingTemplate.convertAndSend(
                         "/chatRoom/" + rid + "/door", participantDTO);
+
+                // 채팅방 목록에서 현재인원 1 증가
+                chatListSseService.sendEventCountUp(rid);
 
             } else {
                 // throw new Exception();

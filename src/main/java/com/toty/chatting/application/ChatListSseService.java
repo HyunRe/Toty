@@ -20,10 +20,20 @@ public class ChatListSseService {
         emitter.onTimeout(() -> emitters.remove(emitter));
     }
 
-    public void sendEventCountUp() {
+    public void sendEventCountUp(long roomId) {
         for (SseEmitter emitter : emitters) {
             try {
-                emitter.send(SseEmitter.event().name("countUp"));
+                emitter.send(SseEmitter.event().name("countUp").data(roomId));
+            } catch (IOException e) {
+                emitters.remove(emitter);
+            }
+        }
+    }
+
+    public void sendEventCountDown(long roomId) {
+        for (SseEmitter emitter : emitters) {
+            try {
+                emitter.send(SseEmitter.event().name("countDown").data(roomId));
             } catch (IOException e) {
                 emitters.remove(emitter);
             }

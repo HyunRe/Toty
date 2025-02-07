@@ -58,33 +58,10 @@
 
             <div class="col-8">
                 <h2>단톡방 목록</h2>
-                <button onclick="fetchRoomList()">채팅방 불러오기</button>
-                
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <td style="width: 20%; text-align: center;">
-                                <div>멘토 이름</div>
-                            </td>
-                            <td style="width: 45%;">
-                                <span style="font-weight: bold;" >단톡방 이름</span>
-                            </td>
-                            <td style="width: 20%; text-align: right;">
-                                <div>제한인원</div>
-                            </td>
-                            <td style="width: 20%;">
-                                채팅 참석
-                            </td>
-                        </tr>
-                    </thead>
-                    <!-- js파일에 있음, Room List( 동적으로 바뀜 ) -->
-                    <tbody></tbody>
-                </table>
                 <hr>
-                <h3>카드 ui</h3>
                 <div id="chatRoomListBox">
                     <div class="row" th:each="cardRow : ${#numbers.sequence(0, chatRoomList.size() - 1, 4)}">
-                        <div class="col-3" th:data-room-id="${chatRoom.id}" 
+                        <div class="col-3" th:classappend="'room-' + ${chatRoom.id}"
                             th:each="chatRoom : ${chatRoomList.subList(cardRow, cardRow + 4 > chatRoomList.size() ? chatRoomList.size() : cardRow + 4)}">
                             <div class="card mb-2">
                                 <div class="row">
@@ -99,7 +76,7 @@
                                 <div>[[${chatRoom.createdAt}]]</div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <span th:data-roomUserCount-id="${chatRoom.id}"
+                                        <span th:class="'roomUserCount-' + ${chatRoom.id}"
                                             >[[${chatRoom.userCount}]]</span>/<span>[[${chatRoom.userLimit}]] </span>
                                     </div>
                                     
