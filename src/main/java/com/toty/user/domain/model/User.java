@@ -1,7 +1,7 @@
 package com.toty.user.domain.model;
 
 
-import com.toty.base.domain.model.BaseTime;
+import com.toty.common.domain.BaseTime;
 import com.toty.user.dto.request.UserInfoUpdateRequest;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
