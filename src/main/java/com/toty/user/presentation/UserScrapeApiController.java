@@ -21,8 +21,7 @@ public class UserScrapeApiController {
     @GetMapping("/myScrape")
     public ResponseEntity<?> myScrape(@RequestParam("userId") Long userId,
                            @RequestParam(name = "page", defaultValue = "1") int page,
-                           @RequestParam(name = "postCategory", required = false) String postCategory,
-                           Model model) {
+                           @RequestParam(name = "postCategory", required = false) String postCategory) {
 
         PaginationResult result = userScrapeService.getPagedPostsByMyScrape(userId, page, postCategory);
         SuccessResponse successResponse = new SuccessResponse(

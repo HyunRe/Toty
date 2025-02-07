@@ -18,7 +18,7 @@ public class UserScrapeViewController {
     @GetMapping("/myScrape")
     public String myScrape(@RequestParam("userId") Long userId,
                            @RequestParam(name = "page", defaultValue = "1") int page,
-                           @RequestParam(name = "postCategory", required = false) String postCategory,
+                           @RequestParam(name = "postCategory", required = false) String postCategory, // free, qna, knowledge
                            Model model) {
 
         PaginationResult result = userScrapeService.getPagedPostsByMyScrape(userId, page, postCategory);
