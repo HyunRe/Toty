@@ -38,7 +38,7 @@ public class NotificationSenderService {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         // 사용자가 알림을 구독한 경우에만 알림을 전송
-        if (!user.getSubscribeInfo().isNotification()) {
+        if (!user.getSubscribeInfo().isNotificationAllowed()) {
             throw new NotificationDisabledException();
         }
 
