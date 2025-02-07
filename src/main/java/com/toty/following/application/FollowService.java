@@ -21,7 +21,7 @@ public class FollowService {
     private final UserRepository userRepository;
     private final FollowingRepository followingRepository;
 
-    public static final int PAGE_SIZE = 10;
+    public static final int PAGE_SIZE = 20;
 
     public Long follow(Long fromId, Long toId) {
         //todo 본인 확인
@@ -49,7 +49,7 @@ public class FollowService {
     }
 
 
-    public FollowingListResponse pagedFollowings(Long userId, boolean isToUser,int page) {
+    public FollowingListResponse pagedFollowings(Long userId, boolean isToUser,int page, Long myId) {
         // isToUser = True 나를 팔로우한 사람 리스트 가져오기 / False면 내가 팔로우하는 사람 리스트 가져오기
         Pageable pageable = PageRequest.of(page-1, PAGE_SIZE);
         Page<Following> followings;
@@ -62,7 +62,7 @@ public class FollowService {
                         return new Summary(
                                 fromUser.getProfileImageUrl(),
                                 fromUser.getNickname(),
-                                followingRepository.existsByFromUserIdAndToUserId(fromUser.getId(), userId)
+                                followingRepository.existsByFromUserIdAndToUserId(myId, fromUser.getId())
                         );
                     })
                     .toList();
@@ -74,7 +74,7 @@ public class FollowService {
                         return new Summary(
                                 toUser.getProfileImageUrl(),
                                 toUser.getNickname(),
-                                followingRepository.existsByFromUserIdAndToUserId(userId, toUser.getId())
+                                followingRepository.existsByFromUserIdAndToUserId(myId, toUser.getId())
                         );
                     })
                     .toList();

@@ -18,6 +18,11 @@ public class UserViewController {
 
     private final UserSignUpService userSignUpService;
     private final UserInfoService userInfoService;
+//    // 로그인 페이지 반환
+//    @GetMapping("/sign-in")
+//    public String signin(){
+//        return "user/signin";
+//    }
 
     // 회원 가입 페이지 반환
     @GetMapping("/signup")
@@ -44,9 +49,10 @@ public class UserViewController {
     }
 
     // 기본 페이지
-    @GetMapping("/home")
+    @GetMapping("/home") // 액세스 토큰 유효성 검사x
     public String home(){
-        return "common/home"; // todo
+        // todo
+        return "user/signIn";
     }
 
     // 메세지 띄우기
@@ -63,9 +69,23 @@ public class UserViewController {
         return "common/alertMsg";
     }
 
-    // 리프레시 토큰 만료 이후 재로그인
+    // 리프레시 토큰 만료 이후 재로그인(액세스 토큰 유효성 검사x)
     @GetMapping("/login")
     public String loginPage() {
         return "common/home"; // todo
+    }
+
+    // 나의/상대방의 정보 보기
+    // 본인인지 아닌지 확인 -> 아니면 약식 정보만 전달
+    @GetMapping("/{id}/info") // -> 모델로 전달하고 view로 변경?
+    public String getUserInfo(@CurrentUser User user,
+            @PathVariable("id") Long id, Model model) {
+        UserInfoResponse userInfo = userInfoService.getUserInfo(user, id);
+        model.addAttribute("userInfo", userInfo);
+        if (user.getId() == id) {
+            return "user/detail";
+        } else {
+            return "user/list";
+        }
     }
 }

@@ -55,6 +55,7 @@ public class UserInfoService {
         Long followerCount = followingRepository.countFollowersByUserId(userId);
 
         return UserInfoResponse.builder()
+                .id(foundUser.getId())
                 .email(isOwner ? foundUser.getEmail() : null)
                 .phoneNumber(isOwner ? foundUser.getPhoneNumber() : null)
                 .nickname(foundUser.getNickname())
@@ -67,7 +68,9 @@ public class UserInfoService {
                 .links(userLinks)
                 .followingCount(followingCount)
                 .followerCount(followerCount)
+                .role(foundUser.getRole())
                 .isFollowing(!isOwner ? followingRepository.existsByFromUserIdAndToUserId(myId, userId) : null)
+                .createdAt(isOwner ? foundUser.getCreatedAt() : null)
                 .build();
     }
 
