@@ -24,16 +24,16 @@
           <h5>TOTY 아이디로 로그인</h5>
 
           <!-- 로그인 폼 -->
-          <form action="/api/users/sign-in" id="signInForm" method="post" style="color: black; font-weight: 400;" onsubmit="return false">
+          <form action="/api/users/sign-in" id="signInForm" method="post" style="color: black; font-weight: 400;">
             <div class="input-group">
               <!-- 이름을 백엔드에서 기대하는 파라미터에 맞게 조정 (예: username) -->
                <label>이메일</label>
-              <input type="email" name="username" style="width: 100%;" required>
+              <input type="email" name="email" style="width: 100%;" required>
             </div>
 
             <div class="input-group">
               <label>비밀번호</label>
-              <input type="password" name="password" style="width: 100%;" required>
+              <input type="password" name="pwd" style="width: 100%;" required>
             </div>
 
             <button type="submit" id="formSubmit"  style="width: 100%;" class="btn">로그인</button>
@@ -66,3 +66,4 @@
 
   </body>
   </html>
+<!--로그인 submit 버튼이 안 먹힘.-->

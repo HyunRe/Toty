@@ -1,0 +1,260 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <title>Toty</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="Free HTML Templates" name="keywords"/>
+  <meta content="Free HTML Templates" name="description"/>
+
+  <!-- Favicon -->
+  <!--  <link href="/static/img/favicon.ico" rel="icon" />-->
+
+
+  <!-- Google Web Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet">
+  <!-- Font Awesome -->
+  <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+      rel="stylesheet"
+  />
+  <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+  />
+
+  <!-- Libraries Stylesheet -->
+  <link href="/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet"/>
+
+  <!--Sweet Alert2-->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"></script>
+
+  <!-- Customized Bootstrap Stylesheet -->
+  <link href="/css/style.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/globals.css"/>
+  <link rel="stylesheet" href="/css/register.css" type="text/css"/>
+</head>
+
+<body>
+<!-- Topbar Start -->
+<div class="container-fluid">
+  <div class="row bg-secondary py-2 px-xl-5">
+    <div class="col-lg-6 d-none d-lg-block">
+    </div>
+  </div>
+</div>
+<div class="row align-items-center py-3 px-xl-5">
+  <div class="col-lg-3 d-none d-lg-block">
+    <a href="/home">
+      <img src="/img/logo.png" style="margin-left: 5%; width: 40%;">
+    </a>
+  </div>
+</div>
+<!-- Topbar End -->
+
+<!-- Navbar Start -->
+<div class="container-fluid mb-2">
+  <div class="row border-top px-xl-5">
+  </div>
+</div>
+<!-- Navbar End -->
+
+ <!-- 
+이메일, 이름, -- readonly 
+  휴대폰 번호, 
+  닉네임, 프사, 태그, 링크,
+  sms, 이메일, 알림 수신 여부 -->
+<div class="container-fluid pt-5">
+  <div class="row"
+       style="justify-content: space-between; flex-wrap: nowrap; margin: auto; width: 70%;">
+    <div class="col-12 mb-0">
+      <div class="mb-8">
+        <h4 class="font-weight-semi-bold mb-5"
+            style="font-size: 20px; text-align: center; color: darkgray;">회원정보 수정</h4>
+        <form action="/api/users/update" id="updateForm" method="post" style="color: black; font-weight: 400;" onsubmit="return false">
+          <div class="row">
+
+            <div class="col-md-7 form-group">
+              <label>프로필 이미지</label>
+              <div class="col-md-4">
+                <a href="img/elements/g2.jpg" class="img-gal">
+                </div>
+                  <div class="single-gallery-image" style="background: url(img/elements/g2.jpg)"></div>
+                </a>
+              <input class="form-control" name="profileImage" type="file" id="formFile"
+                     placeholder="프로필 이미지를 등록해 주세요."
+                     style="padding-top: 0.5rem;">
+            </div>
+
+            <div class="col-md-7 form-group">
+                <label>이메일</label>
+                <div class="check-group">
+                  <input class="form-control" type="text" id="uname" name="uname"
+                         th:value="${user.username}"  style="width: 100%;" readonly>
+                </div>
+                <input type="hidden" th:value="${user.id}" name="uid" id="uid">
+            </div>
+
+            <div class="col-md-7 form-group">
+              <label>이름</label>
+              <div class="check-group">
+                <input class="form-control" type="text" id="uname" name="uname"
+                       th:value="${user.username}"  style="width: 100%;" readonly>
+              </div>
+              <input type="hidden" th:value="${user.id}" name="uid" id="uid">
+            </div>
+            
+            <div class="col-md-7 form-group">
+              <label>닉네임</label>
+              <div class="check-group">
+                <input class="form-control" name="nickname" id="nickname" type="text"
+                       placeholder="사용하실 닉네임을 입력해 주세요." style=" width: 100%;" th:value="${user.nickname}">
+              </div>
+            </div>
+
+            <div class="col-md-7 form-group">
+              <label>휴대폰 번호</label>
+              <div class="check-group">
+                <input class="form-control" id="phone" name="phoneNumber" type="tel"
+                       placeholder="예시: 010-1234-5678"
+                       pattern="(01[016789]{1})-?[0-9]{3,4}-?[0-9]{4}" style="width: 80%;">
+                <button class="btn btn-info" id="authNumReq" type="button">인증</button>
+              </div>
+            </div>
+
+
+            <div class="col-md-7 form-group">
+                <label>기술 스택</label>
+                <div class="dropdown-container" id="tag-options">
+                    <select>
+                      <option value="1">Java</option>
+                      <option value="1">JavaScript</option>
+                      <option value="1">C</option>
+                      <option value="1">C#</option>
+                      <option value="1">C++</option>
+                      <option value="1">Ruby</option>
+                      <option value="1">Go</option>
+                      <option value="1">PHP</option>
+                      <option value="1">Swift</option>
+                      <option value="1">Kotlin</option>
+                      <option value="1">Rust</option>
+                      <option value="1">Spring Boot</option>
+                      <option value="1">Spring Security</option>
+                      <option value="1">Spring Data JPA</option>
+                      <option value="1">Spring Cloud</option>
+                      <option value="1">Spring Batch</option>
+                      <option value="1">Spring REST</option>
+                      <option value="1">Spring Web</option>
+                      <option value="1">Thymeleaf</option>
+                      <option value="1">JPA</option>
+                      <option value="1">Hibernate</option>
+                      <option value="1">MySQL</option>
+                      <option value="1">PostgreSQL</option>
+                      <option value="1">MongoDB</option>
+                      <option value="1">Redis</option>
+                      <option value="1">Kafka</option>
+                      <option value="1">RabbitMQ</option>
+                      <option value="1">AWS</option>
+                      <option value="1">Azure</option>
+                      <option value="1">Google Cloud</option>
+                      <option value="1">Docker</option>
+                      <option value="1">Kubernetes</option>
+                      <option value="1">Jenkins</option>
+                      <option value="1">Maven</option>
+                      <option value="1">Gradle</option>
+                      <option value="1">REST API</option>
+                      <option value="1">SOAP</option>
+                      <option value="1">JWT</option>
+                      <option value="1">OAuth2</option>
+                      <option value="1">Swagger</option>
+                      <option value="1">Logging</option>
+                      <option value="1">Unit Testing</option>
+                      <option value="1">Integration Testing</option>                      
+                    </select>
+                </div>
+                
+                <!--기술 스택 옵션에서 클릭하면 버튼 생성, 다시 클릭 시 사라짐 -->
+                <div class="tags-container col-md-7 form-group" id="tags-container" style="display:flex; flex-wrap : wrap; width: 80%; justify-content: center; margin: auto;">
+
+            </div>
+
+            <div class="col-md-7 form-group">
+                <label>링크</label>
+                <button type="button" id="link-add">+</button>
+                <div class="links-container row" id="links-container" style="display: flex; margin: auto; text-align: start;">
+                  <!-- 동적으로 설정 -->
+                  <button type="button" id="link-del">-</button>
+                  <a class="link-itemz" href="https://github.com/username" target="_blank">
+                    <img src="https://via.placeholder.com/20?text=GH" alt="Github 로고">
+                    <!-- url 주소 그대로 -->
+                    Github
+                  </a>
+                  
+                </div>
+                <!-- <div class="links-container"></div> -->
+            </div>
+
+            <div class="col-md-7 form-group">
+              <label>수신 동의</label>
+              <div class="switch-wrap d-flex justify-content-between">
+                <label>SMS 수신 동의</label>
+                <div class="primary-checkbox">
+                  <input type="checkbox" id="sms-subscribe">
+                  <label for="sms-subscribe"></label>
+                </div>
+              </div>
+              <div class="switch-wrap d-flex justify-content-between">
+                <label>메일 수신 동의</label>
+                <div class="primary-checkbox">
+                  <input type="checkbox" id="email-subscribe" checked="">
+                  <label for="email-subscribe"></label>
+                </div>
+              </div>
+              <div class="switch-wrap d-flex justify-content-between">
+                <label>앱 알림 수신 동의</label>
+                <div class="primary-checkbox">
+                  <input type="checkbox" id="noti-subscribe">
+                  <label for="noti-subscribe"></label>
+                </div>
+              </div>
+            </div>
+
+        </form>
+            <div class="col-md-7 form-group pt-3">
+              <button type="button" id="formSubmit" class="btn btn-info" style="width: 100%;">저장</button>
+            </div>
+      </div>
+
+  </div>
+</div>
+
+</div>
+
+
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script
+    src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+
+<script src="/lib/easing/easing.min.js"></script>
+<script src="/lib/owlcarousel/owl.carousel.min.js"></script>
+
+
+<!-- Template Javascript -->
+<!--<script src="/js/main.js"></script>-->
+</body>
+
+</html>
+        

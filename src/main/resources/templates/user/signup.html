@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8"/>
-  <title>MyFeed</title>
+  <title>Toty</title>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <meta content="Free HTML Templates" name="keywords"/>
   <meta content="Free HTML Templates" name="description"/>
@@ -49,7 +49,7 @@
   <div class="row align-items-center py-3 px-xl-5">
     <div class="col-lg-4" style="margin-left: 15%">
       <a href="/home">
-        <img src="/img/logo.png" style="margin-left: 5%; width: 40%" alt="logo"/>
+        <img src="../../static/img/toty-logo.png" style="margin-left: 5%; width: 40%" alt="logo"/>
       </a>
     </div>
   </div>
@@ -80,12 +80,9 @@
               <div class="check-group">
                 <input class="form-control" type="email" id="email" name="email"
                        placeholder="사용하실 이메일을 입력해 주세요." required>
-                <button class="btn btn-info" id="checkEmailBtn" type="button" style="padding: 0;"
-                        data-available="false">
-                  중복확인
-                </button>
               </div>
             </div>
+
             <div class="col-md-7 form-group">
               <label>비밀번호</label>
               <input class="form-control" id="pwd" name="pwd" type="password"
@@ -99,18 +96,14 @@
             </div>
             <div class="col-md-7 form-group">
               <label>이름</label>
-              <input class="form-control" name="uname" type="text" placeholder="성함을 입력해 주세요."
-                      required
-              >
+                <input class="form-control" type="text" id="username" name="username"
+                       placeholder="실명을 입력해 주세요." required>
             </div>
             <div class="col-md-7 form-group">
               <label>닉네임</label>
               <div class="check-group">
                 <input class="form-control" name="nickname" id="nickname" type="text"
                        placeholder="사용하실 닉네임을 입력해 주세요." required>
-                <button class="btn btn-info" id="checkNicknameBtn" type="button"
-                        style="padding: 0;" data-available="false">중복확인
-                </button>
               </div>
             </div>
             <div class="col-md-7 form-group">
@@ -131,16 +124,23 @@
                 </button>
               </div>
             </div>
-            <div class="col-md-7 form-group">
-              <label>프로필 이미지</label>
-              <input class="form-control" name="profileImage" type="file" id="formFile"
-                     placeholder="프로필 이미지를 등록해 주세요."
-                     style="padding-top: 0.5rem;">
-            </div>
 
         <div class="col-md-7 form-group pt-3">
           <button type="submit" id="formSubmit" class="btn btn-info" style="width: 100%;">회원가입</button>
         </div>
+
+        <div class="social-login">
+          <button type="button" class="social-btn">
+              <img src="/kakao-icon.png" alt="Kakao">
+          </button>
+          <button type="button" class="social-btn">
+              <img src="/github-icon.png" alt="GitHub">
+          </button>
+          <button type="button" class="social-btn">
+              <img src="/google-icon.png" alt="Google">
+          </button>
+      </div>
+
         </form>
       </div>
   </div>
