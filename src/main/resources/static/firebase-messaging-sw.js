@@ -1,3 +1,6 @@
+importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js");
+importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js");
+
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -16,6 +19,16 @@ const firebaseConfig = {
   measurementId: "G-3TRGZCLRG8"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+// Firebase 초기화
+firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
+
+// 백그라운드 푸시 알림 수신 처리
+messaging.onBackgroundMessage(payload => {
+    console.log("백그라운드 푸시 알림:", payload);
+
+    self.registration.showNotification(payload.notification.title, {
+        body: payload.notification.body,
+        icon: payload.notification.icon || "/default-icon.png"
+    });
+});
