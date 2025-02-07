@@ -1,7 +1,9 @@
 package com.toty.notification.application.sender;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.toty.base.exception.*;
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
+import com.toty.common.baseException.UnSupportedNotificationTypeException;
 import com.toty.springconfig.redis.RedisPublisher;
 import com.toty.notification.domain.model.Notification;
 import com.toty.notification.dto.request.NotificationSendRequest;
@@ -35,18 +37,18 @@ public class NotificationSenderService {
     public void send(Notification notification) throws FirebaseMessagingException, MessagingException {
         String type = notification.getType();
         Long userId = notification.getReceiverId();
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
 
         // 사용자가 알림을 구독한 경우에만 알림을 전송
         if (!user.getSubscribeInfo().isNotification()) {
-            throw new NotificationDisabledException();
+            throw new ExpectedException(ErrorCode.NOTIFICATIONS_DISABLED);
         }
 
         NotificationSender sender = senderMap.get(type);
         if (sender != null) {
             sender.send(notification);
         } else {
-            throw new UnsupportedNotificationTypeException(type);
+            throw new UnSupportedNotificationTypeException(type);
         }
 
         // Redis Pub/Sub을 통해 다른 서버로 알림 전송

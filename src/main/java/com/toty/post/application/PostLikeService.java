@@ -1,7 +1,7 @@
 package com.toty.post.application;
 
-import com.toty.base.exception.PostNotFoundException;
-import com.toty.base.exception.UserNotFoundException;
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
 import com.toty.notification.application.service.NotificationSendService;
 import com.toty.notification.dto.request.NotificationSendRequest;
 import com.toty.post.domain.model.Post;
@@ -26,8 +26,8 @@ public class PostLikeService {
     // 좋아요 토글 (증감소)
     @Transactional
     public Boolean toggleLikeAction(Long postId, Long userId, String likeAction) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
 
         boolean isLiked = false;
 
@@ -62,7 +62,7 @@ public class PostLikeService {
     // 게시물의 좋아요 개수 가져오기
     @Transactional(readOnly = true)
     public int getLikeCount(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        Post post = postRepository.findById(id).orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
         return postLikeRepository.countPostLikesByPost(post);
     }
 }

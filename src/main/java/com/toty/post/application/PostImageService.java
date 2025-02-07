@@ -1,5 +1,7 @@
 package com.toty.post.application;
 
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
 import com.toty.post.domain.model.Post;
 import com.toty.post.domain.model.PostImage;
 import com.toty.post.domain.repository.PostImageRepository;
@@ -63,7 +65,7 @@ public class PostImageService {
                         try {
                             return saveImage(imageFile, "src/main/resources/static/posts/images");
                         } catch (IOException e) {
-                            throw new IllegalStateException("이미지 저장 중 오류 발생", e);
+                            throw new ExpectedException(ErrorCode.IMAGE_SAVE_ERROR);
                         }
                     })
                     .noneMatch(newImagePath -> newImagePath.equals(existingImage.getImageUrl()));

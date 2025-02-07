@@ -1,7 +1,8 @@
 package com.toty.post.application;
 
-import com.toty.base.exception.PostNotFoundException;
 import com.toty.comment.application.CommentPaginationService;
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
 import com.toty.common.pagination.PaginationResult;
 import com.toty.post.domain.model.Post;
 import com.toty.post.domain.pagination.PostPaginationStrategy;
@@ -33,7 +34,7 @@ public class PostPaginationService {
 
     // 게시글 가져 오기
     public Post findPostById(Long id) {
-        return postRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        return postRepository.findById(id).orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
     }
 
     // 전체 게시글 목록 조회 (수정시간 기준으로 최신순 정렬 - 오늘 / 이번 주 / 이번 딜)

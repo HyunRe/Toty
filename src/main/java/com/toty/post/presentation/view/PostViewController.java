@@ -25,9 +25,8 @@ public class PostViewController {
     private final PostPaginationService postPaginationService;
     private final PostLikeService postLikeService;
 
-
     @GetMapping("/create")
-    public String createPostForm() {
+    public String createPost() {
         return "post/create";
     }
 
@@ -43,7 +42,7 @@ public class PostViewController {
     }
 
     @GetMapping("/update/{id}")
-    public String updatePostForm(@PathVariable Long id, Model model) {
+    public String updatePost(@PathVariable Long id, Model model) {
         Post post = postService.findPostById(id);
         model.addAttribute("post", post);
         return "post/update";

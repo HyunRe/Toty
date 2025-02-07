@@ -1,6 +1,8 @@
 package com.toty.post.application;
 
 import com.toty.base.exception.*;
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
 import com.toty.post.domain.factory.creation.PostCreationStrategyFactory;
 import com.toty.post.domain.factory.update.PostUpdateStrategyFactory;
 import com.toty.post.domain.strategy.creation.PostCreationStrategy;
@@ -28,17 +30,17 @@ public class PostService {
 
     // 게시글 가져 오기
     public Post findPostById(Long id) {
-        return postRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        return postRepository.findById(id).orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
     }
 
     // 게시글 작성
     @Transactional
     public Post createPost(Long userId, PostCreateRequest postCreateRequest) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(() -> new ExpectedException((ErrorCode.USER_NOT_FOUND)));
 
         PostCreationStrategy strategy = postCreationStrategyFactory.getStrategy(postCreateRequest.getPostCategory());
         if (strategy == null) {
-            throw new PostCategoryCreationNotSupportedException();
+            throw new ExpectedException(ErrorCode.CATEGORY_CREATION_STRATEGY_NOT_FOUND);
         }
 
         return strategy.createPostRequest(postCreateRequest, user);
@@ -55,12 +57,12 @@ public class PostService {
         Post post = findPostById(id);
         // 내 게시글 인지 확인 필요
         if (isOwner(user, post.getUser().getId())) {
-            throw new UnauthorizedException();
+            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
         }
 
         PostUpdateStrategy strategy = postUpdateStrategyFactory.getStrategy(post.getPostCategory());
         if (strategy == null) {
-            throw new PostCategoryUpdateNotSupportedException();
+            throw new ExpectedException(ErrorCode.CATEGORY_UPDATE_STRATEGY_NOT_FOUND);
         }
 
         return strategy.updatePostRequest(postUpdateRequest, post);
@@ -72,7 +74,7 @@ public class PostService {
         Post post = findPostById(id);
         // 내 게시글 인지 확인 필요
         if (isOwner(user, post.getUser().getId())) {
-            throw new UnauthorizedException();
+            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
         }
 
         // 정말로 삭제 할 것인지 확인 필요 - 프론트에서 처리

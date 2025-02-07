@@ -1,8 +1,8 @@
 package com.toty.springconfig.sse;
 
-import com.toty.base.exception.NotificationSendException;
-import com.toty.base.exception.RateLimitExceededException;
-import com.toty.notification.domain.model.Notification;
+import com.toty.common.baseException.NotificationSendException;
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class SseService {
     public SseEmitter createEmitter(Long userId) {
         requestCounts.putIfAbsent(userId, new AtomicInteger(0));
         if (requestCounts.get(userId).incrementAndGet() > 3) {
-            throw new RateLimitExceededException();
+            throw new ExpectedException(ErrorCode.TOO_MANY_SSE_REQUESTS);
         }
 
         SseEmitter emitter = new SseEmitter(60_000L);
