@@ -14,6 +14,8 @@ import com.toty.springconfig.sse.SseNotificationSender;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.repository.UserRepository;
 import jakarta.mail.MessagingException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,18 +23,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class NotificationSenderService {
+    @Autowired
     private final Map<String, NotificationSender> senderMap;
     private final UserRepository userRepository;
     private final RedisPublisher redisPublisher;
-
-    public NotificationSenderService(List<NotificationSender> senders, UserRepository userRepository, RedisPublisher redisPublisher) {
-        this.userRepository = userRepository;
-        this.redisPublisher = redisPublisher;
-        this.senderMap = senders.stream().collect(Collectors.toMap(
-                sender -> getNotificationType(sender.getClass()), sender -> sender
-        ));
-    }
 
     public void send(Notification notification) throws FirebaseMessagingException, MessagingException {
         String type = notification.getType();

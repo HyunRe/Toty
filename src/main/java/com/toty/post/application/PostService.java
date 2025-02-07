@@ -1,6 +1,5 @@
 package com.toty.post.application;
 
-import com.toty.base.exception.*;
 import com.toty.common.exception.ErrorCode;
 import com.toty.common.exception.ExpectedException;
 import com.toty.post.domain.factory.creation.PostCreationStrategyFactory;
