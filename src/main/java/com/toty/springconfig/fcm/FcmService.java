@@ -42,10 +42,12 @@ public class FcmService {
         String title = fcmNotificationSendRequest.getSenderNickname();
         String body = fcmNotificationSendRequest.getMessage();
 
-        Notification notification = new Notification(title, body);
         Message message = Message.builder()
                 .setToken(token)
-                .setNotification(notification)
+                .setNotification(Notification.builder()
+                        .setTitle(title)
+                        .setBody(body)
+                        .build())
                 .putData("url", fcmNotificationSendRequest.getUrl())
                 .build();
 
@@ -62,10 +64,12 @@ public class FcmService {
         String title = fcmNotificationSendRequest.getSenderNickname();
         String body = fcmNotificationSendRequest.getMessage();
 
-        Notification notification = new Notification(title, body);
         MulticastMessage message = MulticastMessage.builder()
                 .addAllTokens(tokens)
-                .setNotification(notification)
+                .setNotification(Notification.builder()
+                        .setTitle(title)
+                        .setBody(body)
+                        .build())
                 .putData("url", fcmNotificationSendRequest.getUrl())
                 .build();
 
