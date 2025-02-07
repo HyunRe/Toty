@@ -84,7 +84,8 @@
                 <h3>카드 ui</h3>
                 <div id="chatRoomListBox">
                     <div class="row" th:each="cardRow : ${#numbers.sequence(0, chatRoomList.size() - 1, 4)}">
-                        <div class="col-3" th:each="chatRoom : ${chatRoomList.subList(cardRow, cardRow + 4 > chatRoomList.size() ? chatRoomList.size() : cardRow + 4)}">
+                        <div class="col-3" th:data-room-id="${chatRoom.id}" 
+                            th:each="chatRoom : ${chatRoomList.subList(cardRow, cardRow + 4 > chatRoomList.size() ? chatRoomList.size() : cardRow + 4)}">
                             <div class="card mb-2">
                                 <div class="row">
                                     <div class="col-4">
@@ -98,7 +99,8 @@
                                 <div>[[${chatRoom.createdAt}]]</div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <span>[[${chatRoom.userCount}]]</span>/<span>[[${chatRoom.userLimit}]] </span>
+                                        <span th:data-roomUserCount-id="${chatRoom.id}"
+                                            >[[${chatRoom.userCount}]]</span>/<span>[[${chatRoom.userLimit}]] </span>
                                     </div>
                                     
                                     <form th:if="${session?.loginUser}"
@@ -110,50 +112,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <hr>
-                <h3>샘플( 카드 ui )</h3>
-                <div class="row">
-                    <div class="col-3">
-                      <div class="card mb-2" >
-                        <div class="row">
-                            <div class="col-4">
-                                <img alt="">
-                            </div>
-                            <div class="col-8">
-                                <p>멘토이름</p>
-                            </div>
-                        </div>
-                        <h4>단톡 주제</h4>
-                        <div>개설된 시간</div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span>현재인원/제한인원 </span>
-                            <button class="btn btn-primary btn-small">단톡방 참여</a>
-                        </div>
-                        
-                      </div>
-                    </div>
-                    <div class="col-3"></div>
-                    <div class="col-3"></div>
-                    <div class="col-3"></div>
-                </div>
-                <div class="row">
-                    <div class="col-3"></div>
-                    <div class="col-3">
-                        <div class="card mb-2" >
-                          <img class="card-img-top" alt="Card image">
-                          <div class="card-body">
-                            <h4 class="card-title" >책 제목</h4>
-                            <p class="card-text" >저자</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                              <span >가격</span>
-                              <button class="btn btn-primary btn-small">카트에 담기</a>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    <div class="col-3"></div>
-                    <div class="col-3"></div>
                 </div>
             </div>
 

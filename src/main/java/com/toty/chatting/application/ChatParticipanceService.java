@@ -24,8 +24,8 @@ public class ChatParticipanceService {
     private final SimpMessagingTemplate messagingTemplate;
 
     /*
-    채팅방 참석자가, 해당방 나가는 기능
- */
+        채팅방 참석자가, 해당방 나가는 기능
+    */
     public void chatterExitRoom(long roomId, long chatterId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElse(null);
         User01 participant = user01Repository.findById(chatterId).orElse(null);

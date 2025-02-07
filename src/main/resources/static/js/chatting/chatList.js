@@ -1,3 +1,15 @@
+let eventSource = new EventSource("/emitter"); // controller 경로
+
+eventSource.addEventListener("countUp", (event) => {
+    // alert( event.data);
+    // console.log("Received message:", event.data);
+    var userId = $(this).data("roomUserCount-id");
+});
+
+eventSource.addEventListener("countDown", (event) => {
+    alert( event.data);
+    console.log("Received message:", event.data);
+});
 
 async function fetchRoomList() {
     try {
