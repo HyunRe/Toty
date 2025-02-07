@@ -35,7 +35,7 @@ public class EmailService {
 
     private static final String EMAIL_TITLE_PREFIX = "[TOTY] ";
 
-    @Async
+    @Async("notificationExecutor")
     public void sendEmailNotification(EmailNotificationSendRequest emailNotificationSendRequest) throws MessagingException {
         User user = validatedEmailUser(emailNotificationSendRequest.getReceiverId());
 

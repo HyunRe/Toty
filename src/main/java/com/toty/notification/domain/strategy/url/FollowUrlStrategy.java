@@ -6,6 +6,6 @@ import org.springframework.stereotype.Component;
 public class FollowUrlStrategy implements NotificationUrlStrategy {
     @Override
     public String generateUrl(String referenceId) {
-        return "/main/following/" + referenceId;
+        return "/main/following/" + referenceId + "info";
     }
 }

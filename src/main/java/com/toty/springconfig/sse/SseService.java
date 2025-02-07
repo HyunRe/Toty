@@ -52,7 +52,7 @@ public class SseService {
     }
 
     // 다중 알림 발생 시 해당 사용자들에게 토스트 알림을 전송
-    @Async
+    @Async("notificationExecutor")
     public void sendMultipleNotifications(List<SseNotificationSendRequest> sseNotificationSendRequests) {
         for (SseNotificationSendRequest sseNotificationSendRequest : sseNotificationSendRequests) {
             SseEmitter emitter = emitters.get(sseNotificationSendRequest.getReceiverId());

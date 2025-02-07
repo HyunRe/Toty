@@ -2,6 +2,8 @@ package com.toty.post.application;
 
 import com.toty.base.exception.PostNotFoundException;
 import com.toty.base.exception.UserNotFoundException;
+import com.toty.notification.application.service.NotificationSendService;
+import com.toty.notification.dto.request.NotificationSendRequest;
 import com.toty.post.domain.model.Post;
 import com.toty.post.domain.model.PostLike;
 import com.toty.post.domain.repository.PostLikeRepository;
@@ -18,6 +20,7 @@ public class PostLikeService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostLikeRepository postLikeRepository;
+    private final NotificationSendService notificationSendService;
 
 
     // 좋아요 토글 (증감소)
@@ -34,6 +37,15 @@ public class PostLikeService {
                 PostLike newLike = new PostLike(user, post);
                 postLikeRepository.save(newLike);
                 isLiked = true;
+
+                NotificationSendRequest notificationSendRequest = new NotificationSendRequest(
+                        post.getUser().getId(),     // 알림 받을 사람
+                        userId,                     // 알림 보낸 사람
+                        user.getNickname(),         // 알림 보낸 사람 닉네임
+                        "Like",                     // 알림 유형
+                        postId.toString()           // 관련된 게시글 ID
+                );
+                notificationSendService.sendNotification(notificationSendRequest);
             }
         }
         if ("unlike".equals(likeAction)) { // 좋아요 취소

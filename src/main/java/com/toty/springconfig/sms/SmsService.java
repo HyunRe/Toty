@@ -21,7 +21,7 @@ public class SmsService {
     private final DefaultMessageService messageService;
     private final UserRepository userRepository;
 
-    @Async
+    @Async("notificationExecutor")
     public void sendSmsNotification(SmsNotificationSendRequest smsNotificationSendRequest) {
         User user = validatedSmsUser(smsNotificationSendRequest.getReceiverId());
         Message message = createMessage(user.getPhoneNumber(), smsNotificationSendRequest.getMessage());

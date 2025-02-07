@@ -42,10 +42,12 @@ public class FcmService {
         String title = fcmNotificationSendRequest.getSenderNickname();
         String body = fcmNotificationSendRequest.getMessage();
 
-        Notification notification = new Notification(title, body);
         Message message = Message.builder()
                 .setToken(token)
-                .setNotification(notification)
+                .setNotification(Notification.builder()
+                        .setTitle(title)
+                        .setBody(body)
+                        .build())
                 .putData("url", fcmNotificationSendRequest.getUrl())
                 .build();
 
@@ -57,20 +59,22 @@ public class FcmService {
     }
 
     // 다중 사용자에게 동시에 푸시 알림 전송
-    @Async
+    @Async("notificationExecutor")
     public void sendNotificationToMultipleUsers(List<String> tokens, FcmNotificationSendRequest fcmNotificationSendRequest) throws FirebaseMessagingException {
         String title = fcmNotificationSendRequest.getSenderNickname();
         String body = fcmNotificationSendRequest.getMessage();
 
-        Notification notification = new Notification(title, body);
         MulticastMessage message = MulticastMessage.builder()
                 .addAllTokens(tokens)
-                .setNotification(notification)
+                .setNotification(Notification.builder()
+                        .setTitle(title)
+                        .setBody(body)
+                        .build())
                 .putData("url", fcmNotificationSendRequest.getUrl())
                 .build();
 
         try {
-            firebaseMessaging.sendMulticast(message);
+            firebaseMessaging.sendEachForMulticast(message);
         } catch (Exception e) {
             throw new NotificationSendException(e);
         }
