@@ -24,7 +24,7 @@ public class ChatParticipanceService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    private final ChatListSseService chatListSseService;
+    private final SseChatListService sseChatListService;
 
     /*
         채팅방 참석자가, 해당방 나가는 기능
@@ -52,7 +52,7 @@ public class ChatParticipanceService {
                 messagingTemplate.convertAndSend(destination, participantDTO);
 
                 // 채팅방 목록에서 현재인원 1 감소
-                chatListSseService.sendEventCountDown(roomId);
+                sseChatListService.sendEventCountDown(roomId);
             }
         }
     }
@@ -87,7 +87,7 @@ public class ChatParticipanceService {
                         "/chatRoom/" + rid + "/door", participantDTO);
 
                 // 채팅방 목록에서 현재인원 1 증가
-                chatListSseService.sendEventCountUp(rid);
+                sseChatListService.sendEventCountUp(rid);
 
             } else {
                 // throw new Exception();

@@ -27,7 +27,7 @@ public class ChatRoomService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    private final ChatListSseService chatListSseService;
+    private final SseChatListService sseChatListService;
 
 
     /*
@@ -53,7 +53,7 @@ public class ChatRoomService {
         messagingTemplate.convertAndSend(destination, "DISCONNECT");
 
         // 채팅방 목록에서 해당방 삭제
-        chatListSseService.sendEventEndRoom(roomId);
+        sseChatListService.sendEventEndRoom(roomId);
     }
 
     /*
@@ -121,7 +121,7 @@ public class ChatRoomService {
 
             ChatRoomListResponse chatRoomListResponse = chatRoomEntityToDto(createdRoom);
             // 채팅방 목록 화면에 생성된 채팅방 추가
-            chatListSseService.sendEventCreationRoom(chatRoomListResponse);
+            sseChatListService.sendEventCreationRoom(chatRoomListResponse);
         } else {
             // throw new Exception();
         }
