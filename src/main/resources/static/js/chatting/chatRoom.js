@@ -1,6 +1,7 @@
 let stompClient;
 let loginUserName, userId; // 로그인한 사용자 정보
 let roomMentorId, roomId; // 단톡방 정보
+let roomEnd = false; // 해당방 종료 정보
 
 function socketSetting() {
     stompClient = new StompJs.Client({ // 웹소켓 url
@@ -34,6 +35,7 @@ function socketSetting() {
         stompClient.subscribe('/chatRoom/' + roomId + '/door', (message) => {
             if (message.body === "DISCONNECT") { // 멘토가 해당 채팅방 종료
                 disconnect();
+                roomEnd = true;
                 alert("채팅방이 종료 되었습니다.");
             } else {
                 const participant = JSON.parse(message.body);
@@ -60,16 +62,18 @@ function socketSetting() {
 
 
 function sendMessage() {
-    var params = {
-        'sender': loginUserName
-        , 'senderId': userId
-        , 'message': $("#messageInput").val()  
+    if (!roomEnd) {
+        var params = {
+            'sender': loginUserName
+            , 'senderId': userId
+            , 'message': $("#messageInput").val()  
+        }
+        
+        stompClient.publish({
+            destination: "/chatApp/" + roomId,
+            body: JSON.stringify(params)
+        });
     }
-
-    stompClient.publish({
-        destination: "/chatApp/" + roomId,
-        body: JSON.stringify(params)
-    });
 }
 
 function updateParticipants(chatterId, chatterName, access) {
@@ -143,7 +147,7 @@ function showMessage(sender, content, sendedAt, isMine) {
 
 async function disconnect() {
     stompClient.deactivate();
-    setConnected(false);
+    // setConnected(false);
     console.log("Disconnected");
 }
 
@@ -180,6 +184,13 @@ function endRoom() {
     }
 }
 
+function handleEnterKey(event) {
+	if (event.key === 'Enter') {
+		event.preventDefault();     // 줄바꿈 방지(기본 엔터 키 동작 방지)
+		sendMessage();
+	}
+}
+
 function setConnected(connected) {
     // $("#connect").prop("disabled", connected);
     // $("#disconnect").prop("disabled", !connected);
@@ -191,16 +202,6 @@ function setConnected(connected) {
     // }
     // $("#greetings").html("");
 }
-
-
-function handleEnterKey(event) {
-	if (event.key === 'Enter') {
-		event.preventDefault();     // 줄바꿈 방지(기본 엔터 키 동작 방지)
-		sendMessage();
-	}
-}
-
-
 
 $(document).ready(function() {
     console.log("$doc ready func");

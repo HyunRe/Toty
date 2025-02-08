@@ -10,8 +10,10 @@ import com.toty.chatting.dto.response.ChatRoomListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,7 +24,10 @@ public class ChatRoomService {
     private final User01Repository user01Repository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatParticipantRepository chatParticipantRepository;
+
     private final SimpMessagingTemplate messagingTemplate;
+
+    private final ChatListSseService chatListSseService;
 
 
     /*
@@ -46,6 +51,9 @@ public class ChatRoomService {
         // 해당 방 종료 알리기( 채팅방에 연결된 웹소켓 통신 종료시키기 )
         String destination = "/chatRoom/" + roomId + "/door";
         messagingTemplate.convertAndSend(destination, "DISCONNECT");
+
+        // 채팅방 목록에서 해당방 삭제
+        chatListSseService.sendEventEndRoom(roomId);
     }
 
     /*
@@ -65,25 +73,38 @@ public class ChatRoomService {
         List<ChatRoomListResponse> chatRoomList = new LinkedList<>();
 
         for (ChatRoom chatRoomEntity :chatRoomEntityList) {
-            // count메서드로 바꿔야함
-            List<ChatParticipant> currentParticipants = chatParticipantRepository.findAllByRoomAndExitAt(chatRoomEntity, null);
-
-            ChatRoomListResponse chatRoom = ChatRoomListResponse.builder()
-                    .id(chatRoomEntity.getId())
-                    .mentor(chatRoomEntity.getMentor().getUserName())
-                    .roomName(chatRoomEntity.getRoomName()).createdAt(chatRoomEntity.getCreatedAt())
-                    .userLimit(chatRoomEntity.getUserLimit()).userCount(currentParticipants.size())
-                    .build();
-
-            chatRoomList.add(chatRoom);
+            chatRoomList.add(
+                    chatRoomEntityToDto(chatRoomEntity));
         }
         return chatRoomList;
     }
 
+    /*
+        채팅방 목록 화면에서, 채팅방에 필요한 데이터들로 얻기
+     */
+    public ChatRoomListResponse chatRoomEntityToDto(ChatRoom entity) {
+        // count메서드로 바꿔야함
+        List<ChatParticipant> currentParticipants = chatParticipantRepository.findAllByRoomAndExitAt(entity, null);
+        
+        // 날짜 String타입의 원하는 형식으로 변형
+        LocalDateTime ldt = entity.getCreatedAt();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd일 HH시mm분");
+        String formattedCreatedAt = ldt.format(formatter);
+
+        ChatRoomListResponse chatRoomDTO = ChatRoomListResponse.builder()
+                .id(entity.getId())
+                .mentor(entity.getMentor().getUserName())
+                .roomName(entity.getRoomName()).createdAt(formattedCreatedAt)
+                .userLimit(entity.getUserLimit()).userCount(currentParticipants.size())
+                .build();
+
+        return chatRoomDTO;
+    }
 
     /*
         멘토가 단톡방 생성
      */
+    @Transactional
     public void mentorCreateRoom(long mid, String roomName, int userLimit) {
 
         User01 mentor = user01Repository.findById(mid).orElse(null);
@@ -92,7 +113,11 @@ public class ChatRoomService {
             ChatRoom room = ChatRoom.builder()
                     .mentor(mentor).roomName(roomName).userLimit(userLimit)
                     .build();
-            chatRoomRepository.save(room);
+            ChatRoom createdRoom = chatRoomRepository.save(room);
+
+            ChatRoomListResponse chatRoomListResponse = chatRoomEntityToDto(createdRoom);
+            // 채팅방 목록 화면에 생성된 채팅방 추가
+            chatListSseService.sendEventCreationRoom(chatRoomListResponse);
         } else {
             // throw new Exception();
         }

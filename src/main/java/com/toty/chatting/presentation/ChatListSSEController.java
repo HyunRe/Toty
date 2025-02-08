@@ -13,7 +13,7 @@ public class ChatListSseController {
 
     private final ChatListSseService chatListSseService;
 
-    @GetMapping(path = "/emitter", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(path = "/sse/chatList", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter connect() {
         SseEmitter emitter = new SseEmitter(300_000L); // 300초 타임아웃
         chatListSseService.addEmitter(emitter);

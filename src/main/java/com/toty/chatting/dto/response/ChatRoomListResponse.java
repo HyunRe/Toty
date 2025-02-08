@@ -24,6 +24,6 @@ public class ChatRoomListResponse {
     private int userCount;
     
     // 생성 시간
-    private LocalDateTime createdAt;
+    private String createdAt;
 
 }

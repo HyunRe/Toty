@@ -1,5 +1,6 @@
 package com.toty.chatting.application;
 
+import com.toty.chatting.dto.response.ChatRoomListResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -34,6 +35,26 @@ public class ChatListSseService {
         for (SseEmitter emitter : emitters) {
             try {
                 emitter.send(SseEmitter.event().name("countDown").data(roomId));
+            } catch (IOException e) {
+                emitters.remove(emitter);
+            }
+        }
+    }
+
+    public void sendEventEndRoom(long roomId) {
+        for (SseEmitter emitter : emitters) {
+            try {
+                emitter.send(SseEmitter.event().name("endRoom").data(roomId));
+            } catch (IOException e) {
+                emitters.remove(emitter);
+            }
+        }
+    }
+
+    public void sendEventCreationRoom(ChatRoomListResponse chatRoomListResponse) {
+        for (SseEmitter emitter : emitters) {
+            try {
+                emitter.send(SseEmitter.event().name("roomCreation").data(chatRoomListResponse));
             } catch (IOException e) {
                 emitters.remove(emitter);
             }
