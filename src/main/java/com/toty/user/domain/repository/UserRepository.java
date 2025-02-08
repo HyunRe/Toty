@@ -1,6 +1,8 @@
 package com.toty.user.domain.repository;
 
+import com.toty.roleRefreshScheduler.dto.UserIdAndRoleDto;
 import com.toty.user.domain.model.User;
+import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
@@ -18,4 +20,6 @@ public interface UserRepository extends Repository<User, Long> {
     boolean existsByNickname(String nickname);
 
     User save(User user);
+
+    List<UserIdAndRoleDto> findAllByIsDeletedFalse();
 }
