@@ -9,7 +9,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Controller
 @RequiredArgsConstructor
-public class ChatListSseController {
+public class SseChatListController {
 
     private final ChatListSseService chatListSseService;
 

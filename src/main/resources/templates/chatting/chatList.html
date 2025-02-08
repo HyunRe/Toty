@@ -18,11 +18,11 @@
 <body>
     <h1 th:if="${session?.loginUser}">로그인됨 : [[${session.loginUser.userName}]]</h1>
     <input th:if="${session?.loginUser}" type="hidden" name="uid" class="userId" th:value="${session.loginUser?.uid}">
-    
+    <div style="height: 50px;"></div>
     <div class="container">
         <div class="row">
-
-            <div class="col-4">
+            <div class="col-4" style="background-color: gray;">
+                <h2>임시 화면( 삭제 예정 )</h2>
                 <h3>회원 추가</h3>
                 <form action="/view/chatting/user" method="post">
                     <input type="text" name="userName"> <button type="submit">일반 회원</button>
@@ -32,10 +32,10 @@
                 </form>
                 <hr>
                 <h2>유저 목록</h2>
+                <div>이름 클릭하면 로그인</div>
                 <table>
                     <tr>
-                        <th>이름(클릭하면 로그인됨)</th>
-                       
+                        <th>이름</th>
                         <th>역할</th>
                         <th>단톡방 개설</th>
                     </tr>
@@ -56,26 +56,28 @@
                 </table>
             </div>
 
-            <div class="col-8">
+            <div class="col-8" style="min-width: 860px;">
+                <h2>SSE통신</h2>
+                
                 <h2>단톡방 목록</h2>
                 <hr>
                 <div id="chatRoomListBox">
-                    <div class="row" th:each="cardRow : ${#numbers.sequence(0, chatRoomList.size() - 1, 4)}">
-                        <div class="col-3" th:classappend="'room-' + ${chatRoom.id}"
+                    <div class="row rowDiv" th:each="cardRow : ${#numbers.sequence(0, chatRoomList.size() - 1, 4)}">
+                        <div class="col-3 roomUI" th:classappend="'room-' + ${chatRoom.id}"
                             th:each="chatRoom : ${chatRoomList.subList(cardRow, cardRow + 4 > chatRoomList.size() ? chatRoomList.size() : cardRow + 4)}">
                             <div class="card mb-2">
                                 <div class="row">
                                     <div class="col-4">
-                                        <img alt="IMG">
+                                        <img src="/img/chatting/undraw_profile.svg" style="width: 50px; height: 50px;">
                                     </div>
                                     <div class="col-8">
                                         <p>[[${chatRoom.mentor}]]</p>
                                     </div>
                                 </div>
                                 <h4>[[${chatRoom.roomName}]]</h4>
-                                <div>[[${chatRoom.createdAt}]]</div>
+                                <div>생성된 시간 : [[${chatRoom.createdAt}]]</div>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <div>
+                                    <div>인원 : 
                                         <span th:class="'roomUserCount-' + ${chatRoom.id}"
                                             >[[${chatRoom.userCount}]]</span>/<span>[[${chatRoom.userLimit}]] </span>
                                     </div>

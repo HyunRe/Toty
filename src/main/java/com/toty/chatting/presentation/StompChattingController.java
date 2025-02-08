@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 
 @Controller
 @Slf4j
-public class ChattingStompController {
+public class StompChattingController {
     @Autowired private ChatMessageService chatMessageService;
 
     /*

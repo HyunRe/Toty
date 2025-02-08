@@ -27,12 +27,10 @@
 
     <div class="container" style="margin-top:40px">
         <div class="row">
-            <div class="col-1">
-                기존 이미지 자리
-            </div>
-
+            <div class="col-1"></div>
             <div class="col-3">
-                <h3><strong>단톡방 참석자 목록</strong></h3>
+                <h3><strong>참석자 목록</strong></h3>
+                <div>인원 : ,  / [[${room.userLimit}]]</div>
                 <hr>
                 <input type="hidden" id="userName" th:value="${session.loginUser.userName}">
                 <input type="hidden" id="userId" th:value="${session.loginUser.uid}">
@@ -47,15 +45,12 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <td style="width: 30%; text-align: center;">
-                                <div>멘토 이미지</div>
+                            <td style="width: 30%;">
+                                <img src="/img/chatting/undraw_profile.svg" style="width: 50px; height: 50px;">
                             </td>
                             <td style="width: 50%;">
                                 <span style="font-weight: bold;" th:text="${room.mentor.userName}">멘토 이름</span> <!--  -->
                                 <input type="hidden" id="mentorId" th:value="${room.mentor.uid}"> <!--  -->
-                            </td>
-                            <td style="width: 20%; text-align: right;">
-                                기타등등
                             </td>
                         </tr>
                     </thead>
@@ -63,9 +58,10 @@
                     <!-- js파일에 있음, Chatter List( 동적으로 바뀜 ) -->
                     <tbody id="chatters">
                         <tr th:each="user : ${chatterList}" th:class="'user-' + ${user.id}">
-                            <td style="text-align: center;"> 참석자 이미지 </td>
+                            <td> 
+                                <img src="/img/chatting/undraw_profile.svg" style="width: 50px; height: 50px;">
+                            </td>
                             <td th:text="${user.chatter.userName}">참석자 이름</td>
-                            <td style="text-align: right;">기타등등</td>
                         </tr>
                     </tbody>
 
@@ -73,15 +69,10 @@
             </div>
 
             <div class="col-8">
-                <h3><strong>단톡방: [[${room.roomName}]] , 제한인원 [[${room.userLimit}]]</strong></h3>
-                <hr>
-                <!--
-                    <button onclick="fetchChatItems()">채팅 메시지들 불러오기</button>
-                -->
                 <button onclick="exitRoom()">채팅방 나가기</button>
                 <button th:if="${session.loginUser.uid == room.mentor.uid}" 
                     onclick="endRoom()">채팅방 종료하기([[${session.loginUser.role.name()}]])</button>
-
+                <hr>
                 <div class="chat-window">
                     <!-- Header -->
                     <div class="header d-flex justify-content-between py-3">

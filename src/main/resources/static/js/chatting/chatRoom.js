@@ -43,6 +43,8 @@ function socketSetting() {
                 updateParticipants(participant.chatterId, participant.chatterName, participant.access);
                 // 채팅방에 출입 메시지
                 showDoor(participant.chatterName, participant.access);
+                // 참석자 인원 변화
+
             }
         });
     };
@@ -82,9 +84,10 @@ function updateParticipants(chatterId, chatterName, access) {
         const newChatter = document.createElement("tr");
         newChatter.className = "user-" + chatterId;
         newChatter.innerHTML =`
-            <td style="text-align: center;"> 참석자 이미지 </td>
+            <td>
+                <img src="/img/chatting/undraw_profile.svg" style="width: 50px; height: 50px;"> 
+            </td>
             <td>${chatterName}</td>
-            <td style="text-align: right;">기타등등</td>
         `;
         chattersTbody.appendChild(newChatter);
     } else if (access === 0) { // 퇴장
@@ -98,7 +101,7 @@ function updateParticipants(chatterId, chatterName, access) {
 function showDoor(chatterName, access) {
     const doorDiv = document.createElement("div");
     doorDiv.className = "text-center mt-2 mb-3";
-    doorDiv.style.fontSize = "0.7rem";
+    doorDiv.style.fontSize = "1rem";
     doorDiv.style.backgroundColor = "lightgrey";
 
     var message;
@@ -120,21 +123,21 @@ function showMessage(sender, content, sendedAt, isMine) {
         chatItemDiv.innerHTML = `
             <div>
                 <img src=""  width="28" style="border-radius: 30%">
-                <span style="font-size: 0.6rem;">${sender}</span>
+                <span style="font-size: 1rem;">${sender}</span>
             </div>
             <div class="message received">
-                <p>${content}</p>
-                <span style="font-size: 0.6rem;">${sendedAt}</span>
+                <p style="font-size: 1rem;">${content}</p>
+                <span style="font-size: 1rem;">${sendedAt}</span>
             </div>
         `;
     } else {
         // 보낸 메시지
         chatItemDiv.innerHTML = `
             <div class="message sent">
-                <span style="font-size: 0.6rem; margin-right: 3px;">
+                <span style="font-size: 1rem; margin-right: 3px;">
                     ${sendedAt}
                 </span>
-                <p>${content}</p>
+                <p style="font-size: 1rem;">${content}</p>
             </div>
         `;
     }

@@ -23,6 +23,7 @@
 
 .card {
     height: 150px; /* 카드 높이 고정 */
+    width: 200px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

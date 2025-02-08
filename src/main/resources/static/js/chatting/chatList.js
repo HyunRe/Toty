@@ -42,16 +42,33 @@ function createRoom(chatRoom) {
     const chatRoomListBox = document.getElementById("chatRoomListBox");
 
     // 일단 마지막 row에 넣는거
-    const cardRows = chatRoomListBox.querySelectorAll(".row");
+    const cardRows = chatRoomListBox.querySelectorAll(".rowDiv");
     let lastRow;
     if (cardRows.length > 0) {
         lastRow = cardRows[cardRows.length - 1];
-    } else {
-        // row하나도 없는거?
+        let roomComponents = lastRow.querySelectorAll(".roomUI");
+        if (roomComponents.length === 4) { // 마지막row 가 다 차있는경우 
+            withRow(chatRoom, chatRoomListBox); // row생성+ 안에 row넣음
+        } else {
+            inRow(chatRoom, lastRow); // 있는row안에 room넣음
+        }
+    } else { // row하나도 없는거
+        withRow(chatRoom, chatRoomListBox);
     }
+}
 
+function withRow(chatRoom, chatRoomListBox) {
+    let rowComponent = document.createElement('div');
+    rowComponent.className = "row rowDiv";
+    inRow(chatRoom, rowComponent);
+
+    chatRoomListBox.appendChild(rowComponent);
+}
+
+
+function inRow(chatRoom, lastRow) {
     let roomComponent = document.createElement('div');
-    roomComponent.className = "col-3";
+    roomComponent.className = `col-3 roomUI room-${chatRoom.id}`;
     roomComponent.innerHTML = `           
         <div class="card mb-2" >
             <div class="row">
@@ -63,17 +80,20 @@ function createRoom(chatRoom) {
                 </div>
             </div>
             <h4>${chatRoom.roomName}</h4>
-            <div>${chatRoom.createdAt}</div>
+            <div>생성된 시간 : ${chatRoom.createdAt}</div>
             <div class="d-flex justify-content-between align-items-center">
-                <span>현재인원/${chatRoom.userLimit} </span>
+                <div>인원 : 
+                    <span class="roomUserCount-${chatRoom.id}"
+                        >0</span>/<span>${chatRoom.userLimit}</span>  
+                </div>
+                
                 <form action="/api/chatting/participant/${chatRoom.id}/${loginId}" 
                     method="post">
                     <button type="submit"> 단톡 참석 </button>
                 </form>
             </div>
         </div>
-    `;
-
+    `; // 버튼 없애기위해 2개로 나눌수도
     lastRow.appendChild(roomComponent);
 }
 

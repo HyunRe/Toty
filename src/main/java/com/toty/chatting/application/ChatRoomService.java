@@ -88,7 +88,11 @@ public class ChatRoomService {
         
         // 날짜 String타입의 원하는 형식으로 변형
         LocalDateTime ldt = entity.getCreatedAt();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd일 HH시mm분");
+
+        if (ldt == null) {
+            ldt = LocalDateTime.now(); // Entity만들때 java쪽에선 null로 들어가고, db쪽에선 CURRENT_TIMESTAMP로 되서
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH시mm분");
         String formattedCreatedAt = ldt.format(formatter);
 
         ChatRoomListResponse chatRoomDTO = ChatRoomListResponse.builder()

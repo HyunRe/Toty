@@ -44,7 +44,7 @@ public class ChatListSseService {
     public void sendEventEndRoom(long roomId) {
         for (SseEmitter emitter : emitters) {
             try {
-                emitter.send(SseEmitter.event().name("endRoom").data(roomId));
+                emitter.send(SseEmitter.event().name("roomEnd").data(roomId));
             } catch (IOException e) {
                 emitters.remove(emitter);
             }
