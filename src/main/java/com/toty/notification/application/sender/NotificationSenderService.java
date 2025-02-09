@@ -47,6 +47,7 @@ public class NotificationSenderService {
             throw new UnSupportedNotificationTypeException(type);
         }
 
+
         // Redis Pub/Sub을 통해 다른 서버로 알림 전송
         NotificationSendRequest sendRequest = convertToSendRequest(notification);
         redisPublisher.publish(sendRequest);

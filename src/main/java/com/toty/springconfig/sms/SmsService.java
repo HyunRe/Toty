@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SmsService {
     private final SmsConfig smsConfig;
-    private final DefaultMessageService messageService;
+//    private final DefaultMessageService messageService;
     private final UserRepository userRepository;
 
     @Async("notificationExecutor")
@@ -26,7 +26,7 @@ public class SmsService {
         Message message = createMessage(user.getPhoneNumber(), smsNotificationSendRequest.getMessage());
 
         try {
-            messageService.sendOne(new SingleMessageSendingRequest(message));
+//            messageService.sendOne(new SingleMessageSendingRequest(message));
         } catch (Exception e) {
             throw new NotificationSendException(e);
         }

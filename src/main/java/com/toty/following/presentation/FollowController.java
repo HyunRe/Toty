@@ -34,17 +34,19 @@ public class FollowController {
 
     // 팔로워 목록 조회
     @GetMapping("/{uid}/followers")
-    public ResponseEntity<FollowingListResponse> followersList(@PathParam("uid") Long id,
+    public ResponseEntity<FollowingListResponse> followersList(@CurrentUser User user,
+                                                               @PathParam("uid") Long id,
                                                                @RequestParam(value = "p", defaultValue = "1") int page) {
-        FollowingListResponse response = followService.pagedFollowings(id, true, page);
+        FollowingListResponse response = followService.pagedFollowings(id, true, page, user.getId());
         return ResponseEntity.ok(response);
     }
 
     // 팔로잉 목록 조회
     @GetMapping("/{uid}/followings")
-    public ResponseEntity<FollowingListResponse> followingList(@PathParam("uid") Long id,
+    public ResponseEntity<FollowingListResponse> followingList(@CurrentUser User user,
+                                                               @PathParam("uid") Long id,
                                                                @RequestParam(value = "p", defaultValue = "1") int page) {
-        FollowingListResponse response = followService.pagedFollowings(id, false, page);
+        FollowingListResponse response = followService.pagedFollowings(id, false, page, user.getId());
         return ResponseEntity.ok(response);
     }
 }

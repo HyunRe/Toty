@@ -9,6 +9,7 @@ import com.toty.user.dto.request.UserInfoUpdateRequest;
 import com.toty.user.dto.response.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +22,12 @@ public class UserApiController {
     private final UserService userService;
     private final UserSignUpService userSignUpService;
     private final UserInfoService userInfoService;
+
+    // 회원가입 - 이메일 중복 확인
+    @GetMapping("/test")
+    public ResponseEntity test(@CurrentUser User user) {
+        return ResponseEntity.ok(user);
+    }
 
     // 회원가입 - 이메일 중복 확인
     @GetMapping("/check-email")
@@ -55,15 +62,6 @@ public class UserApiController {
     public ResponseEntity<String> delete(@CurrentUser User user) {
         userService.deleteUser(user.getId());
         return ResponseEntity.ok("true");
-    }
-
-    // 나의/상대방의 정보 보기
-        // 본인인지 아닌지 확인 -> 아니면 약식 정보만 전달
-    @GetMapping("/{id}/info")
-    public ResponseEntity<UserInfoResponse> getUserInfo(@CurrentUser User user,
-                                                        @PathVariable("id") Long id) {
-        UserInfoResponse userInfo = userInfoService.getUserInfo(user, id);
-        return ResponseEntity.ok(userInfo);
     }
 
     // 내 정보 수정
