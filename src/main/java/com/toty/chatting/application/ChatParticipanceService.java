@@ -8,6 +8,7 @@ import com.toty.chatting.domain.repository.ChatRoomRepository;
 import com.toty.chatting.domain.repository.User01Repository;
 import com.toty.chatting.dto.message.ParticipantMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +24,8 @@ public class ChatParticipanceService {
     private final ChatParticipantRepository chatParticipantRepository;
 
     private final SimpMessagingTemplate messagingTemplate;
-
-    private final SseChatListService sseChatListService;
+    private final StringRedisTemplate strTemplate;
+//    private final SseChatListService sseChatListService;
 
     /*
         채팅방 참석자가, 해당방 나가는 기능
@@ -52,7 +53,8 @@ public class ChatParticipanceService {
                 messagingTemplate.convertAndSend(destination, participantDTO);
 
                 // 채팅방 목록에서 현재인원 1 감소
-                sseChatListService.sendEventCountDown(roomId);
+                strTemplate.convertAndSend("participant/down", roomId+"");
+//                sseChatListService.sendEventCountDown(roomId);
             }
         }
     }
@@ -87,7 +89,8 @@ public class ChatParticipanceService {
                         "/chatRoom/" + rid + "/door", participantDTO);
 
                 // 채팅방 목록에서 현재인원 1 증가
-                sseChatListService.sendEventCountUp(rid);
+                strTemplate.convertAndSend("participant/up", rid+"");
+//                sseChatListService.sendEventCountUp(rid);
 
             } else {
                 // throw new Exception();

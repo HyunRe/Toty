@@ -1,6 +1,10 @@
 package com.toty.chatting.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toty.chatting.dto.response.ChatRoomListResponse;
+import com.toty.common.baseException.JsonProcessingCustomException;
+import com.toty.notification.dto.request.NotificationSendRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -19,7 +23,7 @@ public class SseChatListService {
         emitter.onTimeout(() -> emitters.remove(emitter));
     }
 
-    public void sendEventCountUp(long roomId) {
+    public void sendEventCountUp(String roomId) {
         for (SseEmitter emitter : emitters) {
             try {
                 emitter.send(SseEmitter.event().name("countUp").data(roomId));
@@ -29,7 +33,7 @@ public class SseChatListService {
         }
     }
 
-    public void sendEventCountDown(long roomId) {
+    public void sendEventCountDown(String roomId) {
         for (SseEmitter emitter : emitters) {
             try {
                 emitter.send(SseEmitter.event().name("countDown").data(roomId));
@@ -39,7 +43,7 @@ public class SseChatListService {
         }
     }
 
-    public void sendEventEndRoom(long roomId) {
+    public void sendEventEndRoom(String roomId) {
         for (SseEmitter emitter : emitters) {
             try {
                 emitter.send(SseEmitter.event().name("roomEnd").data(roomId));
@@ -49,13 +53,23 @@ public class SseChatListService {
         }
     }
 
-    public void sendEventCreationRoom(ChatRoomListResponse chatRoomListResponse) {
+    public void sendEventCreationRoom(String chatRoomJson) {
+
+        ChatRoomListResponse chatRoomListResponse = convertFromJson(chatRoomJson);
         for (SseEmitter emitter : emitters) {
             try {
                 emitter.send(SseEmitter.event().name("roomCreation").data(chatRoomListResponse));
             } catch (IOException e) {
                 emitters.remove(emitter);
             }
+        }
+    }
+
+    private ChatRoomListResponse convertFromJson(String json) {
+        try {
+            return new ObjectMapper().readValue(json, ChatRoomListResponse.class);
+        } catch (JsonProcessingException e) {
+            throw new JsonProcessingCustomException(e);
         }
     }
 }

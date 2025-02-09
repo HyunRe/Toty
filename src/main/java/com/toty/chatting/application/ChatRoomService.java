@@ -1,5 +1,7 @@
 package com.toty.chatting.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toty.chatting.domain.model.ChatParticipant;
 import com.toty.chatting.domain.model.ChatRoom;
 import com.toty.chatting.domain.model.User01;
@@ -7,7 +9,11 @@ import com.toty.chatting.domain.repository.ChatParticipantRepository;
 import com.toty.chatting.domain.repository.ChatRoomRepository;
 import com.toty.chatting.domain.repository.User01Repository;
 import com.toty.chatting.dto.response.ChatRoomListResponse;
+import com.toty.common.baseException.JsonProcessingCustomException;
+import com.toty.notification.dto.request.NotificationSendRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +32,9 @@ public class ChatRoomService {
     private final ChatParticipantRepository chatParticipantRepository;
 
     private final SimpMessagingTemplate messagingTemplate;
-
-    private final SseChatListService sseChatListService;
-
+    private final StringRedisTemplate strTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
+//    private final SseChatListService sseChatListService;
 
     /*
         개설자가 채팅방 종료
@@ -53,7 +59,8 @@ public class ChatRoomService {
         messagingTemplate.convertAndSend(destination, "DISCONNECT");
 
         // 채팅방 목록에서 해당방 삭제
-        sseChatListService.sendEventEndRoom(roomId);
+        strTemplate.convertAndSend("room/end", roomId+"");
+//        sseChatListService.sendEventEndRoom(roomId);
     }
 
     /*
@@ -121,9 +128,20 @@ public class ChatRoomService {
 
             ChatRoomListResponse chatRoomListResponse = chatRoomEntityToDto(createdRoom);
             // 채팅방 목록 화면에 생성된 채팅방 추가
-            sseChatListService.sendEventCreationRoom(chatRoomListResponse);
+            String message = convertToJson(chatRoomListResponse);
+            strTemplate.convertAndSend("room/creation", message);
+//            redisTemplate.convertAndSend("room/creation", chatRoomListResponse);
+//            sseChatListService.sendEventCreationRoom(chatRoomListResponse);
         } else {
             // throw new Exception();
+        }
+    }
+
+    private String convertToJson(ChatRoomListResponse chatRoomListResponse) {
+        try {
+            return new ObjectMapper().writeValueAsString(chatRoomListResponse);
+        } catch (JsonProcessingException e) {
+            throw new JsonProcessingCustomException(e);
         }
     }
 

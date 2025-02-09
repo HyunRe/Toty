@@ -73,7 +73,7 @@ function inRow(chatRoom, lastRow) {
         <div class="card mb-2" >
             <div class="row">
                 <div class="col-4">
-                    <img alt="IMG">
+                    <img src="/img/chatting/undraw_profile.svg" style="width: 50px; height: 50px;">
                 </div>
                 <div class="col-8">
                     <p>${chatRoom.mentor}</p>
