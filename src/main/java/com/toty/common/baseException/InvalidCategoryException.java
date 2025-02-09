@@ -1,4 +1,4 @@
-package com.toty.base.exception;
+package com.toty.common.baseException;
 
 import org.springframework.http.HttpStatus;
 

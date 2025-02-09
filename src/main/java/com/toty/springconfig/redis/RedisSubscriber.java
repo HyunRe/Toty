@@ -3,7 +3,7 @@ package com.toty.springconfig.redis;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.toty.base.exception.JsonProcessingCustomException;
+import com.toty.common.baseException.JsonProcessingCustomException;
 import com.toty.notification.application.service.NotificationCreationService;
 import com.toty.notification.application.service.NotificationSubscriber;
 import com.toty.notification.dto.request.NotificationSendRequest;

@@ -1,5 +1,7 @@
 package com.toty.post.domain.strategy.update;
 
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
 import com.toty.post.application.PostImageService;
 import com.toty.post.domain.model.Post;
 import com.toty.post.domain.model.PostCategory;
@@ -22,7 +24,7 @@ public interface PostUpdateStrategy {
         try {
             postImageService.updateImages(post, images);
         } catch (IOException e) {
-            throw new IllegalStateException("이미지 업로드 실패를 했습니다.", e);
+            throw new ExpectedException(ErrorCode.IMAGE_UPLOAD_FAILED);
         }
     }
 
@@ -30,7 +32,7 @@ public interface PostUpdateStrategy {
     default void validateImageFormats(List<MultipartFile> images) {
         images.forEach(image -> {
             if (isValidImageFormat(image.getOriginalFilename())) {
-                throw new IllegalArgumentException("잘못된 이미지 형식 입니다: " + image.getOriginalFilename());
+                throw new ExpectedException(ErrorCode.INVALID_IMAGE_FORMAT);
             }
         });
     }
