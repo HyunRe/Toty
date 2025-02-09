@@ -78,7 +78,7 @@ function sendMessage() {
     }
 }
 
-function updateCount() {
+function updateCount(access) {
     if (access === 1) { // 입장
         $("#userCount").text(
             Number($("#userCount").text()) + 1
@@ -203,6 +203,7 @@ function handleEnterKey(event) {
 	if (event.key === 'Enter') {
 		event.preventDefault();     // 줄바꿈 방지(기본 엔터 키 동작 방지)
 		sendMessage();
+        $("#messageInput").val("");
 	}
 }
 

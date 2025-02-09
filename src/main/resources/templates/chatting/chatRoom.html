@@ -29,6 +29,19 @@
         <div class="row">
             <div class="col-1"></div>
             <div class="col-3">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td style="width: 30%;"> 멘토 : </td>
+                            <td style="width: 30%;">
+                                <img src="/img/chatting/undraw_profile.svg" style="width: 50px; height: 50px;">
+                            </td>
+                            <td style="width: 30%;">
+                                <span style="font-weight: bold;" th:text="${room.mentor.userName}">멘토 이름</span> <!--  -->
+                            </td>
+                        </tr>
+                    </thead>
+                </table>
                 <h3><strong>참석자 목록</strong></h3>
                 <div>인원 : <span id="userCount">[[${chatterList.size()}]]</span> / [[${room.userLimit}]]</div>
                 <hr>
@@ -45,12 +58,8 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <td style="width: 30%;">
-                                <img src="/img/chatting/undraw_profile.svg" style="width: 50px; height: 50px;">
-                            </td>
-                            <td style="width: 50%;">
-                                <span style="font-weight: bold;" th:text="${room.mentor.userName}">멘토 이름</span> <!--  -->
-                            </td>
+                            <td style="width: 30%;"></td>
+                            <td style="width: 50%;"></td>
                         </tr>
                     </thead>
 
