@@ -1,7 +1,9 @@
 package com.toty.notification.application.sender;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.toty.base.exception.*;
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
+import com.toty.common.baseException.UnSupportedNotificationTypeException;
 import com.toty.springconfig.redis.RedisPublisher;
 import com.toty.notification.domain.model.Notification;
 import com.toty.notification.dto.request.NotificationSendRequest;
@@ -12,6 +14,8 @@ import com.toty.springconfig.sse.SseNotificationSender;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.repository.UserRepository;
 import jakarta.mail.MessagingException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,35 +23,30 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class NotificationSenderService {
-//    private final Map<String, NotificationSender> senderMap;
+    @Autowired
+    private final Map<String, NotificationSender> senderMap;
     private final UserRepository userRepository;
     private final RedisPublisher redisPublisher;
-
-    public NotificationSenderService(UserRepository userRepository, RedisPublisher redisPublisher) {
-        this.userRepository = userRepository;
-        this.redisPublisher = redisPublisher;
-//        this.senderMap = senders.stream().collect(Collectors.toMap(
-//                sender -> getNotificationType(sender.getClass()), sender -> sender
-//        ));
-    }
 
     public void send(Notification notification) throws FirebaseMessagingException, MessagingException {
         String type = notification.getType();
         Long userId = notification.getReceiverId();
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
 
         // 사용자가 알림을 구독한 경우에만 알림을 전송
-        if (!user.getSubscribeInfo().isNotification()) {
-            throw new NotificationDisabledException();
+        if (!user.getSubscribeInfo().isNotificationAllowed()) {
+            throw new ExpectedException(ErrorCode.NOTIFICATIONS_DISABLED);
         }
 
-//        NotificationSender sender = senderMap.get(type);
-//        if (sender != null) {
-//            sender.send(notification);
-//        } else {
-//            throw new UnsupportedNotificationTypeException(type);
-//        }
+        NotificationSender sender = senderMap.get(type);
+        if (sender != null) {
+            sender.send(notification);
+        } else {
+            throw new UnSupportedNotificationTypeException(type);
+        }
+
 
         // Redis Pub/Sub을 통해 다른 서버로 알림 전송
         NotificationSendRequest sendRequest = convertToSendRequest(notification);

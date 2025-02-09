@@ -22,84 +22,50 @@ public class NotificationApiController {
 
     // sse 연결
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<?> subscribe(@RequestParam Long userId) {
+    public ResponseEntity<SseEmitter> subscribe(@RequestParam Long userId) {
         SseEmitter sseEmitter = sseService.createEmitter(userId);
-
-        SuccessResponse successResponse = new SuccessResponse(
-                HttpStatus.OK.value(),
-                "SSE 연결 완료",
-                sseEmitter
-        );
-
-        return ResponseEntity.ok(successResponse);
-    }
-
-    // 읽지 않은 알림 목록
-    @GetMapping("/unread")
-    public ResponseEntity<?> getUnreadNotifications(@RequestParam Long userId) {
-        List<Notification> unreadNotifications = notificationService.getUnreadNotificationsSortedByDate(userId);
-
-        SuccessResponse successResponse = new SuccessResponse(
-                HttpStatus.OK.value(),
-                "읽지 않은 알림 목록",
-                null
-        );
-
-        return ResponseEntity.ok(successResponse);
+        return ResponseEntity.ok(sseEmitter);
     }
 
     // 읽지 않은 알림 개수
     @GetMapping("/unread/count")
-    public ResponseEntity<?> getUnreadNotificationCount(@RequestParam Long receiverId) {
+    public ResponseEntity<Integer> getUnreadNotificationCount(@RequestParam Long receiverId) {
         int unreadCount = notificationService.countUnreadNotifications(receiverId);
-
-        SuccessResponse successResponse = new SuccessResponse(
-                HttpStatus.OK.value(),
-                "읽지 않은 알림 개수",
-                unreadCount
-        );
-
-        return ResponseEntity.ok(successResponse);
+        return ResponseEntity.ok(unreadCount);
     }
 
     // 전체 알림 읽음 처리
     @PutMapping("/read/all")
-    public ResponseEntity<?> markAllAsRead(@RequestParam Long receiverId) {
+    public ResponseEntity<String> markAllAsRead(@RequestParam Long receiverId) {
         notificationService.markAllAsRead(receiverId);
-
-        SuccessResponse successResponse = new SuccessResponse(
-                HttpStatus.OK.value(),
-                "전체 알림 읽음 처리",
-                null
-        );
-
-        return ResponseEntity.ok(successResponse);
+        return ResponseEntity.ok("true");
     }
 
     // 읽은 알림으로 전환
     @PostMapping("/{id}/read")
-    public ResponseEntity<?> markAsRead(@PathVariable String id,
-                                        @RequestParam Long receiverId) {
+    public ResponseEntity<String> markAsRead(@PathVariable String id,
+                                             @RequestParam Long receiverId) {
         notificationService.markAsReadForReceiverAndNotification(receiverId, id);
-
-        SuccessResponse successResponse = new SuccessResponse(
-                HttpStatus.OK.value(),
-                "읽은 알림으로 전환",
-                null
-        );
-
-        return ResponseEntity.ok(successResponse);
+        return ResponseEntity.ok("true");
     }
 
     // 읽은 알림 삭제
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteNotification(@RequestParam Long userId) {
+    public ResponseEntity<String> deleteNotification(@RequestParam Long userId) {
         notificationService.deleteAllReadNotifications(userId);
+        return ResponseEntity.ok("true");
+    }
 
+    // 이 밑은 테스트 용도
+
+    // 읽지 않은 알림 목록 (test)
+    @GetMapping("/unread")
+    public ResponseEntity<SuccessResponse> getUnreadNotifications(@RequestParam Long userId) {
+        List<Notification> unreadNotifications = notificationService.getUnreadNotificationsSortedByDate(userId);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
-                "읽은 알림 삭제 설공",
-                null
+                "읽지 않은 알림 목록",
+                unreadNotifications.size()
         );
 
         return ResponseEntity.ok(successResponse);

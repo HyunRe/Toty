@@ -1,7 +1,9 @@
 package com.toty.post.application;
 
-import com.toty.base.exception.PostNotFoundException;
-import com.toty.base.exception.UserNotFoundException;
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
+import com.toty.notification.application.service.NotificationSendService;
+import com.toty.notification.dto.request.NotificationSendRequest;
 import com.toty.post.domain.model.Post;
 import com.toty.post.domain.model.PostLike;
 import com.toty.post.domain.repository.PostLikeRepository;
@@ -18,13 +20,14 @@ public class PostLikeService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostLikeRepository postLikeRepository;
+    private final NotificationSendService notificationSendService;
 
 
     // 좋아요 토글 (증감소)
     @Transactional
     public Boolean toggleLikeAction(Long postId, Long userId, String likeAction) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
 
         boolean isLiked = false;
 
@@ -34,6 +37,15 @@ public class PostLikeService {
                 PostLike newLike = new PostLike(user, post);
                 postLikeRepository.save(newLike);
                 isLiked = true;
+
+                NotificationSendRequest notificationSendRequest = new NotificationSendRequest(
+                        post.getUser().getId(),     // 알림 받을 사람
+                        userId,                     // 알림 보낸 사람
+                        user.getNickname(),         // 알림 보낸 사람 닉네임
+                        "Like",                     // 알림 유형
+                        postId.toString()           // 관련된 게시글 ID
+                );
+                notificationSendService.sendNotification(notificationSendRequest);
             }
         }
         if ("unlike".equals(likeAction)) { // 좋아요 취소
@@ -50,7 +62,7 @@ public class PostLikeService {
     // 게시물의 좋아요 개수 가져오기
     @Transactional(readOnly = true)
     public int getLikeCount(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        Post post = postRepository.findById(id).orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
         return postLikeRepository.countPostLikesByPost(post);
     }
 }
