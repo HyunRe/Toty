@@ -108,9 +108,11 @@ public class PostViewController {
         postService.incrementViewCount(id);
         PostDetailResponse response = postPaginationService.getPostDetailByCategory(page, id, postCategory);
         Boolean isLiked = postLikeService.toggleLikeAction(id, user.getId(), likeAction);
+        int likeCount = postLikeService.getLikeCount(id);
         model.addAttribute("result", response);
         model.addAttribute("isLiked", isLiked);
         model.addAttribute("likeAction", likeAction);
+        model.addAttribute("likeCount", likeCount);
         model.addAttribute("postCategory", postCategory);
 
         return "post/detail";
