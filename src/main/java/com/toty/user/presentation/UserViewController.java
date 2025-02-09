@@ -41,10 +41,10 @@ public class UserViewController {
     @GetMapping("/edit-form/{id}")
     public String updateProc(@CurrentUser User user, @PathVariable Long id, Model model){
         // 본인인지 확인 -> 아니면 예외
+//
+//        UserInfoResponse userInfo = userInfoService.getMyInfoForUpdate(user, id);
 
-        UserInfoResponse userInfo = userInfoService.getMyInfoForUpdate(user, id);
-
-        model.addAttribute("userInfo", userInfo);
+//        model.addAttribute("userInfo", userInfo);
         return "update";
     }
 
