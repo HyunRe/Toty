@@ -42,10 +42,10 @@ public class UserInfoService {
     private UserInfoResponse getUserInfoByAccount(Long myId, Long userId, boolean isOwner) {
         User foundUser = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        List<Tag> userTags = userTagRepository.findByUserId(userId)
+        
+        List<String> userTags = userTagRepository.findByUserId(userId)
                 .stream()
-                .map(userTag -> userTag.getTag())
+                .map(userTag -> userTag.getTag().getTag())
                 .toList();
         List<UserLinkInfo> userLinks = userLinkRepository.findByUserId(userId)
                 .stream()
