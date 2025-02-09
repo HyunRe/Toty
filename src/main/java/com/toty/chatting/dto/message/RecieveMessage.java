@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
 public class RecieveMessage {
     private String content;
     private String sender;
-    private LocalDateTime sendedAt;
-
-
+    private String sendedAt;
 
 }

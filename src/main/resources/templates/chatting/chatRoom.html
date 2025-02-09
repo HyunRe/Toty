@@ -30,7 +30,7 @@
             <div class="col-1"></div>
             <div class="col-3">
                 <h3><strong>참석자 목록</strong></h3>
-                <div>인원 : ,  / [[${room.userLimit}]]</div>
+                <div>인원 : <span id="userCount">[[${chatterList.size()}]]</span> / [[${room.userLimit}]]</div>
                 <hr>
                 <input type="hidden" id="userName" th:value="${session.loginUser.userName}">
                 <input type="hidden" id="userId" th:value="${session.loginUser.uid}">
@@ -50,7 +50,6 @@
                             </td>
                             <td style="width: 50%;">
                                 <span style="font-weight: bold;" th:text="${room.mentor.userName}">멘토 이름</span> <!--  -->
-                                <input type="hidden" id="mentorId" th:value="${room.mentor.uid}"> <!--  -->
                             </td>
                         </tr>
                     </thead>

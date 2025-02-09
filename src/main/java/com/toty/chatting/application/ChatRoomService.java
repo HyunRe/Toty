@@ -10,9 +10,7 @@ import com.toty.chatting.domain.repository.ChatRoomRepository;
 import com.toty.chatting.domain.repository.User01Repository;
 import com.toty.chatting.dto.response.ChatRoomListResponse;
 import com.toty.common.baseException.JsonProcessingCustomException;
-import com.toty.notification.dto.request.NotificationSendRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -33,8 +31,6 @@ public class ChatRoomService {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final StringRedisTemplate strTemplate;
-    private final RedisTemplate<String, Object> redisTemplate;
-//    private final SseChatListService sseChatListService;
 
     /*
         개설자가 채팅방 종료
@@ -60,7 +56,6 @@ public class ChatRoomService {
 
         // 채팅방 목록에서 해당방 삭제
         strTemplate.convertAndSend("room/end", roomId+"");
-//        sseChatListService.sendEventEndRoom(roomId);
     }
 
     /*
@@ -130,8 +125,6 @@ public class ChatRoomService {
             // 채팅방 목록 화면에 생성된 채팅방 추가
             String message = convertToJson(chatRoomListResponse);
             strTemplate.convertAndSend("room/creation", message);
-//            redisTemplate.convertAndSend("room/creation", chatRoomListResponse);
-//            sseChatListService.sendEventCreationRoom(chatRoomListResponse);
         } else {
             // throw new Exception();
         }

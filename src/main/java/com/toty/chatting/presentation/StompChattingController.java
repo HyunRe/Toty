@@ -12,6 +12,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Controller
 @Slf4j
@@ -32,8 +33,13 @@ public class StompChattingController {
 
         chatMessageService.saveMessage(roomId, senderId, message);
 
+        // 날짜 String타입의 원하는 형식으로 변형
+        LocalDateTime ldt = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH시mm분");
+        String formattedSendedAt = ldt.format(formatter);
+
         RecieveMessage msg = RecieveMessage.builder()
-                .content(message).sender(sender).sendedAt(LocalDateTime.now())
+                .content(message).sender(sender).sendedAt(formattedSendedAt)
                 .build();
 
         return msg;

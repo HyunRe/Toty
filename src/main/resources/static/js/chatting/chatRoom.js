@@ -44,7 +44,7 @@ function socketSetting() {
                 // 채팅방에 출입 메시지
                 showDoor(participant.chatterName, participant.access);
                 // 참석자 인원 변화
-
+                updateCount(participant.access);
             }
         });
     };
@@ -76,6 +76,18 @@ function sendMessage() {
             body: JSON.stringify(params)
         });
     }
+}
+
+function updateCount() {
+    if (access === 1) { // 입장
+        $("#userCount").text(
+            Number($("#userCount").text()) + 1
+        );
+    } else if (access === 0) { // 퇴장
+        $("#userCount").text(
+            Number($("#userCount").text()) - 1
+        );
+    } //  id="userCount"
 }
 
 function updateParticipants(chatterId, chatterName, access) {
@@ -122,7 +134,7 @@ function showMessage(sender, content, sendedAt, isMine) {
         // 받은 메시지
         chatItemDiv.innerHTML = `
             <div>
-                <img src=""  width="28" style="border-radius: 30%">
+                <img src="/img/chatting/undraw_profile.svg"  width="28" style="border-radius: 30%">
                 <span style="font-size: 1rem;">${sender}</span>
             </div>
             <div class="message received">
