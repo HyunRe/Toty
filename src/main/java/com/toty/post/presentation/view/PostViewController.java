@@ -74,11 +74,11 @@ public class PostViewController {
 
     // 내가 작성한 게시글 목록 조회
     @GetMapping("/myList")
-    public String myPostList(@RequestParam(name = "page", defaultValue = "1") int page,
-                             @RequestParam("userId") Long userId,
+    public String myPostList(@CurrentUser User user,
+                             @RequestParam(name = "page", defaultValue = "1") int page,
                              @RequestParam(name = "postCategory", required = false) String postCategory,
                              Model model) {
-        PaginationResult result = postPaginationService.getPagedPostsByUserId(page, userId, postCategory);
+        PaginationResult result = postPaginationService.getPagedPostsByUserId(page, user.getId(), postCategory);
         model.addAttribute("result", result);
         model.addAttribute("postCategory", postCategory);
 

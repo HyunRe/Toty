@@ -89,10 +89,10 @@ public class PostApiController {
 
     // 내가 작성한 게시글 목록 조회 (test)
     @GetMapping("/myList")
-    public ResponseEntity<SuccessResponse> myPostList(@RequestParam(name = "page", defaultValue = "1") int page,
-                                                      @RequestParam("userId") Long userId,
+    public ResponseEntity<SuccessResponse> myPostList(@CurrentUser User user,
+                                                      @RequestParam(name = "page", defaultValue = "1") int page,
                                                       @RequestParam(name = "postCategory", required = false) String postCategory) {
-        PaginationResult result = postPaginationService.getPagedPostsByUserId(page, userId, postCategory);
+        PaginationResult result = postPaginationService.getPagedPostsByUserId(page, user.getId(), postCategory);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 "내가 작성한 게시글 목록 조회",
