@@ -48,7 +48,12 @@
                         <td>
                             <div th:if="${user.role.name() == 'MENTOR'}">
                                 <input type="text" th:class="'roomName-' + ${user.uid}" placeholder="단톡방 이름">
-                                <input type="text" th:class="'userLimit-' + ${user.uid}" placeholder="인원 제한">
+                                <select th:class="'userLimit-' + ${user.uid}">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="15">15</option>
+                                </select>
+                                <!-- <input type="text" th:class="'userLimit-' + ${user.uid}" placeholder="인원 제한"> -->
                                 <button class="createRoom" th:data-user-id="${user.uid}">단톡방 생성</button>
                             </div>
                         </td>
