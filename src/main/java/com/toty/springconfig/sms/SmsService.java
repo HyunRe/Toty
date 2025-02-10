@@ -1,9 +1,8 @@
 package com.toty.springconfig.sms;
 
-import com.toty.base.exception.PhoneNumberNotRegisteredException;
-import com.toty.base.exception.NotificationSendException;
-import com.toty.base.exception.SmsSubscriptionException;
-import com.toty.base.exception.UserNotFoundException;
+import com.toty.common.baseException.NotificationSendException;
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.repository.UserRepository;
 import jakarta.validation.constraints.NotNull;
@@ -18,16 +17,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SmsService {
     private final SmsConfig smsConfig;
-//    private final DefaultMessageService messageService;
+    private final DefaultMessageService messageService;
     private final UserRepository userRepository;
 
-    @Async
+    @Async("notificationExecutor")
     public void sendSmsNotification(SmsNotificationSendRequest smsNotificationSendRequest) {
         User user = validatedSmsUser(smsNotificationSendRequest.getReceiverId());
-        Message message = createMessage(user.getPhoneNumber(), smsNotificationSendRequest.getMessage());
+        Message message = createMessage(user.getPhoneNumber(), smsNotificationSendRequest.getMessage(), smsNotificationSendRequest.getUrl());
 
         try {
-//            messageService.sendOne(new SingleMessageSendingRequest(message));
+            messageService.sendOne(new SingleMessageSendingRequest(message));
         } catch (Exception e) {
             throw new NotificationSendException(e);
         }
@@ -37,23 +36,24 @@ public class SmsService {
     // sms 알림 동의 확인 여부
     @NotNull
     private User validatedSmsUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(id).orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
 
         if (!user.getSubscribeInfo().isSmsSubscribed()) {
-            throw new SmsSubscriptionException();
+            throw new ExpectedException(ErrorCode.SMS_CONSENT_DENIED);
         }
         if (user.getPhoneNumber() == null) {
-            throw new PhoneNumberNotRegisteredException();
+            throw new ExpectedException(ErrorCode.SMS_NOT_REGISTERED);
         }
         return user;
     }
 
     // 메세지 작성
-    private Message createMessage(String to, String text) {
+    private Message createMessage(String to, String text, String url) {
         Message message = new Message();
         message.setFrom(smsConfig.getMessageFrom());
         message.setTo(to);
         message.setText(text);
+        message.setText(url);
         return message;
     }
 }

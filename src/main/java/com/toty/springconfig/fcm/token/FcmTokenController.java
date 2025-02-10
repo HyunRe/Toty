@@ -1,29 +1,22 @@
 package com.toty.springconfig.fcm.token;
 
-import com.toty.base.response.SuccessResponse;
-import com.toty.springconfig.fcm.FcmService;
+import com.toty.common.annotation.CurrentUser;
+import com.toty.user.domain.model.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/fcm")
+@RequestMapping("/api/fcmToken")
 @RequiredArgsConstructor
 public class FcmTokenController {
-    private final FcmService fcmService;
+    private final FCmTokenService fCmTokenService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerFcmToken(@Valid @RequestBody FcmTokenRequest fcmTokenRequest) {
-        FcmToken fcmToken = fcmService.saveToken(fcmTokenRequest.getUserId(), fcmTokenRequest.getToken());
-
-        SuccessResponse successResponse = new SuccessResponse(
-                HttpStatus.OK.value(),
-                "FCM 토큰 등록 완료",
-                fcmToken
-        );
-
-        return ResponseEntity.ok(successResponse);
+    public ResponseEntity<FcmToken> registerFcmToken(@CurrentUser User user,
+                                                     @Valid @RequestBody FcmTokenRequest fcmTokenRequest) {
+        FcmToken fcmToken = fCmTokenService.saveToken(user.getId(), fcmTokenRequest.getToken());
+        return ResponseEntity.ok(fcmToken);
     }
 }

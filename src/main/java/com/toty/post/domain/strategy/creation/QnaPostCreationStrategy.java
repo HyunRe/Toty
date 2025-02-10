@@ -1,9 +1,12 @@
 package com.toty.post.domain.strategy.creation;
 
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
 import com.toty.post.application.PostImageService;
 import com.toty.post.domain.model.Post;
 import com.toty.post.domain.model.PostCategory;
 import com.toty.post.domain.model.PostTag;
+import com.toty.post.domain.repository.PostRepository;
 import com.toty.post.domain.repository.PostTagRepository;
 import com.toty.post.dto.request.PostCreateRequest;
 import com.toty.user.domain.model.User;
@@ -19,6 +22,7 @@ import java.util.Optional;
 public class QnaPostCreationStrategy implements PostCreationStrategy {
     private final PostImageService postImageService;
     private final PostTagRepository postTagRepository;
+    private final PostRepository postRepository;
 
     @Override
     public Post createPostRequest(PostCreateRequest postCreateRequest, User user) {
@@ -26,9 +30,9 @@ public class QnaPostCreationStrategy implements PostCreationStrategy {
         List<PostTag> postTags = postCreateRequest.getPostTags();
         Optional.ofNullable(postTags)
                 .filter(tags -> !tags.isEmpty())
-                .orElseThrow(() -> new ValidationException("선택된 태그가 반드시 하나 필요 합니다."));
+                .orElseThrow(() -> new ExpectedException(ErrorCode.MISSING_REQUIRED_TAG));
         if (postTags.size() > 5) {
-            throw new ValidationException("태그 선택은 최대 5개만 가능 합니다.");
+            throw new ExpectedException(ErrorCode.TAG_LIMIT_EXCEEDED);
         }
 
         Post post = new Post(user, postCreateRequest.getPostCategory(), postCreateRequest.getTitle(),
@@ -42,6 +46,7 @@ public class QnaPostCreationStrategy implements PostCreationStrategy {
         // 이미지
         processImages(post, postCreateRequest.getPostImages(), postImageService);
 
+        postRepository.save(post);
         return post;
     }
 

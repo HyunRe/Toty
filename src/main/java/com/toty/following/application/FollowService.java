@@ -5,6 +5,8 @@ import com.toty.following.domain.FollowingRepository;
 import com.toty.following.dto.response.FollowingListResponse;
 import com.toty.following.dto.response.FollowingListResponse.PageInfo;
 import com.toty.following.dto.response.FollowingListResponse.Summary;
+import com.toty.notification.application.service.NotificationSendService;
+import com.toty.notification.dto.request.NotificationSendRequest;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.repository.UserRepository;
 import java.util.List;
@@ -20,6 +22,7 @@ public class FollowService {
 
     private final UserRepository userRepository;
     private final FollowingRepository followingRepository;
+    private final NotificationSendService notificationSendService;
 
     public static final int PAGE_SIZE = 20;
 
@@ -32,6 +35,16 @@ public class FollowService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         followingRepository.save(new Following(fromUser, toUser));
+
+        NotificationSendRequest notificationSendRequest = new NotificationSendRequest(
+                toId,                       // 알림 받을 사람
+                fromId,                     // 알림 보낸 사람
+                fromUser.getNickname(),     // 알림 보낸 사람 닉네임
+                "Follow",                  // 알림 유형
+                fromId.toString()           // 팔로잉한 사용자 ID
+        );
+        notificationSendService.sendNotification(notificationSendRequest);
+
         return toId;
     }
 
@@ -95,5 +108,6 @@ public class FollowService {
     public Long countFollowings(Long userId) {
         return followingRepository.countFollowingsByUserId(userId);
     }
+
 }
 

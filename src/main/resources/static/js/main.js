@@ -146,7 +146,7 @@ function sendNumber() {
     const cleanedPhoneNum = phone.replace(/-/g, '');
 
     $.ajax({
-      url: '/api/send-sms/send-authcode',
+      url: '/api/users/authCode',
       type: 'POST',
       data: JSON.stringify ({phoneNumber: cleanedPhoneNum}),
       dataType: 'json',

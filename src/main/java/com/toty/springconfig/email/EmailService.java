@@ -1,10 +1,12 @@
 package com.toty.springconfig.email;
 
-import com.toty.base.exception.*;
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
+import com.toty.common.baseException.NotificationSendException;
 import com.toty.notification.application.service.NotificationService;
-import com.toty.springconfig.email.template.MentoEmailTemplateStrategy;
-import com.toty.springconfig.email.template.EmailTemplateStrategy;
-import com.toty.springconfig.email.template.UnreadEmailTemplateStrategy;
+import com.toty.springconfig.email.template.MentoEmailTemplate;
+import com.toty.springconfig.email.template.EmailTemplate;
+import com.toty.springconfig.email.template.UnreadEmailTemplate;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.repository.UserRepository;
 import jakarta.mail.MessagingException;
@@ -31,11 +33,11 @@ public class EmailService {
     private final SpringTemplateEngine templateEngine;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
-    private final List<EmailTemplateStrategy> strategies;  // 전략 리스트
+    private final List<EmailTemplate> strategies;  // 전략 리스트
 
     private static final String EMAIL_TITLE_PREFIX = "[TOTY] ";
 
-    @Async
+    @Async("notificationExecutor")
     public void sendEmailNotification(EmailNotificationSendRequest emailNotificationSendRequest) throws MessagingException {
         User user = validatedEmailUser(emailNotificationSendRequest.getReceiverId());
 
@@ -70,55 +72,55 @@ public class EmailService {
     // email 알림 동의 확인 여부
     @NotNull
     private User validatedEmailUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(id).orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
 
         if (!user.getSubscribeInfo().isEmailSubscribed()) {
-            throw new SmsSubscriptionException();
+            throw new ExpectedException(ErrorCode.EMAIL_CONSENT_DENIED);
         }
         if (user.getEmail() == null) {
-            throw new EmailNotRegisteredException();
+            throw new ExpectedException(ErrorCode.EMAIL_NOT_REGISTERED);
         }
         return user;
     }
 
     // 사용자 역할과 읽지 않은 알림 수에 따른 템플릿 선택
     private String setContext(EmailNotificationSendRequest emailNotificationSendRequest, User user, Map<String, String> emailValues) {
-        EmailTemplateStrategy strategy = selectStrategy(emailNotificationSendRequest);
+        EmailTemplate strategy = selectStrategy(emailNotificationSendRequest);
         Context context = new Context();
         emailValues.forEach(context::setVariable);
 
         // 전략에 따른 추가 변수 설정
-        if (strategy instanceof MentoEmailTemplateStrategy) {
-            ((MentoEmailTemplateStrategy) strategy).addAdditionalVariables(context, user);
-        } else if (strategy instanceof UnreadEmailTemplateStrategy) {
-            ((UnreadEmailTemplateStrategy) strategy).addAdditionalVariables(context, notificationService.countUnreadNotifications(emailNotificationSendRequest.getReceiverId()));
+        if (strategy instanceof MentoEmailTemplate) {
+            ((MentoEmailTemplate) strategy).addAdditionalVariables(context, user);
+        } else if (strategy instanceof UnreadEmailTemplate) {
+            ((UnreadEmailTemplate) strategy).addAdditionalVariables(context, notificationService.countUnreadNotifications(emailNotificationSendRequest.getReceiverId()));
         }
 
         return templateEngine.process(strategy.getTemplate(emailNotificationSendRequest), context);
     }
 
-    private EmailTemplateStrategy selectStrategy(EmailNotificationSendRequest emailNotificationSendRequest) {
-        User user = userRepository.findById(emailNotificationSendRequest.getReceiverId()).orElseThrow(UserNotFoundException::new);
+    private EmailTemplate selectStrategy(EmailNotificationSendRequest emailNotificationSendRequest) {
+        User user = userRepository.findById(emailNotificationSendRequest.getReceiverId()).orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
 
         // 멘토 역할 확인
         if (user.getRole().name().equals("MENTOR")) {
             return strategies.stream()
-                    .filter(strategy -> strategy instanceof MentoEmailTemplateStrategy)
+                    .filter(strategy -> strategy instanceof MentoEmailTemplate)
                     .findFirst()
-                    .orElseThrow(MentoStrategyNotFoundException::new);
+                    .orElseThrow(() -> new ExpectedException(ErrorCode.MENTOR_TEMPLATE_NOT_FOUND));
         }
 
         // 읽지 않은 알림 수 확인
         if (notificationService.countUnreadNotifications(emailNotificationSendRequest.getReceiverId()) >= 10) {
             return strategies.stream()
-                    .filter(strategy -> strategy instanceof UnreadEmailTemplateStrategy)
+                    .filter(strategy -> strategy instanceof UnreadEmailTemplate)
                     .findFirst()
-                    .orElseThrow(UnreadStrategyNotFoundException::new);
+                    .orElseThrow(() -> new ExpectedException(ErrorCode.UNREAD_NOTIFICATION_TEMPLATE_NOT_FOUND));
         }
 
         // 기본 템플릿 처리
         return strategies.stream()
                 .findFirst()
-                .orElseThrow(DefaultStrategyNotFoundException::new);
+                .orElseThrow(() -> new ExpectedException(ErrorCode.TEMPLATE_NOT_FOUND));
     }
 }

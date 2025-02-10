@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public class UserIdAndRoleDto {
-
     private final Long id;
     private final Role role;
-
 }

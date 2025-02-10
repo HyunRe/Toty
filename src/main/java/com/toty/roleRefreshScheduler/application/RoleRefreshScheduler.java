@@ -1,6 +1,9 @@
 package com.toty.roleRefreshScheduler.application;
 
 import com.toty.following.application.FollowService;
+
+import com.toty.notification.application.service.NotificationSendService;
+import com.toty.notification.dto.request.NotificationSendRequest;
 import com.toty.roleRefreshScheduler.dto.UserIdAndRoleDto;
 import com.toty.user.application.UserService;
 import com.toty.user.domain.model.Role;
@@ -35,5 +38,4 @@ public class RoleRefreshScheduler {
     private boolean isQualified(Long id) {
         return followService.countFollowers(id) >= MINIMUM_MENTOR_FOLLOWERS;
     }
-
 }

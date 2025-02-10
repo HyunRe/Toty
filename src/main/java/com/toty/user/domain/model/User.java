@@ -80,7 +80,6 @@ public class User extends BaseTime {
     public void deleteUser() {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();
-
     }
 
     public void updateRole(Role role) {
