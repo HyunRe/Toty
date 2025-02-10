@@ -33,7 +33,6 @@ public class SecurityConfig {
     private final SavedRequestAwareAuthenticationSuccessHandler formloginsuccess;
     private final JwtRequestFilter jwtRequestFilter;
     private final AccessTokenValidationFilter accessTokenValidationFilter;
-    private final CookieRequestCache cookieRequestCache;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -73,7 +72,7 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .requestCache(requestCache -> requestCache
                         .requestCache(cookieRequestCache));
 
