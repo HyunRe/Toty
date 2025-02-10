@@ -52,7 +52,7 @@ public class UserViewController {
     @GetMapping("/home") // 액세스 토큰 유효성 검사x
     public String home(){
         // todo
-        return "user/signIn";
+        return "common/home";
     }
 
     // 메세지 띄우기
