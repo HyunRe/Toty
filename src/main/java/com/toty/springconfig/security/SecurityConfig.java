@@ -90,16 +90,16 @@ public class SecurityConfig {
         failureHandler.setDefaultFailureUrl("/api/users/sign-out"); // 인증 실패 시
         return failureHandler;
     }
-
-    // 방화벽
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.httpFirewall(defaultHttpFirewall());
-    }
-
-    @Bean
-    public HttpFirewall defaultHttpFirewall() {
-        return new DefaultHttpFirewall();
-    }
+//
+//    // 방화벽
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return web -> web.httpFirewall(defaultHttpFirewall());
+//    }
+//
+//    @Bean
+//    public HttpFirewall defaultHttpFirewall() {
+//        return new DefaultHttpFirewall();
+//    }
 
 }

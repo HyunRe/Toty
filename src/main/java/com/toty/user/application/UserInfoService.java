@@ -90,7 +90,8 @@ public class UserInfoService {
         if (imgFile != null && !imgFile.isEmpty()) {
             try {
                 String savePath = basePath + userId;
-                imgFile.transferTo(new File(savePath));
+                String contentType = imgFile.getContentType().split("/")[1];
+                imgFile.transferTo(new File(savePath+"."+contentType)); // ex) --.jpg, --hi.png
                 foundUser.updateInfo(newInfo, savePath);
             } catch (IOException e) {
                 throw new RuntimeException();
