@@ -98,6 +98,15 @@ public class JwtTokenUtil {
         return cookie;
     }
 
+    public Cookie accessTokenRemover() {
+        Cookie accessToken = new Cookie("accessToken", null);
+        accessToken.setMaxAge(0);
+        accessToken.setSecure(true);
+        accessToken.setPath("/");
+        accessToken.setHttpOnly(true);
+        return accessToken;
+    }
+
     public void storeRefreshToken(String username, String newRefreshToken){
         redisService.setData(username, newRefreshToken, Duration.ofMillis(REFRESH_TOKEN_TTL));
     }
