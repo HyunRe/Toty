@@ -5,6 +5,8 @@ import com.toty.following.domain.FollowingRepository;
 import com.toty.following.dto.response.FollowingListResponse;
 import com.toty.following.dto.response.FollowingListResponse.PageInfo;
 import com.toty.following.dto.response.FollowingListResponse.Summary;
+import com.toty.notification.application.service.NotificationSendService;
+import com.toty.notification.dto.request.NotificationSendRequest;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.repository.UserRepository;
 import java.util.List;
@@ -20,8 +22,9 @@ public class FollowService {
 
     private final UserRepository userRepository;
     private final FollowingRepository followingRepository;
+    private final NotificationSendService notificationSendService;
 
-    public static final int PAGE_SIZE = 10;
+    public static final int PAGE_SIZE = 20;
 
     public Long follow(Long fromId, Long toId) {
         //todo 본인 확인
@@ -32,6 +35,16 @@ public class FollowService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         followingRepository.save(new Following(fromUser, toUser));
+
+        NotificationSendRequest notificationSendRequest = new NotificationSendRequest(
+                toId,                       // 알림 받을 사람
+                fromId,                     // 알림 보낸 사람
+                fromUser.getNickname(),     // 알림 보낸 사람 닉네임
+                "Follow",                  // 알림 유형
+                fromId.toString()           // 팔로잉한 사용자 ID
+        );
+        notificationSendService.sendNotification(notificationSendRequest);
+
         return toId;
     }
 
@@ -49,7 +62,7 @@ public class FollowService {
     }
 
 
-    public FollowingListResponse pagedFollowings(Long userId, boolean isToUser,int page) {
+    public FollowingListResponse pagedFollowings(Long userId, boolean isToUser,int page, Long myId) {
         // isToUser = True 나를 팔로우한 사람 리스트 가져오기 / False면 내가 팔로우하는 사람 리스트 가져오기
         Pageable pageable = PageRequest.of(page-1, PAGE_SIZE);
         Page<Following> followings;
@@ -62,7 +75,7 @@ public class FollowService {
                         return new Summary(
                                 fromUser.getProfileImageUrl(),
                                 fromUser.getNickname(),
-                                followingRepository.existsByFromUserIdAndToUserId(fromUser.getId(), userId)
+                                followingRepository.existsByFromUserIdAndToUserId(myId, fromUser.getId())
                         );
                     })
                     .toList();
@@ -74,7 +87,7 @@ public class FollowService {
                         return new Summary(
                                 toUser.getProfileImageUrl(),
                                 toUser.getNickname(),
-                                followingRepository.existsByFromUserIdAndToUserId(userId, toUser.getId())
+                                followingRepository.existsByFromUserIdAndToUserId(myId, toUser.getId())
                         );
                     })
                     .toList();

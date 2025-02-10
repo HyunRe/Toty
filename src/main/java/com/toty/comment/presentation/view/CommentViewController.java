@@ -5,7 +5,6 @@ import com.toty.comment.domain.model.Comment;
 import com.toty.comment.dto.request.CommentCreateUpdateRequest;
 import com.toty.common.annotation.CurrentUser;
 import com.toty.post.application.PostService;
-import com.toty.post.domain.model.Post;
 import com.toty.user.domain.model.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,7 @@ public class CommentViewController {
     private final PostService postService;
 
     @GetMapping("/create")
-    public String createCommentForm() {
+    public String createComment() {
         return "post/detail";
     }
 
@@ -39,7 +38,7 @@ public class CommentViewController {
     }
 
     @GetMapping("/update/{id}")
-    public String updateCommentForm(@PathVariable Long id, Model model) {
+    public String updateComment(@PathVariable Long id, Model model) {
         Comment comment = commentService.findByCommentId(id);
         model.addAttribute("comment", comment);
         return "post/detail";

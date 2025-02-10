@@ -1,6 +1,6 @@
 package com.toty.notification.domain.factory.message;
 
-import com.toty.base.exception.UnsupportedNotificationTypeException;
+import com.toty.common.baseException.UnSupportedNotificationTypeException;
 import com.toty.notification.domain.strategy.message.NotificationMessageStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ public class NotificationMessageFactory {
         if (strategy != null) {
             return strategy.generateMessage(sender);
         }
-        throw new UnsupportedNotificationTypeException(type);
+        throw new UnSupportedNotificationTypeException(type);
     }
 }
 

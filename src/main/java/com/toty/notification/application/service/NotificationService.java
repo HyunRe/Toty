@@ -1,6 +1,7 @@
 package com.toty.notification.application.service;
 
-import com.toty.base.exception.NotificationNotFoundException;
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
 import com.toty.notification.domain.model.Notification;
 import com.toty.notification.domain.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +48,7 @@ public class NotificationService {
     public void markAsReadForReceiverAndNotification(Long receiverId, String notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .filter(n -> n.getReceiverId().equals(receiverId) && !n.isRead())
-                .orElseThrow(NotificationNotFoundException::new);
+                .orElseThrow(() -> new ExpectedException(ErrorCode.NOTIFICATION_NOT_FOUND));
         notification.updateIsRead(true);
         notificationRepository.save(notification);
 

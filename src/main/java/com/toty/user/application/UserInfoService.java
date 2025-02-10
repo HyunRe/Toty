@@ -39,7 +39,7 @@ public class UserInfoService {
         return user.getId().equals(id);
     }
 
-    private UserInfoResponse getUserInfoByAccount(Long userId, boolean isOwner) {
+    private UserInfoResponse getUserInfoByAccount(Long myId, Long userId, boolean isOwner) {
         User foundUser = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
@@ -55,24 +55,30 @@ public class UserInfoService {
         Long followerCount = followingRepository.countFollowersByUserId(userId);
 
         return UserInfoResponse.builder()
+                .id(foundUser.getId())
                 .email(isOwner ? foundUser.getEmail() : null)
                 .phoneNumber(isOwner ? foundUser.getPhoneNumber() : null)
                 .nickname(foundUser.getNickname())
+                .username(isOwner ? foundUser.getUsername() : null)
                 .profileImgUrl(foundUser.getProfileImageUrl())
                 .emailSubscribed(isOwner ? foundUser.getSubscribeInfo().isEmailSubscribed() : null)
                 .smsSubscribed(isOwner ? foundUser.getSubscribeInfo().isSmsSubscribed() : null)
+                .notificationAllowed(isOwner ? foundUser.getSubscribeInfo().isNotificationAllowed() : null)
                 .tags(userTags)
                 .links(userLinks)
                 .followingCount(followingCount)
                 .followerCount(followerCount)
+                .role(foundUser.getRole())
+                .isFollowing(!isOwner ? followingRepository.existsByFromUserIdAndToUserId(myId, userId) : null)
+                .createdAt(isOwner ? foundUser.getCreatedAt() : null)
                 .build();
     }
 
     public UserInfoResponse getUserInfo(User user, Long id) {
         if (isSelfAccount(user, id)) {
-            return getUserInfoByAccount(id, true);
+            return getUserInfoByAccount(user.getId(), id, true);
         } else {
-            return getUserInfoByAccount(id, false);
+            return getUserInfoByAccount(user.getId(), id, false);
         }
     }
 
@@ -106,7 +112,7 @@ public class UserInfoService {
 
     public UserInfoResponse getMyInfoForUpdate(User user, Long id) {
         if (isSelfAccount(user, id)) {
-            return getUserInfoByAccount(id,true);
+            return getUserInfoByAccount(id, id,true);
         } else {
             throw new IllegalArgumentException("수정 권한이 없습니다.");
         }

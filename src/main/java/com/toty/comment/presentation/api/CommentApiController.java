@@ -21,11 +21,21 @@ public class CommentApiController {
     private final CommentService commentService;
     private final CommentPaginationService commentPaginationService;
 
-    // 댓글 작성
+    // 댓글 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteComment(@CurrentUser User user,
+                                                @PathVariable Long id) {
+        commentService.deleteComment(user, id);
+        return ResponseEntity.ok("true");
+    }
+
+    // 이 밑은 테스트 용도
+
+    // 댓글 작성 (test)
     @PostMapping("/create")
-    public ResponseEntity<?> createComment(@RequestParam("userId") Long userId,
-                                           @RequestParam("postId") Long postId,
-                                           @Valid @RequestBody CommentCreateUpdateRequest commentCreateUpdateRequest) {
+    public ResponseEntity<SuccessResponse> createComment(@RequestParam("userId") Long userId,
+                                                         @RequestParam("postId") Long postId,
+                                                         @Valid @RequestBody CommentCreateUpdateRequest commentCreateUpdateRequest) {
         Comment comment = commentService.createComment(userId, postId, commentCreateUpdateRequest);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
@@ -36,11 +46,11 @@ public class CommentApiController {
         return ResponseEntity.ok(successResponse);
     }
 
-    // 댓글 수정
+    // 댓글 수정 (test)
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateComment(@CurrentUser User user,
-                                           @PathVariable Long id,
-                                           @Valid @RequestBody CommentCreateUpdateRequest commentCreateUpdateRequest) {
+    public ResponseEntity<SuccessResponse> updateComment(@CurrentUser User user,
+                                                         @PathVariable Long id,
+                                                         @Valid @RequestBody CommentCreateUpdateRequest commentCreateUpdateRequest) {
         Comment comment = commentService.updateComment(user, id, commentCreateUpdateRequest);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
@@ -51,29 +61,15 @@ public class CommentApiController {
         return ResponseEntity.ok(successResponse);
     }
 
-    // 댓글 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteComment(@CurrentUser User user,
-                                           @PathVariable Long id) {
-        commentService.deleteComment(user, id);
-        SuccessResponse successResponse = new SuccessResponse(
-                HttpStatus.OK.value(),
-                "댓글 삭제 성공",
-                null
-        );
-
-        return ResponseEntity.ok(successResponse);
-    }
-
-    // 게시글 내 댓글 목록 조회
+    // 게시글 내 댓글 목록 조회 (test)
     @GetMapping("/list")
-    public ResponseEntity<?> commentList(@RequestParam(name = "page", defaultValue = "1") int page,
-                                         @RequestParam("postId") Long postId) {
+    public ResponseEntity<SuccessResponse> commentList(@RequestParam(name = "page", defaultValue = "1") int page,
+                                                       @RequestParam("postId") Long postId) {
         PaginationResult result = commentPaginationService.getPagedCommentsByPostId(page, postId);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 "게시글 내 댓글 목록 조회",
-                null
+                result.getContent().size()
         );
 
         return ResponseEntity.ok(successResponse);

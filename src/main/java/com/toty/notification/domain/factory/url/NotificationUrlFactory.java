@@ -1,6 +1,6 @@
 package com.toty.notification.domain.factory.url;
 
-import com.toty.base.exception.UnsupportedNotificationTypeException;
+import com.toty.common.baseException.UnSupportedNotificationTypeException;
 import com.toty.notification.domain.strategy.url.NotificationUrlStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,6 +24,6 @@ public class NotificationUrlFactory {
         if (strategy != null) {
             return strategy.generateUrl(referenceId);
         }
-        throw new UnsupportedNotificationTypeException(type);
+        throw new UnSupportedNotificationTypeException(type);
     }
 }

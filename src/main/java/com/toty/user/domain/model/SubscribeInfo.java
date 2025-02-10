@@ -18,11 +18,11 @@ public class SubscribeInfo {
     private boolean smsSubscribed = false;
 
     @Column(name = "notification", columnDefinition = "TINYINT(1)  DEFAULT 0")
-    private boolean notification = false;
+    private boolean notificationAllowed = false;
 
-    public SubscribeInfo(boolean emailSubscribed, boolean smsSubscribed, boolean notification) {
+    public SubscribeInfo(boolean emailSubscribed, boolean smsSubscribed, boolean notificationAllowed) {
         this.emailSubscribed = emailSubscribed;
         this.smsSubscribed = smsSubscribed;
-        this.notification = notification;
+        this.notificationAllowed = notificationAllowed;
     }
 }

@@ -49,7 +49,7 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 )
                 .formLogin(auth -> auth
-                        .loginPage("/common/home") // template 이하 경로
+//                        .loginPage("/user/signup") // template 이하 경로
                         .loginProcessingUrl("/api/users/sign-in")  // post 엔드포인트
                         .usernameParameter("email")
                         .passwordParameter("pwd")
