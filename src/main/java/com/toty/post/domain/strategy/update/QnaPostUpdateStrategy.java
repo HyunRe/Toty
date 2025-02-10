@@ -6,6 +6,7 @@ import com.toty.post.application.PostImageService;
 import com.toty.post.domain.model.Post;
 import com.toty.post.domain.model.PostCategory;
 import com.toty.post.domain.model.PostTag;
+import com.toty.post.domain.repository.PostRepository;
 import com.toty.post.domain.repository.PostTagRepository;
 import com.toty.post.dto.request.PostUpdateRequest;
 import jakarta.validation.ValidationException;
@@ -20,6 +21,7 @@ import java.util.Optional;
 public class QnaPostUpdateStrategy implements PostUpdateStrategy {
     private final PostImageService postImageService;
     private final PostTagRepository postTagRepository;
+    private final PostRepository postRepository;
 
     @Override
     public Post updatePostRequest(PostUpdateRequest postUpdateRequest, Post post) {
@@ -43,6 +45,7 @@ public class QnaPostUpdateStrategy implements PostUpdateStrategy {
         // 이미지
         synchronizeImages(updatedPost, postUpdateRequest.getPostImages(), postImageService);
 
+        postRepository.save(updatedPost);
         return updatedPost;
     }
 

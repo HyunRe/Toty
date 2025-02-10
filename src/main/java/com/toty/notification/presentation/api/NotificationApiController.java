@@ -3,15 +3,12 @@ package com.toty.notification.presentation.api;
 import com.toty.base.response.SuccessResponse;
 import com.toty.common.annotation.CurrentUser;
 import com.toty.notification.application.service.NotificationService;
-import com.toty.springconfig.sse.SseService;
 import com.toty.notification.domain.model.Notification;
 import com.toty.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 
@@ -20,14 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationApiController {
     private final NotificationService notificationService;
-    private final SseService sseService;
-
-    // sse 연결
-    @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<SseEmitter> subscribe(@CurrentUser User user) {
-        SseEmitter sseEmitter = sseService.createEmitter(user.getId());
-        return ResponseEntity.ok(sseEmitter);
-    }
 
     // 읽지 않은 알림 개수
     @GetMapping("/unread-count")

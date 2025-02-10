@@ -21,6 +21,7 @@ public class NotificationViewController {
     public String getUnreadNotifications(@CurrentUser User user, Model model) {
         List<Notification> unReadNotifications =  notificationService.getUnreadNotificationsSortedByDate(user.getId());
         model.addAttribute("unReadNotifications", unReadNotifications);
+        model.addAttribute("unReadCount", unReadNotifications.size());
         return "main/header";
     }
 }

@@ -48,9 +48,9 @@ async function getToken() {
     }
 }
 
-// 백엔드로 FCM 토큰 전송
+// 백엔드로 FCM 토큰 전송 (url 수정 필요)
 function sendTokenToServer(token) {
-    fetch("http://your-backend-url/save-token", {
+    fetch("http://localhost:8070/api/fcmToken/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token })

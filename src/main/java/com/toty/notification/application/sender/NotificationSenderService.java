@@ -1,6 +1,7 @@
 package com.toty.notification.application.sender;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
+import com.toty.common.baseException.NotificationSenderNotFoundException;
 import com.toty.common.exception.ErrorCode;
 import com.toty.common.exception.ExpectedException;
 import com.toty.common.baseException.UnSupportedNotificationTypeException;
@@ -14,21 +15,42 @@ import com.toty.springconfig.sse.SseNotificationSender;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.repository.UserRepository;
 import jakarta.mail.MessagingException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class NotificationSenderService {
-    @Autowired
     private final Map<String, NotificationSender> senderMap;
     private final UserRepository userRepository;
     private final RedisPublisher redisPublisher;
+
+    public NotificationSenderService(List<NotificationSender> senders,
+                                     Map<String, NotificationSender> senderMap,
+                                     UserRepository userRepository,
+                                     RedisPublisher redisPublisher) {
+        this.senderMap = senderMap;
+        this.userRepository = userRepository;
+        this.redisPublisher = redisPublisher;
+
+        registerSender(senders, SseNotificationSender.class, "Follow", "Comment", "Like");
+        registerSender(senders, FcmNotificationSender.class, "ChatRoom", "GroupChatRoom", "Knowledge", "GroupKnowledge", "Q/A");
+        registerSender(senders, EmailNotificationSender.class, "Mento");
+        registerSender(senders, SmsNotificationSender.class, "Mento");
+    }
+
+    // 전략 패턴에 따라 다른 알림 전송
+    private void registerSender(List<NotificationSender> senders, Class<? extends NotificationSender> clazz, String... types) {
+        NotificationSender sender = senders.stream()
+                .filter(s -> s.getClass().equals(clazz))
+                .findFirst()
+                .orElseThrow(() -> new NotificationSenderNotFoundException(clazz.getSimpleName()));
+
+        for (String type : types) {
+            senderMap.put(type, sender);
+        }
+    }
 
     public void send(Notification notification) throws FirebaseMessagingException, MessagingException {
         String type = notification.getType();
@@ -47,7 +69,6 @@ public class NotificationSenderService {
             throw new UnSupportedNotificationTypeException(type);
         }
 
-
         // Redis Pub/Sub을 통해 다른 서버로 알림 전송
         NotificationSendRequest sendRequest = convertToSendRequest(notification);
         redisPublisher.publish(sendRequest);
@@ -61,14 +82,5 @@ public class NotificationSenderService {
                 notification.getType(),
                 notification.getUrl()
         );
-    }
-
-    // 전략 패턴에 따라 다른 알림 전송
-    private String getNotificationType(Class<?> clazz) {
-        if (clazz == SseNotificationSender.class) return "Follow, Comment, Like";
-        if (clazz == FcmNotificationSender.class) return "ChatRoom, GroupChatRoom, Knowledge, GroupKnowledge, Q/A";
-        if (clazz == EmailNotificationSender.class) return "Mento";
-        if (clazz == SmsNotificationSender.class) return "Mento";
-        return null;
     }
 }

@@ -25,10 +25,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             senderNicknameElement.textContent = data.senderNickname;
         }
 
-        // 버튼 URL 업데이트
+        // 버튼
         let button = document.querySelector(".button");
-        if (button && data.mentorPageUrl) {
-            button.setAttribute("href", data.mentorPageUrl);
+        if (button) {
+            button.setAttribute("href", "https://localhost:8070/main");
         }
 
     } catch (error) {

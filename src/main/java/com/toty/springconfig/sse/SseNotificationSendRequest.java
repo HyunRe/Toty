@@ -1,5 +1,7 @@
 package com.toty.springconfig.sse;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,25 +11,20 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SseNotificationSendRequest {
-    private Long receiverId;
-    private Long senderId;
+    @NotNull(message = "수신자 닉네임은 필수입니다.")
     private String senderNickname;
-    private String type;
+
+    @NotNull(message = "메시지는 필수입니다.")
+    @Size(min = 1, max = 25, message = "메시지는 1자 이상, 25 이하이어야 합니다.")
     private String message;
+
+    @NotNull(message = "URL은 필수입니다.")
+    @Size(min = 1, max = 100, message = "URL은 1자 이상, 100 이하이어야 합니다.")
     private String url;
-    private boolean isRead = false;
-    private LocalDateTime createdAt;
 
-    // Getter, Setter, Constructor
-
-    public SseNotificationSendRequest(Long receiverId, Long senderId, String senderNickname, String type, String message, String url, boolean isRead, LocalDateTime createdAt) {
-        this.receiverId = receiverId;
-        this.senderId = senderId;
+    public SseNotificationSendRequest(String senderNickname, String message, String url) {
         this.senderNickname = senderNickname;
-        this.type = type;
         this.message = message;
         this.url = url;
-        this.isRead = isRead;
-        this.createdAt = createdAt;
     }
 }
