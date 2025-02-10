@@ -34,7 +34,7 @@ public class PostApiController {
     }
 
     // 게시글 좋아요 토글 (증감소)
-    @PostMapping("/{id}/like")
+    @PatchMapping("/{id}/like")
     public ResponseEntity<Boolean> toggleLike(@PathVariable Long id,
                                               @CurrentUser User user,
                                               @RequestParam(name = "likeAction", required = false) String likeAction) {

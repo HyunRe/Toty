@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public enum PostCategory {
-    QnA("qna"), KNOWLEDGE("Knowledge"), GENERAL("General");
+    QnA("Qna"), KNOWLEDGE("Knowledge"), GENERAL("General");
 
     private String category;
 

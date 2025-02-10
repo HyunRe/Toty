@@ -36,7 +36,7 @@ async function requestPermission() {
 // FCM 토큰 가져오기
 async function getToken() {
     try {
-        const currentToken = await messaging.getToken({ vapidKey: "YOUR_VAPID_KEY" });
+        const currentToken = await messaging.getToken({ vapidKey: "BGORj8XCPGAZQRStC5eQq4I_c1JFd9QHwx0iKmMmL2QJbx4JAIRQH4uwba" });
         if (currentToken) {
             console.log("FCM 토큰:", currentToken);
             sendTokenToServer(currentToken); // 백엔드에 토큰 전송

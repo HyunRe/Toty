@@ -51,14 +51,14 @@ public class NotificationApiController {
         return ResponseEntity.ok("true");
     }
 
+    // 이 밑은 테스트 용도
+
     // 읽은 알림 삭제
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteNotification(@CurrentUser User user) {
         notificationService.deleteAllReadNotifications(user.getId());
         return ResponseEntity.ok("true");
     }
-
-    // 이 밑은 테스트 용도
 
     // 읽지 않은 알림 목록 (test)
     @GetMapping("/unread")
