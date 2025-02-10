@@ -64,8 +64,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
 	// firebase
-	implementation 'com.google.firebase:firebase-admin:9.4.3'
+  implementation 'com.google.firebase:firebase-admin:9.4.3'
 	implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+
+	// elasticsearch
+	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+	implementation 'co.elastic.clients:elasticsearch-java:8.17.0'
 }
 
 sourceSets {
