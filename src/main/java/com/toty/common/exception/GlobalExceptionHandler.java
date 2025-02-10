@@ -1,6 +1,7 @@
 package com.toty.common.exception;
 
 import com.toty.common.response.TotyResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExpectedException.class)
@@ -42,7 +44,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<TotyResponse> handleUnExpectedException(Exception ex) {
-        // 추후 ex.getMessage() 로깅 추가 필요
+        log.error("에러 발생 :", ex);
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
