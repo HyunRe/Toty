@@ -15,9 +15,10 @@ public class SseNotificationSender implements NotificationSender {
     @Override
     public void send(Notification notification) {
         SseNotificationSendRequest sseNotificationSendRequest = new SseNotificationSendRequest(
-            notification.getSenderNickname(),
-            notification.getMessage(),
-            notification.getUrl()
+                notification.getReceiverId(),
+                notification.getSenderNickname(),
+                notification.getMessage(),
+                notification.getUrl()
         );
 
         // 알림 발생 시 해당 사용자에게 토스트 알림을 전송
