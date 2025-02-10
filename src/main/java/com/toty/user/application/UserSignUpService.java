@@ -1,8 +1,6 @@
 package com.toty.user.application;
 
 import com.toty.springconfig.redis.RedisService;
-import com.toty.user.domain.model.SubscribeInfo;
-import com.toty.user.dto.response.SmsAuthCodeResponse;
 import com.toty.user.domain.model.LoginProvider;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.repository.UserRepository;
@@ -15,7 +13,6 @@ import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -112,6 +109,10 @@ public class UserSignUpService {
 
     public boolean checkAuthCode(String phoneNumber, String authCode) {
         String redisAuthCode = redisService.getData(phoneNumber);
-        return authCode.equals(redisAuthCode);
+        if (authCode.equals(redisAuthCode)) {
+            return true;
+        } else {
+            throw new IllegalArgumentException("인증번호가 일치하지 않습니다.");
+        }
     }
 }

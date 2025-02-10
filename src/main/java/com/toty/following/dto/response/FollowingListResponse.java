@@ -25,6 +25,7 @@ public class FollowingListResponse {
 
     @AllArgsConstructor
     public static class Summary {
+        Long id;
         String profileImgUrl;
         String nickname;
         boolean isFollowing;

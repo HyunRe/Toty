@@ -12,7 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/api/users")
+@RequestMapping("/view/users")
 @RequiredArgsConstructor
 public class UserViewController {
 
@@ -41,10 +41,10 @@ public class UserViewController {
     @GetMapping("/edit-form/{id}")
     public String updateProc(@CurrentUser User user, @PathVariable Long id, Model model){
         // 본인인지 확인 -> 아니면 예외
+//
+//        UserInfoResponse userInfo = userInfoService.getMyInfoForUpdate(user, id);
 
-        UserInfoResponse userInfo = userInfoService.getMyInfoForUpdate(user, id);
-
-        model.addAttribute("userInfo", userInfo);
+//        model.addAttribute("userInfo", userInfo);
         return "update";
     }
 
@@ -79,9 +79,7 @@ public class UserViewController {
     // 본인인지 아닌지 확인 -> 아니면 약식 정보만 전달
     @GetMapping("/{id}/info") // -> 모델로 전달하고 view로 변경?
     public String getUserInfo(@CurrentUser User user,
-            @PathVariable("id") Long id, Model model) {
-        UserInfoResponse userInfo = userInfoService.getUserInfo(user, id);
-        model.addAttribute("userInfo", userInfo);
+            @PathVariable("id") Long id) {
         if (user.getId() == id) {
             return "user/detail";
         } else {

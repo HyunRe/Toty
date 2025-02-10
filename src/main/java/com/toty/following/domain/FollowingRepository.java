@@ -19,7 +19,6 @@ public interface FollowingRepository extends Repository<Following, Long> {
 
     void save(Following following);
 
-    // 확인 필요
     Following findByFromUserIdAndToUserId(Long fromId, Long toId);
 
     void deleteById(Long id);
