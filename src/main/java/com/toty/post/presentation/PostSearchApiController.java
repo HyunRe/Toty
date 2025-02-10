@@ -14,7 +14,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/search/posts")
-public class PostSearchController {
+public class PostSearchApiController {
 
     private final PostSearchService postSearchService;
 
