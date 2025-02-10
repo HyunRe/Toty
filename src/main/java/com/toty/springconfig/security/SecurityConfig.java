@@ -61,7 +61,7 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .deleteCookies("accessToken")
                         .deleteCookies("refreshToken")
-                        .logoutSuccessUrl("/api/users/home")
+                        .logoutSuccessUrl("/view/users/home")
                 )
                 // 추가 예정
 //                .oauth2Login(auth -> auth
@@ -72,7 +72,7 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 //                .requestCache(requestCache -> requestCache
 //                        .requestCache(cookieRequestCache));
 
@@ -87,8 +87,7 @@ public class SecurityConfig {
     @Bean
     public SimpleUrlAuthenticationFailureHandler loginFailureHandler() {
         SimpleUrlAuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
-        failureHandler.setDefaultFailureUrl("/api/view/home");
-        failureHandler.setAllowSessionCreation(false);
+        failureHandler.setDefaultFailureUrl("/api/users/sign-out"); // 인증 실패 시
         return failureHandler;
     }
 
