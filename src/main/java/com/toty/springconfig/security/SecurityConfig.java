@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.web.firewall.HttpFirewall;
-import org.springframework.security.web.savedrequest.CookieRequestCache;
+//import org.springframework.security.web.savedrequest.CookieRequestCache;
 
 @RequiredArgsConstructor
 @Configuration
@@ -72,9 +72,9 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .requestCache(requestCache -> requestCache
-                        .requestCache(cookieRequestCache));
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+//                .requestCache(requestCache -> requestCache
+//                        .requestCache(cookieRequestCache));
 
         // 토큰 관련 Filter 추가
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // /api/users/sign-in, /api/auth/refresh 제외 모든 경로
@@ -87,7 +87,7 @@ public class SecurityConfig {
     @Bean
     public SimpleUrlAuthenticationFailureHandler loginFailureHandler() {
         SimpleUrlAuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
-        failureHandler.setDefaultFailureUrl("/api/users/login");
+        failureHandler.setDefaultFailureUrl("/api/view/home");
         failureHandler.setAllowSessionCreation(false);
         return failureHandler;
     }
