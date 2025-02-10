@@ -36,7 +36,7 @@ async function requestPermission() {
 // FCM 토큰 가져오기
 async function getToken() {
     try {
-        const currentToken = await messaging.getToken({ vapidKey: "YOUR_VAPID_KEY" });
+        const currentToken = await messaging.getToken({ vapidKey: "BGORj8XCPGAZQRStC5eQq4I_c1JFd9QHwx0iKmMmL2QJbx4JAIRQH4uwba" });
         if (currentToken) {
             console.log("FCM 토큰:", currentToken);
             sendTokenToServer(currentToken); // 백엔드에 토큰 전송
@@ -48,9 +48,9 @@ async function getToken() {
     }
 }
 
-// 백엔드로 FCM 토큰 전송
+// 백엔드로 FCM 토큰 전송 (url 수정 필요)
 function sendTokenToServer(token) {
-    fetch("http://your-backend-url/save-token", {
+    fetch("http://localhost:8070/api/fcmToken/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token })

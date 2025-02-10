@@ -3,6 +3,7 @@ package com.toty.post.domain.strategy.creation;
 import com.toty.post.application.PostImageService;
 import com.toty.post.domain.model.Post;
 import com.toty.post.domain.model.PostCategory;
+import com.toty.post.domain.repository.PostRepository;
 import com.toty.post.dto.request.PostCreateRequest;
 import com.toty.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class GeneralPostCreationStrategy implements PostCreationStrategy {
     private final PostImageService postImageService;
+    private final PostRepository postRepository;
 
     @Override
     public Post createPostRequest(PostCreateRequest postCreateRequest, User user) {
@@ -21,6 +23,7 @@ public class GeneralPostCreationStrategy implements PostCreationStrategy {
         // 이미지
         processImages(post, postCreateRequest.getPostImages(), postImageService);
 
+        postRepository.save(post);
         return post;
     }
 

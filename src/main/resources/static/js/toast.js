@@ -30,7 +30,7 @@ function showToast(message) {
 }
 
 // SSE 연결 설정 (수정 필요)
-const eventSource = new EventSource("http://your-backend-url/events");
+const eventSource = new EventSource("http://localhost:8070/api/sse/subscribe");
 
 eventSource.onmessage = function(event) {
     showToast(event.data); // 백엔드에서 받은 메시지를 토스트로 표시

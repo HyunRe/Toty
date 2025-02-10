@@ -1,7 +1,9 @@
 package com.toty.notification.presentation.view;
 
+import com.toty.common.annotation.CurrentUser;
 import com.toty.notification.application.service.NotificationService;
 import com.toty.notification.domain.model.Notification;
+import com.toty.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,9 +18,10 @@ public class NotificationViewController {
     private final NotificationService notificationService;
 
     @GetMapping("/unread")
-    public String getUnreadNotifications(@RequestParam Long userId, Model model) {
-        List<Notification> unReadNotifications =  notificationService.getUnreadNotificationsSortedByDate(userId);
+    public String getUnreadNotifications(@CurrentUser User user, Model model) {
+        List<Notification> unReadNotifications =  notificationService.getUnreadNotificationsSortedByDate(user.getId());
         model.addAttribute("unReadNotifications", unReadNotifications);
+        model.addAttribute("unReadCount", unReadNotifications.size());
         return "main/header";
     }
 }

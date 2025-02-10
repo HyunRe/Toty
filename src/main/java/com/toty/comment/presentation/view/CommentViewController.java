@@ -26,14 +26,14 @@ public class CommentViewController {
     }
 
     @PostMapping("/create")
-    public String createComment(@RequestParam("userId") Long userId,
+    public String createComment(@CurrentUser User user,
                                 @RequestParam("postId") Long postId,
                                 @ModelAttribute @Valid CommentCreateUpdateRequest commentCreateUpdateRequest,
                                 BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "post/detail"; // 유효성 검사 실패 시, 다시 폼을 반환
         }
-        commentService.createComment(userId, postId, commentCreateUpdateRequest);
+        commentService.createComment(user.getId(), postId, commentCreateUpdateRequest);
         return "post/detail";
     }
 

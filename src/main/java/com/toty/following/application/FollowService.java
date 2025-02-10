@@ -98,5 +98,9 @@ public class FollowService {
         FollowingListResponse response = new FollowingListResponse(userSummaries, pages);
         return response;
     }
+
+    public Long countFollowers(Long userId) {
+        return followingRepository.countFollowersByUserId(userId);
+    }
 }
 

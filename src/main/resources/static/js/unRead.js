@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", async function () {
     try {
         // API 요청 (실제 엔드포인트로 변경 필요)
-        let response = await fetch("https://your-api.com/mentor-info", {
+        let response = await fetch("https://localhost:8070/view/notifications/unread", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
@@ -25,10 +25,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             senderNicknameElement.textContent = data.unReadCount;
         }
 
-        // 버튼 URL 업데이트
+        // 버튼
         let button = document.querySelector(".button");
-        if (button && data.notificationListUrl) {
-            button.setAttribute("href", data.notificationListUrl);
+        if (button) {
+            button.setAttribute("href", "https://localhost:8070/main");
         }
 
     } catch (error) {
