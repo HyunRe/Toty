@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/sse")
 @RequiredArgsConstructor
-public class SesController {
+public class SseController {
     private final SseService sseService;
 
     // sse 연결

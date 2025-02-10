@@ -27,15 +27,13 @@
                     <option value="Qna" th:selected="${post.postCategory == 'Qna'}">Qna</option>
                 </select>
             </div>
-            <div class="col-md-6" id="tagsContainer" style="display: none;">
-                <label class="form-label">Tags</label>
-                <div id="postTags" class="form-check">
-                    <input type="checkbox" class="form-check-input" id="tag1" name="postTags" value="tag1" th:checked="${post.postTags.contains('tag1')}">
-                    <label class="form-check-label" for="tag1">Tag 1</label><br>
-                    <input type="checkbox" class="form-check-input" id="tag2" name="postTags" value="tag2" th:checked="${post.postTags.contains('tag2')}">
-                    <label class="form-check-label" for="tag2">Tag 2</label><br>
-                    <input type="checkbox" class="form-check-input" id="tag3" name="postTags" value="tag3" th:checked="${post.postTags.contains('tag3')}">
-                    <label class="form-check-label" for="tag3">Tag 3</label>
+            <div class="col-md-6">
+                <label class="form-label">태그</label>
+                <div id="postTags">
+                    <div th:each="tag : ${tags}" class="form-check">
+                        <input type="checkbox" class="form-check-input" th:id="${tag}" th:name="postTags" th:value="${tag}">
+                        <label class="form-check-label" th:for="${tag}" th:text="${tag}"></label>
+                    </div>
                 </div>
             </div>
         </div>

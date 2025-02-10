@@ -31,13 +31,14 @@ public class PostViewController {
     }
 
     @PostMapping("/create")
-    public String createPost(@RequestParam("userId") Long userId,
+    public String createPost(@CurrentUser User user,
                              @ModelAttribute @Valid PostCreateRequest postCreateRequest,
-                             BindingResult bindingResult) {
+                             BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             return "post/create"; // 유효성 검사 실패 시, 다시 폼을 반환
         }
-        postService.createPost(userId, postCreateRequest);
+        postService.createPost(user.getId(), postCreateRequest);
+        model.addAttribute("tags", postCreateRequest.getPostTags());
         return "redirect:/view/posts/myList";
     }
 
@@ -52,11 +53,12 @@ public class PostViewController {
     public String updatePost(@CurrentUser User user,
                              @PathVariable Long id,
                              @ModelAttribute @Valid PostUpdateRequest postUpdateRequest,
-                             BindingResult bindingResult) {
+                             BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             return "post/update"; // 유효성 검사 실패 시, 다시 폼을 반환
         }
         postService.updatePost(user, id, postUpdateRequest);
+        model.addAttribute("tags", postUpdateRequest.getPostTags());
         return "redirect:/view/posts/myList";
     }
 

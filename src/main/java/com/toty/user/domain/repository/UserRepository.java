@@ -21,5 +21,5 @@ public interface UserRepository extends Repository<User, Long> {
 
     User save(User user);
 
-    List<UserIdAndRoleDto> findAllByIsDeletedFalse();
+    //List<UserIdAndRoleDto> findAllByIsDeletedFalse();
 }

@@ -46,9 +46,9 @@ public class PostApiController {
 
     // 게시글 작성 (test)
     @PostMapping("/create")
-    public ResponseEntity<SuccessResponse> createPost(@RequestParam("userId") Long userId,
+    public ResponseEntity<SuccessResponse> createPost(@CurrentUser User user,
                                                       @Valid @RequestBody PostCreateRequest postCreateRequest) {
-        Post post = postService.createPost(userId, postCreateRequest);
+        Post post = postService.createPost(user.getId(), postCreateRequest);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 "게시글 생성 성공",

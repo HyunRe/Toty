@@ -28,7 +28,7 @@ public class EmailController {
     public void sendMentoEmailNotification(@ModelAttribute @Valid EmailNotificationSendRequest emailNotificationSendRequest,
                                                              Model model) throws MessagingException {
         emailService.sendEmailNotification(emailNotificationSendRequest);
-        roleRefreshScheduler.refreshRole();
+        //roleRefreshScheduler.refreshRole();
         User receiverNickname = userService.findById(emailNotificationSendRequest.getReceiverId());
         model.addAttribute("receiverNickname", receiverNickname);
     }
