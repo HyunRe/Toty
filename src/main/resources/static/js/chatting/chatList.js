@@ -16,8 +16,59 @@ eventSource.addEventListener("roomEnd", (event) => {
 
 eventSource.addEventListener("roomCreation", (event) => {
     const chatRoom = JSON.parse(event.data); // JSON으로 파싱
-    createRoom(chatRoom);
+    showRoom(chatRoom);
 });
+
+// 멘토권한 사용자가 단톡방 생성 
+function createRoom() {
+
+    Swal.fire({
+        title: "채팅방 생성",
+        html: `
+            <input class="roomName" placeholder="단톡방 주제">
+            <select class="userLimit">
+                <option value="5">제한인원</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+            </select>
+        `,
+        showCancelButton: true,
+        cancelButtonText: "생성 취소",
+        confirmButtonText: "채팅방 개설",
+        confirmButtonColor: "#1f9bcf",
+      }).then((result) => {
+        /* 예, 아니오 선택에 따라 조건문 로직 실행 */
+        if (result.isConfirmed) {
+            var rr = $(".roomName").val();
+            var ul = $(".userLimit").val();
+            var params = {
+                            "roomName": rr, "userLimit": ul
+                        }
+            $.ajax({
+                type:"post",
+                url:"/api/chatting/room",
+                data: params,
+                success:function(response) {
+                    Swal.fire({
+                        title: "탈퇴 완료",
+                        text: "새 채팅방이 개설되었습니다.",
+                        icon: "success",
+                        confirmButtonColor: "#1f9bcf",
+                      });
+                },
+                error:function(xhr) {
+                    let response = xhr.responseJSON;
+                    console.log(response);
+                    alert("단톡방 생성 실패 \n" + response.message);
+                }
+            });
+        } else { // 그냥 닫힘
+            }
+      });
+
+    
+}
 
 function upUserCount(roomId) {
     $(".roomUserCount-" + roomId).text(
@@ -31,14 +82,8 @@ function downUserCount(roomId) {
     );
 }
 
-function deleteRoom(roomId) {
-    const chatRoomListBox = document.getElementById("chatRoomListBox");
-    var target = chatRoomListBox.querySelector(".room-" + roomId);
-    target.remove();
-}
-
 // 마지막 row 확인해서 
-function createRoom(chatRoom) {
+function showRoom(chatRoom) {
     const chatRoomListBox = document.getElementById("chatRoomListBox");
 
     // 일단 마지막 row에 넣는거
@@ -97,30 +142,17 @@ function inRow(chatRoom, lastRow) {
     lastRow.appendChild(roomComponent);
 }
 
+function deleteRoom(roomId) {
+    const chatRoomListBox = document.getElementById("chatRoomListBox");
+    var target = chatRoomListBox.querySelector(".room-" + roomId);
+    target.remove();
+}
+
+
+
 $(document).ready(function() {
 
     // 로그인한 사용자id
     loginId = $(".userId").val();  
-    
-    $(".createRoom").on("click", function() {
-       
-        var rr = $(".roomName").val();
-        var ul = $(".userLimit").val();
-        var params = {
-                        "roomName": rr, "userLimit": ul
-                      }
-        $.ajax({
-            type:"post",
-            url:"/api/chatting/room",
-            data: params,
-            success:function(response) {
-    
-            },
-            error:function(xhr) {
-                let response = xhr.responseJSON;
-                console.log(response);
-                alert("단톡방 생성 실패 \n" + response.message);
-            }
-        });
-    });
+
 })

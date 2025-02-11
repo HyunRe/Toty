@@ -35,27 +35,31 @@ public class ChatRoomService {
     /*
         개설자가 채팅방 종료
      */
-    public void mentorEndRoom(long roomId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElse(null);
-        LocalDateTime endTime = LocalDateTime.now();
+    public void mentorEndRoom(Long userId, Long roomId) {
+        if (roomId != null) {
+            ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElse(null);
+            if (userId == chatRoom.getMentor().getId()) {
+                LocalDateTime endTime = LocalDateTime.now();
 
-        // 채팅방 종료시간 입력
-        chatRoom.setEndedAt(endTime);
-        chatRoomRepository.save(chatRoom);
+                // 채팅방 종료시간 입력
+                chatRoom.setEndedAt(endTime);
+                chatRoomRepository.save(chatRoom);
 
-        // 채팅방 참석자들 나가는 시간 입력
-        List<ChatParticipant> chatterList = chatParticipantRepository.findAllByRoomAndExitAt(chatRoom, null);
-        for (ChatParticipant chatter : chatterList) {
-            chatter.setExitAt(endTime);
+                // 채팅방 참석자들 나가는 시간 입력
+                List<ChatParticipant> chatterList = chatParticipantRepository.findAllByRoomAndExitAt(chatRoom, null);
+                for (ChatParticipant chatter : chatterList) {
+                    chatter.setExitAt(endTime);
+                }
+                chatParticipantRepository.saveAll(chatterList);
+
+                // 해당 방 종료 알리기( 채팅방에 연결된 웹소켓 통신 종료시키기 )
+                String destination = "/chatRoom/" + roomId + "/door";
+                messagingTemplate.convertAndSend(destination, "DISCONNECT");
+
+                // 채팅방 목록에서 해당방 삭제
+                strTemplate.convertAndSend("room/end", roomId+"");
+            }
         }
-        chatParticipantRepository.saveAll(chatterList);
-
-        // 해당 방 종료 알리기( 채팅방에 연결된 웹소켓 통신 종료시키기 )
-        String destination = "/chatRoom/" + roomId + "/door";
-        messagingTemplate.convertAndSend(destination, "DISCONNECT");
-
-        // 채팅방 목록에서 해당방 삭제
-        strTemplate.convertAndSend("room/end", roomId+"");
     }
 
     /*

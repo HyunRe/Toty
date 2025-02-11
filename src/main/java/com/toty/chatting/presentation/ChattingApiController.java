@@ -33,8 +33,8 @@ public class ChattingApiController {
     @PostMapping("/participant/{rid}")
     public String enterRoom( @PathVariable("rid") long rid
             , @CurrentUser User user, RedirectAttributes reAtr) {
-        Long userId = user.getId();
-        if (userId != null) {
+        if (user != null) {
+            Long userId = user.getId();
             chatParticipanceService.userEnterRoom(rid, userId);
             reAtr.addAttribute("rid", rid);
             return "redirect:/view/chatting/room";
@@ -58,8 +58,11 @@ public class ChattingApiController {
      */
     @PatchMapping("/rooms/{roomId}")
     @ResponseBody
-    public void endRoom(@PathVariable("roomId") long roomId) {
-        chatRoomService.mentorEndRoom(roomId);
+    public void endRoom(@PathVariable("roomId") long roomId, @CurrentUser User user) {
+        if (user != null) {
+            Long userId = user.getId();
+            chatRoomService.mentorEndRoom(userId, roomId);
+        }
     }
 
     /*
@@ -70,8 +73,10 @@ public class ChattingApiController {
     @ResponseBody
     public void createRoom( @RequestParam("roomName") String roomName, @RequestParam("userLimit") int userLimit
         , @CurrentUser User user) {
-        Long userId = user.getId();
-        chatRoomService.mentorCreateRoom(userId, roomName, userLimit);
+        if (user != null) {
+            Long userId = user.getId();
+            chatRoomService.mentorCreateRoom(userId, roomName, userLimit);
+        }
     }
 
     /*

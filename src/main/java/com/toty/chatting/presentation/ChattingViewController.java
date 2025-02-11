@@ -38,11 +38,12 @@ public class ChattingViewController {
      */
     @RequestMapping("/list")
     public String chatList(Model model, @CurrentUser User user) {
-        Long userId = user.getId();
-
         List<ChatRoomListResponse> chatRoomList = chatRoomService.getChatRoomListView();
         model.addAttribute("chatRoomList", chatRoomList);
-        model.addAttribute("userId", userId);
+        if (user != null) {
+            Long userId = user.getId();
+            model.addAttribute("userId", userId);
+        }
         return "chatting/chatList";
     }
 
@@ -54,8 +55,6 @@ public class ChattingViewController {
      */
     @RequestMapping("/room")
     public String aachr(@RequestParam("rid") long rid, @CurrentUser User user, Model model) {
-        Long userId = user.getId();
-        String nickname = user.getNickname();
 
         Optional<ChatRoom> room = chatRoomRepository.findById(rid);
 
@@ -63,9 +62,12 @@ public class ChattingViewController {
             List<ChatParticipant> chatterList = chatParticipantRepository.findAllByRoomAndExitAt(room.get(), null);
             model.addAttribute("chatterList", chatterList);
             model.addAttribute("room", room.get());
-            model.addAttribute("userId", userId);
-            model.addAttribute("nickname", nickname);
-            
+            if (user != null) {
+                Long userId = user.getId();
+                String nickname = user.getNickname();
+                model.addAttribute("userId", userId);
+                model.addAttribute("nickname", nickname);
+            }
             model.addAttribute("serverPort", serverPort);
         }
 
