@@ -27,8 +27,8 @@ public class PostSearchService {
      * 1. 검색 속성(field)(제목, 본문, 제목 + 본문)마다 검색 방식(조회 메서드)이 다르다.
      * 2. 검색은 모든 게시판(일반, 정보, QnA)의 게시글들을 포함하고 있어야 한다.
      */
-    public Map<PostCategory, Page<PostEs>> searchPosts(String keyword, SearchField field, int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page - 1, size);
+    public Map<PostCategory, Page<PostEs>> searchPosts(String keyword, SearchField field, int size) {
+        PageRequest pageRequest = PageRequest.of(0, size);
 
         if (field == SearchField.TITLE) {
             return Map.of(
@@ -53,9 +53,29 @@ public class PostSearchService {
         }
     }
 
+    public Map<PostCategory, Page<PostEs>> searchPostsByCategory(String keyword, SearchField field, PostCategory category, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        if (field == SearchField.TITLE) {
+            return Map.of(
+                    category, postSearchRepository.searchByTitleAndCategory(keyword, category.toString() ,pageRequest)
+            );
+        } else if (field == SearchField.CONTENT) {
+            return Map.of(
+                    category, postSearchRepository.searchByContentAndCategory(keyword, category.toString() ,pageRequest)
+            );
+        } else if (field == SearchField.TITLE_CONTENT) {
+            return Map.of(
+                    category, postSearchRepository.searchTitleAndContentAndCategory(keyword, category.toString() ,pageRequest)
+            );
+        } else {
+            throw new ExpectedException(ErrorCode.INVALID_SEARCH_FIELD);
+        }
+    }
+
     public String savePost(String title, String content, String nickname, PostCategory category) {
         PostEs postSearch = PostEs.builder()
-                .id(UUID.randomUUID().toString()) // id는 UUID로 생성
+                .id(UUID.randomUUID().toString()) // todo : mysql의 pk 값이 저장되어야 함
                 .nickname(nickname) // 사용자가 입력한 닉네임
                 .title(title) // 사용자가 입력한 제목
                 .content(content) // 사용자가 입력한 본문
