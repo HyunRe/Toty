@@ -23,7 +23,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ChattingViewController {
 
-    private final User01Repository user01Repository;
     private final ChatParticipantRepository chatParticipantRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomService chatRoomService;
@@ -38,8 +37,8 @@ public class ChattingViewController {
         model.addAttribute("chatRoomList", chatRoomList);
 
         // 삭제 예정
-        List<User01> userList = user01Repository.findAll();
-        model.addAttribute("userList", userList);
+//        List<User01> userList = user01Repository.findAll();
+//        model.addAttribute("userList", userList);
 
         return "chatting/chatList";
     }
@@ -68,29 +67,29 @@ public class ChattingViewController {
         아래 2개는 나중에 삭제할꺼
      */
     // 회원가입(user)
-    @PostMapping("/user")
-    public String aa12 (@RequestParam("userName") String userName) {
-        Role userRole = Role.USER;
-
-        User01 uu = User01.builder()
-                .userName(userName).role(userRole)
-                .build();
-
-        user01Repository.save(uu);
-        return "redirect:/view/chatting/list";
-    }
+//    @PostMapping("/user")
+//    public String aa12 (@RequestParam("userName") String userName) {
+//        Role userRole = Role.USER;
+//
+//        User01 uu = User01.builder()
+//                .userName(userName).role(userRole)
+//                .build();
+//
+//        user01Repository.save(uu);
+//        return "redirect:/view/chatting/list";
+//    }
 
     // 회원가입(mentor)
-    @PostMapping("/mentor")
-    public String aa (@RequestParam("userName") String userName) {
-        Role userRole = Role.MENTOR;
-
-        User01 uu = User01.builder()
-                .userName(userName).role(userRole)
-                .build();
-
-        user01Repository.save(uu);
-        return "redirect:/view/chatting/list";
-    }
+//    @PostMapping("/mentor")
+//    public String aa (@RequestParam("userName") String userName) {
+//        Role userRole = Role.MENTOR;
+//
+//        User01 uu = User01.builder()
+//                .userName(userName).role(userRole)
+//                .build();
+//
+//        user01Repository.save(uu);
+//        return "redirect:/view/chatting/list";
+//    }
 
 }

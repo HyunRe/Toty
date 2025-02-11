@@ -8,6 +8,8 @@ import com.toty.chatting.domain.repository.ChatParticipantRepository;
 import com.toty.chatting.domain.repository.ChatRoomRepository;
 import com.toty.chatting.dto.response.ChatRoomListResponse;
 import com.toty.common.baseException.JsonProcessingCustomException;
+import com.toty.user.domain.model.User;
+import com.toty.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -23,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatRoomService {
 
-//    private final User01Repository user01Repository;
+    private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatParticipantRepository chatParticipantRepository;
 
@@ -111,7 +113,7 @@ public class ChatRoomService {
     @Transactional
     public void mentorCreateRoom(long mid, String roomName, int userLimit) {
 
-        User01 mentor = user01Repository.findById(mid).orElse(null);
+        User mentor = userRepository.findById(mid).orElse(null);
 
         if (mentor != null && mentor.getRole().name() == "MENTOR") {
             ChatRoom room = ChatRoom.builder()

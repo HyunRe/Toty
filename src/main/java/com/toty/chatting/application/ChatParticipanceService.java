@@ -5,6 +5,8 @@ import com.toty.chatting.domain.model.ChatRoom;
 import com.toty.chatting.domain.repository.ChatParticipantRepository;
 import com.toty.chatting.domain.repository.ChatRoomRepository;
 import com.toty.chatting.dto.message.ParticipantMessage;
+import com.toty.user.domain.model.User;
+import com.toty.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -17,7 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ChatParticipanceService {
 
-    private final User01Repository user01Repository;
+    private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatParticipantRepository chatParticipantRepository;
 
@@ -29,7 +31,7 @@ public class ChatParticipanceService {
     */
     public void chatterExitRoom(long roomId, long chatterId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElse(null);
-        User01 participant = user01Repository.findById(chatterId).orElse(null);
+        User participant = userRepository.findById(chatterId).orElse(null);
 
         if (participant != null && chatRoom != null) {
             Optional<ChatParticipant> attendance = chatParticipantRepository.findByChatterAndRoomAndExitAt(participant, chatRoom, null);
@@ -39,7 +41,7 @@ public class ChatParticipanceService {
                 chatParticipantRepository.save(chatParticipant02);
 
                 long chatter01Id = chatParticipant02.getId();
-                String chatterName = chatParticipant02.getChatter().getUserName();
+                String chatterName = chatParticipant02.getChatter().getNickname();
 
                 ParticipantMessage participantDTO = ParticipantMessage.builder()
                         .chatterId(chatter01Id).chatterName(chatterName).access(0)
@@ -62,7 +64,7 @@ public class ChatParticipanceService {
         // 일단은 단톡방으로 무조건 넘어가는 로직만 있음
         // 여러가지 경우를 고려해야할수도( 단톡방 없는경우 등 )
         ChatRoom chatRoom = chatRoomRepository.findById(rid).orElse(null);
-        User01 participant = user01Repository.findById(uid).orElse(null);
+        User participant = userRepository.findById(uid).orElse(null);
         // 로그인 여부까지 체크하면 좋음
 
         Optional<ChatParticipant> attendance = chatParticipantRepository.findByChatterAndRoomAndExitAt(participant, chatRoom, null);
@@ -74,7 +76,7 @@ public class ChatParticipanceService {
                 ChatParticipant savedChatter = chatParticipantRepository.save(chatter);
 
                 long chatterId = savedChatter.getId();
-                String chatterName = savedChatter.getChatter().getUserName();
+                String chatterName = savedChatter.getChatter().getNickname();
 
                 ParticipantMessage participantDTO = ParticipantMessage.builder()
                         .chatterId(chatterId).chatterName(chatterName).access(1)

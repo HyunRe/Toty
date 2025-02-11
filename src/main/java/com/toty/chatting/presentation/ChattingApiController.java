@@ -22,7 +22,6 @@ public class ChattingApiController {
 
     private final ChatRoomService chatRoomService;
     private final ChatParticipanceService chatParticipanceService;
-    private final User01Service user01Service;
 
     /*
                 단톡방 입장하기
@@ -80,11 +79,11 @@ public class ChattingApiController {
 
 
     // 나중에 삭제할꺼, 사용자 로그인
-    @GetMapping("/login/{id}")
-    @ResponseBody
-    public String userLogin(HttpSession session, @PathVariable("id") long id) {
-        String result = user01Service.findUserAndLogin(session, id);
-        return result;
-    }
+//    @GetMapping("/login/{id}")
+//    @ResponseBody
+//    public String userLogin(HttpSession session, @PathVariable("id") long id) {
+//        String result = user01Service.findUserAndLogin(session, id);
+//        return result;
+//    }
 
 }
