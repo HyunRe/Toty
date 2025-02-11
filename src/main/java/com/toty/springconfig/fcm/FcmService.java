@@ -28,7 +28,7 @@ public class FcmService {
                 .build();
 
         try {
-//            firebaseMessaging.send(message);
+            firebaseMessaging.send(message);
         } catch (Exception e) {
             throw new NotificationSendException(e);
         }

@@ -54,6 +54,7 @@ public class CommentService {
         );
         notificationSendService.sendNotification(notificationSendRequest);
 
+        commentRepository.save(comment);
         return comment;
     }
 
@@ -73,6 +74,7 @@ public class CommentService {
 
         Comment updatedComment = new Comment(comment.getUser(), comment.getPost(), commentCreateUpdateRequest.getContent());
         comment.getPost().addComment(updatedComment);
+        commentRepository.save(comment);
         return updatedComment;
     }
 

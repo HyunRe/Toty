@@ -73,6 +73,7 @@ public class FollowService {
                     .map(following -> {
                         User fromUser = following.getFromUser();
                         return new Summary(
+                                fromUser.getId(),
                                 fromUser.getProfileImageUrl(),
                                 fromUser.getNickname(),
                                 followingRepository.existsByFromUserIdAndToUserId(myId, fromUser.getId())
@@ -85,6 +86,7 @@ public class FollowService {
                     .map(following -> {
                         User toUser = following.getToUser(); // 중복 호출 방지
                         return new Summary(
+                                toUser.getId(),
                                 toUser.getProfileImageUrl(),
                                 toUser.getNickname(),
                                 followingRepository.existsByFromUserIdAndToUserId(myId, toUser.getId())
@@ -98,5 +100,14 @@ public class FollowService {
         FollowingListResponse response = new FollowingListResponse(userSummaries, pages);
         return response;
     }
+
+    public Long countFollowers(Long userId) {
+        return followingRepository.countFollowersByUserId(userId);
+    }
+
+    public Long countFollowings(Long userId) {
+        return followingRepository.countFollowingsByUserId(userId);
+    }
+
 }
 

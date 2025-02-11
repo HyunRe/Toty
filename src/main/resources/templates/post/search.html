@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시판 검색</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>게시판 검색 결과</h1>
+
+<!-- 검색 폼 -->
+<div>
+    <input type="text" id="keyword" value="테스트" placeholder="검색어를 입력하세요">
+    <select id="field">
+        <option value="TITLE" selected>제목</option>
+        <option value="CONTENT">내용</option>
+        <option value="AUTHOR">작성자</option>
+    </select>
+    <button id="searchButton">검색</button>
+</div>
+
+<div id="general-board">
+    <h2>일반 게시판</h2>
+    <ul id="general-list"></ul>
+    <div id="general-pagination"></div>
+</div>
+
+<div id="info-board">
+    <h2>정보 게시판</h2>
+    <ul id="info-list"></ul>
+    <div id="info-pagination"></div>
+</div>
+
+<div id="qna-board">
+    <h2>QnA 게시판</h2>
+    <ul id="qna-list"></ul>
+    <div id="qna-pagination"></div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        function fetchPosts(page = 1) {  // 페이지를 0부터 시작하도록 수정
+            const keyword = $('#keyword').val();
+            const field = $('#field').val();
+
+            $.ajax({
+                url: '/api/search/posts',  // API URL을 맞게 수정
+                type: 'GET',
+                data: {
+                    keyword: keyword,
+                    field: field,
+                    page: page,
+                    size: 3
+                },
+                success: function(response) {
+                    const data = response.data;
+
+                    // 일반 게시판
+                    renderBoard(data['GENERAL'], '#general-list', '#general-pagination', 'GENERAL', page);
+
+                    // 정보 게시판
+                    renderBoard(data['KNOWLEDGE'], '#info-list', '#info-pagination', 'KNOWLEDGE', page);
+
+                    // QnA 게시판
+                    renderBoard(data['QnA'], '#qna-list', '#qna-pagination', 'QnA', page);
+                },
+                error: function() {
+                    alert('게시글을 불러오는 데 실패했습니다.');
+                }
+            });
+        }
+
+        function renderBoard(boardData, listSelector, paginationSelector, category, currentPage) {
+            const posts = boardData.content;
+            const totalPages = boardData.totalPages;
+            const currentPageIndex = boardData.number;
+
+            // 게시글 목록 출력
+            $(listSelector).empty();
+            posts.forEach(post => {
+                $(listSelector).append(`
+                    <li>
+                        <h3>${post.title}</h3>
+                        <p>${post.content}</p>
+                    </li>
+                `);
+            });
+
+            // 페이지네이션 출력
+            $(paginationSelector).empty();
+            if (currentPageIndex > 0) {
+                $(paginationSelector).append(`<a href="#" class="page-link" data-page="${currentPageIndex - 1}">이전</a>`);
+            }
+            if (currentPageIndex < totalPages - 1) {
+                $(paginationSelector).append(`<a href="#" class="page-link" data-page="${currentPageIndex + 1}">다음</a>`);
+            }
+
+            // 페이지 링크 클릭 시 처리
+            $(paginationSelector).find('.page-link').click(function(e) {
+                e.preventDefault();
+                const page = $(this).data('page');
+                fetchPosts(page);  // 페이지는 0부터 시작하므로 수정
+            });
+        }
+
+        // 검색 버튼 클릭 시 게시글 목록 및 페이지네이션 갱신
+        $('#searchButton').click(function() {
+            fetchPosts(1);  // 첫 번째 페이지부터 검색
+        });
+
+        // 초기 페이지 로드 시 기본 검색
+        fetchPosts(1);  // 첫 페이지부터 로드
+    });
+</script>
+
+</body>
+</html>

@@ -31,13 +31,14 @@ public class PostViewController {
     }
 
     @PostMapping("/create")
-    public String createPost(@RequestParam("userId") Long userId,
+    public String createPost(@CurrentUser User user,
                              @ModelAttribute @Valid PostCreateRequest postCreateRequest,
-                             BindingResult bindingResult) {
+                             BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             return "post/create"; // 유효성 검사 실패 시, 다시 폼을 반환
         }
-        postService.createPost(userId, postCreateRequest);
+        postService.createPost(user.getId(), postCreateRequest);
+        model.addAttribute("tags", postCreateRequest.getPostTags());
         return "redirect:/view/posts/myList";
     }
 
@@ -52,11 +53,12 @@ public class PostViewController {
     public String updatePost(@CurrentUser User user,
                              @PathVariable Long id,
                              @ModelAttribute @Valid PostUpdateRequest postUpdateRequest,
-                             BindingResult bindingResult) {
+                             BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             return "post/update"; // 유효성 검사 실패 시, 다시 폼을 반환
         }
         postService.updatePost(user, id, postUpdateRequest);
+        model.addAttribute("tags", postUpdateRequest.getPostTags());
         return "redirect:/view/posts/myList";
     }
 
@@ -74,11 +76,11 @@ public class PostViewController {
 
     // 내가 작성한 게시글 목록 조회
     @GetMapping("/myList")
-    public String myPostList(@RequestParam(name = "page", defaultValue = "1") int page,
-                             @RequestParam("userId") Long userId,
+    public String myPostList(@CurrentUser User user,
+                             @RequestParam(name = "page", defaultValue = "1") int page,
                              @RequestParam(name = "postCategory", required = false) String postCategory,
                              Model model) {
-        PaginationResult result = postPaginationService.getPagedPostsByUserId(page, userId, postCategory);
+        PaginationResult result = postPaginationService.getPagedPostsByUserId(page, user.getId(), postCategory);
         model.addAttribute("result", result);
         model.addAttribute("postCategory", postCategory);
 
@@ -108,9 +110,11 @@ public class PostViewController {
         postService.incrementViewCount(id);
         PostDetailResponse response = postPaginationService.getPostDetailByCategory(page, id, postCategory);
         Boolean isLiked = postLikeService.toggleLikeAction(id, user.getId(), likeAction);
+        int likeCount = postLikeService.getLikeCount(id);
         model.addAttribute("result", response);
         model.addAttribute("isLiked", isLiked);
         model.addAttribute("likeAction", likeAction);
+        model.addAttribute("likeCount", likeCount);
         model.addAttribute("postCategory", postCategory);
 
         return "post/detail";

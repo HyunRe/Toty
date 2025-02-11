@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.web.firewall.HttpFirewall;
-import org.springframework.security.web.savedrequest.CookieRequestCache;
+//import org.springframework.security.web.savedrequest.CookieRequestCache;
 
 @RequiredArgsConstructor
 @Configuration
@@ -33,7 +33,6 @@ public class SecurityConfig {
     private final SavedRequestAwareAuthenticationSuccessHandler formloginsuccess;
     private final JwtRequestFilter jwtRequestFilter;
     private final AccessTokenValidationFilter accessTokenValidationFilter;
-    private final CookieRequestCache cookieRequestCache;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -62,7 +61,7 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .deleteCookies("accessToken")
                         .deleteCookies("refreshToken")
-                        .logoutSuccessUrl("/api/users/home")
+                        .logoutSuccessUrl("/view/users/home")
                 )
                 // 추가 예정
 //                .oauth2Login(auth -> auth
@@ -73,9 +72,9 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .requestCache(requestCache -> requestCache
-                        .requestCache(cookieRequestCache));
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+//                .requestCache(requestCache -> requestCache
+//                        .requestCache(cookieRequestCache));
 
         // 토큰 관련 Filter 추가
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // /api/users/sign-in, /api/auth/refresh 제외 모든 경로
@@ -88,20 +87,19 @@ public class SecurityConfig {
     @Bean
     public SimpleUrlAuthenticationFailureHandler loginFailureHandler() {
         SimpleUrlAuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
-        failureHandler.setDefaultFailureUrl("/api/users/login");
-        failureHandler.setAllowSessionCreation(false);
+        failureHandler.setDefaultFailureUrl("/api/users/sign-out"); // 인증 실패 시
         return failureHandler;
     }
-
-    // 방화벽
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.httpFirewall(defaultHttpFirewall());
-    }
-
-    @Bean
-    public HttpFirewall defaultHttpFirewall() {
-        return new DefaultHttpFirewall();
-    }
+//
+//    // 방화벽
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return web -> web.httpFirewall(defaultHttpFirewall());
+//    }
+//
+//    @Bean
+//    public HttpFirewall defaultHttpFirewall() {
+//        return new DefaultHttpFirewall();
+//    }
 
 }

@@ -9,7 +9,9 @@ import com.toty.notification.dto.request.NotificationSendRequest;
 import com.toty.post.application.PostImageService;
 import com.toty.post.domain.model.Post;
 import com.toty.post.domain.model.PostCategory;
+import com.toty.post.domain.repository.PostRepository;
 import com.toty.post.dto.request.PostCreateRequest;
+import com.toty.user.domain.model.Role;
 import com.toty.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -22,11 +24,12 @@ public class KnowledgePostCreationStrategy implements PostCreationStrategy {
     private final PostImageService postImageService;
     private final NotificationSendService notificationSendService;
     private final FollowingRepository followingRepository;
+    private final PostRepository postRepository;
 
     @Override
     public Post createPostRequest(PostCreateRequest postCreateRequest, User user) {
         // 사용자 권한 확인
-        if (postCreateRequest.getPostCategory().equals(PostCategory.KNOWLEDGE)) { // && user.getRole().equals(Role.USER)
+        if (postCreateRequest.getPostCategory().equals(PostCategory.KNOWLEDGE) && user.getRole().equals(Role.USER)) {
             throw new ExpectedException(ErrorCode.USER_NOT_MENTOR);
         }
 
@@ -48,6 +51,7 @@ public class KnowledgePostCreationStrategy implements PostCreationStrategy {
             notificationSendService.sendNotification(notificationSendRequest);
         }
 
+        postRepository.save(post);
         return post;
     }
 

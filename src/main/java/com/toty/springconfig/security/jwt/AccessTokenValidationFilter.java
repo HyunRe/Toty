@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.web.savedrequest.CookieRequestCache;
+//import org.springframework.security.web.savedrequest.CookieRequestCache;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -25,12 +25,12 @@ public class AccessTokenValidationFilter extends OncePerRequestFilter {
     private final JwtTokenUtil jwtTokenUtil;
     private final RedisService refreshTokenService;
     private final MyUserDetailsService myUserDetailsService; // todo oauth2user
-    private final CookieRequestCache requestCache;
+//    private final CookieRequestCache requestCache;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return path.equals("/api/auth/refresh") || path.equals("/api/users/login");
+        return path.endsWith("/login");
     }
 
     @Override

@@ -33,10 +33,10 @@ public class CommentApiController {
 
     // 댓글 작성 (test)
     @PostMapping("/create")
-    public ResponseEntity<SuccessResponse> createComment(@RequestParam("userId") Long userId,
+    public ResponseEntity<SuccessResponse> createComment(@CurrentUser User user,
                                                          @RequestParam("postId") Long postId,
                                                          @Valid @RequestBody CommentCreateUpdateRequest commentCreateUpdateRequest) {
-        Comment comment = commentService.createComment(userId, postId, commentCreateUpdateRequest);
+        Comment comment = commentService.createComment(user.getId(), postId, commentCreateUpdateRequest);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 "댓글 생성 성공",

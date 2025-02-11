@@ -14,7 +14,8 @@ public class SmsNotificationSender implements NotificationSender {
     public void send(Notification notification) {
         SmsNotificationSendRequest smsNotificationSendRequest = new SmsNotificationSendRequest(
                 notification.getReceiverId(),
-                notification.getMessage()
+                notification.getMessage(),
+                notification.getUrl()
         );
 
         smsService.sendSmsNotification(smsNotificationSendRequest);

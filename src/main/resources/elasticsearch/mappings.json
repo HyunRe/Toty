@@ -1,0 +1,59 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "nickname": {
+      "type": "keyword"
+    },
+    "title": {
+      "type": "text",
+      "fields": {
+        "keyword": {
+          "type": "keyword"
+        }
+      },
+      "analyzer": "my_nori_analyzer",
+      "search_analyzer": "my_nori_analyzer"
+    },
+    "content": {
+      "type": "text",
+      "analyzer": "my_nori_analyzer",
+      "search_analyzer": "my_nori_analyzer"
+    },
+    "category": {
+      "type": "keyword"
+    },
+    "viewCount": {
+      "type": "integer"
+    },
+    "likeCount": {
+      "type": "integer"
+    },
+    "replyCount":{
+      "type": "integer"
+    },
+    "createdAt" : {
+      "type" : "date",
+      "format" : "date_time"
+    },
+    "comments": {
+      "type": "nested",
+      "properties": {
+        "id": {
+          "type": "keyword"
+        },
+        "nickname": {
+          "type": "keyword"
+        },
+        "content": {
+          "type": "text"
+        },
+        "createdAt" : {
+          "type" : "date",
+          "format" : "date_time"
+        }
+      }
+    }
+  }
+}
