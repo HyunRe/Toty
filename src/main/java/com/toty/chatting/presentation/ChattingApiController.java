@@ -2,11 +2,9 @@ package com.toty.chatting.presentation;
 
 import com.toty.chatting.application.ChatParticipanceService;
 import com.toty.chatting.application.ChatRoomService;
-import com.toty.chatting.application.User01Service;
 import com.toty.chatting.domain.model.ChatRoom;
 import com.toty.common.annotation.CurrentUser;
 import com.toty.user.domain.model.User;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
