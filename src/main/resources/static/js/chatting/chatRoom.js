@@ -145,7 +145,7 @@ function showMessage(sender, content, sendedAt, isMine) {
     } else {
         // 보낸 메시지
         chatItemDiv.innerHTML = `
-            <div class="message sent">
+            <div class="message sent" style="margin-buttom: 2px;">
                 <span style="font-size: 1rem; margin-right: 3px;">
                     ${sendedAt}
                 </span>
