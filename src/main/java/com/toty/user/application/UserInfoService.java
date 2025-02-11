@@ -42,10 +42,10 @@ public class UserInfoService {
     private UserInfoResponse getUserInfoByAccount(Long myId, Long userId, boolean isOwner) {
         User foundUser = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        List<Tag> userTags = userTagRepository.findByUserId(userId)
+        
+        List<String> userTags = userTagRepository.findByUserId(userId)
                 .stream()
-                .map(userTag -> userTag.getTag())
+                .map(userTag -> userTag.getTag().getTag())
                 .toList();
         List<UserLinkInfo> userLinks = userLinkRepository.findByUserId(userId)
                 .stream()
@@ -90,7 +90,8 @@ public class UserInfoService {
         if (imgFile != null && !imgFile.isEmpty()) {
             try {
                 String savePath = basePath + userId;
-                imgFile.transferTo(new File(savePath));
+                String contentType = imgFile.getContentType().split("/")[1];
+                imgFile.transferTo(new File(savePath+"."+contentType)); // ex) --.jpg, --hi.png
                 foundUser.updateInfo(newInfo, savePath);
             } catch (IOException e) {
                 throw new RuntimeException();

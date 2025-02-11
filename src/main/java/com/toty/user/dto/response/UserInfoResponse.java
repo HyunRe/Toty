@@ -30,7 +30,7 @@ public class UserInfoResponse {
 
     private String phoneNumber; //본인만
 
-    private List<Tag> tags;
+    private List<String> tags;
 
     private String profileImgUrl;
 
@@ -50,7 +50,7 @@ public class UserInfoResponse {
     public UserInfoResponse(Long id, String email, String nickname,
                             boolean emailSubscribed, boolean smsSubscribed,
                             boolean notificationAllowed,
-                            String status_message, String phoneNumber, List<Tag> tags,
+                            String status_message, String phoneNumber, List<String> tags,
                             String profileImgUrl, List<UserLinkInfo> links,
                             Long followerCount, Long followingCount, String username, boolean isFollowing,
                             Role role, LocalDateTime createdAt) {

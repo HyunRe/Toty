@@ -28,13 +28,13 @@ public class RefreshTokenAuthenticationFilter extends AbstractAuthenticationProc
 
     private String username;
 
-    public RefreshTokenAuthenticationFilter(TokenProvider authenticationManager, JwtTokenUtil jwtTokenUtil, SimpleUrlAuthenticationFailureHandler failurehandler) {
-        super(new AntPathRequestMatcher("/api/auth/refresh", "GET")); // 특정 요청만 필터링
+    public RefreshTokenAuthenticationFilter(TokenProvider authenticationManager, JwtTokenUtil jwtTokenUtil, SimpleUrlAuthenticationFailureHandler failurehandler, SavedRequestAwareAuthenticationSuccessHandler loginsuccesshandler) {
+        super(new AntPathRequestMatcher("/api/auth/refresh")); // 특정 요청만 필터링
         setAuthenticationManager(new ProviderManager(authenticationManager));
 
-        SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
-        successHandler.setRequestCache(new CookieRequestCache());
-        setAuthenticationSuccessHandler(successHandler);
+//        SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
+//        successHandler.setRequestCache(new CookieRequestCache());
+        setAuthenticationSuccessHandler(loginsuccesshandler);
 
         setAuthenticationFailureHandler(failurehandler);
         this.jwtTokenUtil = jwtTokenUtil;
@@ -69,21 +69,21 @@ public class RefreshTokenAuthenticationFilter extends AbstractAuthenticationProc
         return getAuthenticationManager().authenticate(new TokenAuthentication(username, refreshToken));
     }
 
-    @Override
-    protected void successfulAuthentication(HttpServletRequest request,
-            HttpServletResponse response, FilterChain chain, Authentication authResult)
-            throws IOException, ServletException {
-        System.out.println("--------------requestCache 내 내용---------------");
-
-        // 새로 발급하고 response에 넣는 과정
-        String newAccessToken = jwtTokenUtil.generateToken(username, ACCESS_TOKEN_TTL);
-        String newRefreshToken = jwtTokenUtil.generateToken(username, REFRESH_TOKEN_TTL);
-
-        jwtTokenUtil.storeRefreshToken(username, newRefreshToken);
-
-        //응답에 쿠키 포함
-        response.addCookie(jwtTokenUtil.createCookie("accessToken", newAccessToken, false));
-        response.addCookie(jwtTokenUtil.createCookie("refreshToken", newRefreshToken, true));
-        super.successfulAuthentication(request, response, chain, authResult);
-    }
+//    @Override
+//    protected void successfulAuthentication(HttpServletRequest request,
+//            HttpServletResponse response, FilterChain chain, Authentication authResult)
+//            throws IOException, ServletException {
+//        System.out.println("--------------requestCache 내 내용---------------");
+//
+//        // 새로 발급하고 response에 넣는 과정
+//        String newAccessToken = jwtTokenUtil.generateToken(username, ACCESS_TOKEN_TTL);
+//        String newRefreshToken = jwtTokenUtil.generateToken(username, REFRESH_TOKEN_TTL);
+//
+//        jwtTokenUtil.storeRefreshToken(username, newRefreshToken);
+//
+//        //응답에 쿠키 포함
+//        response.addCookie(jwtTokenUtil.createCookie("accessToken", newAccessToken, false));
+//        response.addCookie(jwtTokenUtil.createCookie("refreshToken", newRefreshToken, true));
+//        super.successfulAuthentication(request, response, chain, authResult);
+//    }
 }

@@ -17,16 +17,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SmsService {
     private final SmsConfig smsConfig;
-//    private final DefaultMessageService messageService;
+    private final DefaultMessageService messageService;
     private final UserRepository userRepository;
 
     @Async("notificationExecutor")
     public void sendSmsNotification(SmsNotificationSendRequest smsNotificationSendRequest) {
         User user = validatedSmsUser(smsNotificationSendRequest.getReceiverId());
-        Message message = createMessage(user.getPhoneNumber(), smsNotificationSendRequest.getMessage());
+        Message message = createMessage(user.getPhoneNumber(), smsNotificationSendRequest.getMessage(), smsNotificationSendRequest.getUrl());
 
         try {
-//            messageService.sendOne(new SingleMessageSendingRequest(message));
+            messageService.sendOne(new SingleMessageSendingRequest(message));
         } catch (Exception e) {
             throw new NotificationSendException(e);
         }
@@ -48,11 +48,12 @@ public class SmsService {
     }
 
     // 메세지 작성
-    private Message createMessage(String to, String text) {
+    private Message createMessage(String to, String text, String url) {
         Message message = new Message();
         message.setFrom(smsConfig.getMessageFrom());
         message.setTo(to);
         message.setText(text);
+        message.setText(url);
         return message;
     }
 }

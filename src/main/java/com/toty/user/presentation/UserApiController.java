@@ -1,15 +1,18 @@
 package com.toty.user.presentation;
 
+import com.toty.base.response.SuccessResponse;
 import com.toty.common.annotation.CurrentUser;
+import com.toty.springconfig.security.jwt.JwtTokenUtil;
 import com.toty.user.application.UserInfoService;
 import com.toty.user.application.UserService;
 import com.toty.user.application.UserSignUpService;
 import com.toty.user.domain.model.User;
 import com.toty.user.dto.request.UserInfoUpdateRequest;
 import com.toty.user.dto.response.UserInfoResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +25,7 @@ public class UserApiController {
     private final UserService userService;
     private final UserSignUpService userSignUpService;
     private final UserInfoService userInfoService;
+    private final JwtTokenUtil jwtTokenUtil;
 
     // 회원가입 - 이메일 중복 확인
     @GetMapping("/test")
@@ -31,45 +35,93 @@ public class UserApiController {
 
     // 회원가입 - 이메일 중복 확인
     @GetMapping("/check-email")
-    public ResponseEntity<String> emailValidation(@RequestParam(name = "email") String email) {
+    public ResponseEntity emailValidation(@RequestParam(name = "email") String email) {
         String response = userSignUpService.validateEmail(email);
-        return ResponseEntity.ok(response);
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "사용할 수 있는 이메일입니다.",
+                response
+        );
+        return ResponseEntity.ok(successResponse);
     }
 
     // 회원가입 - 닉네임 증복 확인
     @GetMapping("/check-nickname")
-    public ResponseEntity<String> nicknameValidation(@RequestParam(name = "nickname") String nickname) {
+    public ResponseEntity nicknameValidation(@RequestParam(name = "nickname") String nickname) {
         String response = userSignUpService.validateNickname(nickname);
-        return ResponseEntity.ok(response);
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "사용할 수 있는 닉네임입니다.",
+                response
+        );
+
+        return ResponseEntity.ok(successResponse);
     }
 
     // 회원가입 - 휴대폰 인증번호 요청
     @PostMapping("/authCode")
-    public ResponseEntity<String> sendAuthCode(@RequestParam(name = "phoneNumber") String phoneNumber) {
+    public ResponseEntity sendAuthCode(@RequestParam(name = "phoneNumber") String phoneNumber) {
         String response = userSignUpService.sendAuthCodeMessage(phoneNumber);
-        return ResponseEntity.ok(response);
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "인증번호가 전송되었습니다.",
+                null
+        );
+        return ResponseEntity.ok(successResponse);
     }
 
     // 회원가입 - 휴대폰 인증번호 확인
     @PostMapping("/check-authCode")
-    public ResponseEntity<Boolean> checkAuthCode(@RequestParam(name = "authCode") String authCode, @RequestParam(name = "phoneNumber") String phoneNumber) {
+    public ResponseEntity checkAuthCode(@RequestParam(name = "authCode") String authCode, @RequestParam(name = "phoneNumber") String phoneNumber) {
         Boolean response = userSignUpService.checkAuthCode(phoneNumber, authCode);
-        return ResponseEntity.ok(response);
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "인증되었습니다.",
+                response
+        );
+        return ResponseEntity.ok(successResponse);
     }
 
     // 회원 탈퇴
     @DeleteMapping("/")
-    public ResponseEntity<String> delete(@CurrentUser User user) {
+    public ResponseEntity delete(@CurrentUser User user, HttpServletResponse response) {
+        response.addCookie(jwtTokenUtil.accessTokenRemover());
         userService.deleteUser(user.getId());
-        return ResponseEntity.ok("true");
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "회원 탈퇴 성공",
+                null
+        );
+        return ResponseEntity.ok(successResponse);
     }
 
     // 내 정보 수정
     @PatchMapping("/info")
-    public ResponseEntity<String> updateUserInfo(@CurrentUser User user,
+    public ResponseEntity updateUserInfo(@CurrentUser User user,
                                                  @RequestPart UserInfoUpdateRequest newInfo,
                                                  @RequestPart(required = false) MultipartFile imgFile) {
         userInfoService.updateUserInfo(user.getId(), newInfo, imgFile);
-        return ResponseEntity.ok("true");
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "정보가 수정되었습니다.",
+                null
+        );
+        return ResponseEntity.ok(successResponse);
     }
+
+    // 상대방의 정보 보기
+    // 본인인지 아닌지 확인 -> 아니면 약식 정보만 전달
+    @GetMapping("/{id}/info") //
+    public ResponseEntity getUserInfo(@CurrentUser User user,
+            @PathVariable("id") Long id) {
+        UserInfoResponse userInfo = userInfoService.getUserInfo(user, id);
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "정보 조회에 성공했습니다.",
+                userInfo
+        );
+        return ResponseEntity.ok(successResponse);
+    }
+
+
 }
