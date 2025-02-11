@@ -30,6 +30,7 @@ public class UserApiController {
     // 회원가입 - 이메일 중복 확인
     @GetMapping("/test")
     public ResponseEntity test(@CurrentUser User user) {
+        System.out.println("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
         return ResponseEntity.ok(user);
     }
 

@@ -3,6 +3,7 @@ package com.toty.springconfig.security;
 import com.toty.springconfig.security.jwt.CustomAuthenticationEntryPoint;
 import com.toty.springconfig.security.jwt.JwtRequestFilter;
 import com.toty.springconfig.security.jwt.AccessTokenValidationFilter;
+import com.toty.springconfig.security.oauth2.MyOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +18,6 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.web.firewall.HttpFirewall;
-//import org.springframework.security.web.savedrequest.CookieRequestCache;
 
 @RequiredArgsConstructor
 @Configuration
@@ -28,7 +28,7 @@ public class SecurityConfig {
 //    @Autowired
 //    private AuthenticationFailureHandler failureHandler;
 //    @Autowired
-//    private MyOAuth2UserService myOAuth2UserService;
+    private final MyOAuth2UserService myOAuth2UserService;
 
     private final SavedRequestAwareAuthenticationSuccessHandler formloginsuccess;
     private final JwtRequestFilter jwtRequestFilter;
@@ -48,7 +48,7 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 )
                 .formLogin(auth -> auth
-//                        .loginPage("/user/signup") // template 이하 경로
+                        .loginPage("/login") // template 이하 경로
                         .loginProcessingUrl("/api/users/sign-in")  // post 엔드포인트
                         .usernameParameter("email")
                         .passwordParameter("pwd")
@@ -64,11 +64,11 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/view/users/home")
                 )
                 // 추가 예정
-//                .oauth2Login(auth -> auth
-//                        .userInfoEndpoint(user -> user.userService(myOAuth2UserService))
-//                        .successHandler(authSuccessHandler)
-//                        .failureHandler(failureHandler)
-//                )
+                .oauth2Login(auth -> auth
+                        .userInfoEndpoint(user -> user.userService(myOAuth2UserService))
+                        .successHandler(formloginsuccess)
+                        .failureHandler(loginFailureHandler())
+                )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .sessionManagement(session -> session
@@ -90,16 +90,5 @@ public class SecurityConfig {
         failureHandler.setDefaultFailureUrl("/api/users/sign-out"); // 인증 실패 시
         return failureHandler;
     }
-//
-//    // 방화벽
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer() {
-//        return web -> web.httpFirewall(defaultHttpFirewall());
-//    }
-//
-//    @Bean
-//    public HttpFirewall defaultHttpFirewall() {
-//        return new DefaultHttpFirewall();
-//    }
 
 }
