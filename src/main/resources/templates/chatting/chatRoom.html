@@ -159,17 +159,21 @@
     </div>
     <!-- Navbar End -->
      <!-- Fragment declaration -->
-    <h3 th:if="${session?.loginUser}">로그인됨 : [[${session.loginUser.userName}]]</h3>
+    <input type="hidden" id="userName" th:value="${nickname}">
+    <input type="hidden" id="userId" th:value="${userId}">
+    <input type="hidden" id="roomId" th:value="${room.id}">
+    <input type="hidden" id="roomMentorId" th:value="${room.mentor.uid}">
+    <input type="hidden" id="serverPort" th:value="${serverPort}">
     
     <div class="container">
       <div class="row">
         <div class="col-8">
-          <h1>환영합니다. [[${room.mentor.userName}]]님의 단톡방 입니다.</h1>
+          <h3>환영합니다. [[${room.mentor.userName}]]님의 단톡방 입니다.</h3>
           <div>주제 : [[${room.roomName}]]</div>
         </div>
         <div class="col-3">
           <button onclick="exitRoom()">채팅방 나가기</button>
-          <button th:if="${session.loginUser.uid == room.mentor.uid}" 
+          <button th:if="${userId == room.mentor.uid}" 
               onclick="endRoom()">채팅방 종료하기([[${session.loginUser.role.name()}]])</button>
         </div>
       </div>
@@ -202,16 +206,7 @@
         </div>
         <div class="col-3">
           <h3><strong>참석자 목록</strong></h3>
-          <input type="hidden" id="userName" th:value="${session.loginUser.userName}">
-          <input type="hidden" id="userId" th:value="${session.loginUser.uid}">
-          <input type="hidden" id="userRole" th:value="${session.loginUser.role.name()}">
-          <input type="hidden" id="roomId" th:value="${room.id}">
-          <input type="hidden" id="roomMentorId" th:value="${room.mentor.uid}">
-              <!--
-                  <input type="hidden" id="chattingStatus" th:value="${session.chattingStatus}">
-                  <input type="hidden" id="serverPort" th:value="${session.serverPort}">
-                  <input type="hidden" id="serverIp" th:value="${session.serverIp}">   
-              -->
+          
           <table class="table">
               <thead>
                   <tr>

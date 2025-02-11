@@ -11,6 +11,7 @@ import com.toty.common.annotation.CurrentUser;
 import com.toty.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -28,6 +30,8 @@ public class ChattingViewController {
     private final ChatParticipantRepository chatParticipantRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomService chatRoomService;
+
+    @Value("${server.port}") private String serverPort;
 
     /*
         유저, 단톡방 목록 화면
@@ -49,46 +53,23 @@ public class ChattingViewController {
         @PostMapping("/participant/{rid}/{uid}")에서 redirect:/view/chatting/room 됨
      */
     @RequestMapping("/room")
-    public String aachr(@RequestParam("rid") long rid, Model model) {
+    public String aachr(@RequestParam("rid") long rid, @CurrentUser User user, Model model) {
+        Long userId = user.getId();
+        String nickname = user.getNickname();
+
         Optional<ChatRoom> room = chatRoomRepository.findById(rid);
 
         if (!room.isEmpty()) {
             List<ChatParticipant> chatterList = chatParticipantRepository.findAllByRoomAndExitAt(room.get(), null);
             model.addAttribute("chatterList", chatterList);
             model.addAttribute("room", room.get());
+            model.addAttribute("userId", userId);
+            model.addAttribute("nickname", nickname);
+            
+            model.addAttribute("serverPort", serverPort);
         }
 
         return "chatting/chatRoom";
     }
-
-
-    /*
-        아래 2개는 나중에 삭제할꺼
-     */
-    // 회원가입(user)
-//    @PostMapping("/user")
-//    public String aa12 (@RequestParam("userName") String userName) {
-//        Role userRole = Role.USER;
-//
-//        User01 uu = User01.builder()
-//                .userName(userName).role(userRole)
-//                .build();
-//
-//        user01Repository.save(uu);
-//        return "redirect:/view/chatting/list";
-//    }
-
-    // 회원가입(mentor)
-//    @PostMapping("/mentor")
-//    public String aa (@RequestParam("userName") String userName) {
-//        Role userRole = Role.MENTOR;
-//
-//        User01 uu = User01.builder()
-//                .userName(userName).role(userRole)
-//                .build();
-//
-//        user01Repository.save(uu);
-//        return "redirect:/view/chatting/list";
-//    }
 
 }

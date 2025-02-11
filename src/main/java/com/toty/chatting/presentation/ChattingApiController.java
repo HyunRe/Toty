@@ -82,14 +82,4 @@ public class ChattingApiController {
     public List<ChatRoom> roomList() {
         return chatRoomService.getChatRoomList();
     }
-
-
-    // 나중에 삭제할꺼, 사용자 로그인
-//    @GetMapping("/login/{id}")
-//    @ResponseBody
-//    public String userLogin(HttpSession session, @PathVariable("id") long id) {
-//        String result = user01Service.findUserAndLogin(session, id);
-//        return result;
-//    }
-
 }

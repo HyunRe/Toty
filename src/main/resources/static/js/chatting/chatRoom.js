@@ -2,10 +2,11 @@ let stompClient;
 let loginUserName, userId; // 로그인한 사용자 정보
 let roomMentorId, roomId; // 단톡방 정보
 let roomEnd = false; // 해당방 종료 정보
+let serverPort; 
 
 function socketSetting() {
     stompClient = new StompJs.Client({ // 웹소켓 url
-        brokerURL: 'ws://localhost:8070/websocket-chatRoom'
+        brokerURL: `ws://localhost:${serverPort}/websocket-chatRoom`
     });
 
     // 로그인한 사용자 정보 
@@ -75,6 +76,8 @@ function sendMessage() {
             destination: "/chatApp/" + roomId,
             body: JSON.stringify(params)
         });
+    } else {
+        alert("채팅방이 종료되었습니다");
     }
 }
 
@@ -221,7 +224,7 @@ function setConnected(connected) {
 
 $(document).ready(function() {
     console.log("$doc ready func");
-
+    serverPort = $("#serverPort").val();  
     socketSetting();
     
 
