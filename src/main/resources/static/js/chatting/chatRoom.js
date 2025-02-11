@@ -138,14 +138,14 @@ function showMessage(sender, content, sendedAt, isMine) {
                 <span style="font-size: 1rem;">${sender}</span>
             </div>
             <div class="message received">
-                <p style="font-size: 1rem;">${content}</p>
+                <p style="font-size: 1.3rem;">${content}</p>
                 <span style="font-size: 1rem;">${sendedAt}</span>
             </div>
         `;
     } else {
         // 보낸 메시지
         chatItemDiv.innerHTML = `
-            <div class="message sent">
+            <div class="message sent" style="margin-buttom: 2px;">
                 <span style="font-size: 1rem; margin-right: 3px;">
                     ${sendedAt}
                 </span>
