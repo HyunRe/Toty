@@ -87,7 +87,7 @@ function inRow(chatRoom, lastRow) {
                         >0</span>/<span>${chatRoom.userLimit}</span>  
                 </div>
                 
-                <form action="/api/chatting/participant/${chatRoom.id}/${loginId}" 
+                <form action="/api/chatting/participant/${chatRoom.id}" 
                     method="post">
                     <button type="submit"> 단톡 참석 </button>
                 </form>
@@ -101,35 +101,17 @@ $(document).ready(function() {
 
     // 로그인한 사용자id
     loginId = $(".userId").val();  
-
-    $(".loginBtn").on("click", function() {
-        var userId = $(this).data("user-id");
-    
-        $.ajax({
-            type:"get",
-            url:"/api/chatting/login/" + userId,
-            success:function(response) {
-                alert(response);
-            },
-            error:function(xhr) {
-                let response = xhr.responseJSON;
-                console.log(response);
-                alert("로그인 실패 \n" + response.message);
-            }
-        });
-    });
     
     $(".createRoom").on("click", function() {
-        var mId = $(this).data("user-id");
-    
-        var rr = $(".roomName-" + mId).val();
-        var ul = $(".userLimit-" + mId).val();
+       
+        var rr = $(".roomName").val();
+        var ul = $(".userLimit").val();
         var params = {
                         "roomName": rr, "userLimit": ul
                       }
         $.ajax({
             type:"post",
-            url:"/api/chatting/room/" + mId,
+            url:"/api/chatting/room",
             data: params,
             success:function(response) {
     

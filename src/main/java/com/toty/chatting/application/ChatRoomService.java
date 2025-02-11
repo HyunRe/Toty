@@ -111,13 +111,13 @@ public class ChatRoomService {
         멘토가 단톡방 생성
      */
     @Transactional
-    public void mentorCreateRoom(long mid, String roomName, int userLimit) {
+    public void mentorCreateRoom(long userId, String roomName, int userLimit) {
 
-        User mentor = userRepository.findById(mid).orElse(null);
+        User user = userRepository.findById(userId).orElse(null);
 
-        if (mentor != null && mentor.getRole().name() == "MENTOR") {
+        if (user != null && user.getRole().name() == "MENTOR") {
             ChatRoom room = ChatRoom.builder()
-                    .mentor(mentor).roomName(roomName).userLimit(userLimit)
+                    .mentor(user).roomName(roomName).userLimit(userLimit)
                     .build();
             ChatRoom createdRoom = chatRoomRepository.save(room);
 

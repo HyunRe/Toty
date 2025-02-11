@@ -159,9 +159,9 @@
     <!-- Navbar End -->
      
     <!-- Fragment declaration -->
-    <h1 th:if="${session?.loginUser}">로그인됨 : [[${session.loginUser.userName}]]</h1>
-    <input th:if="${session?.loginUser}" type="hidden" name="uid" class="userId" th:value="${session.loginUser?.uid}">
-    <div style="height: 50px;"></div>
+    <div style="height: 50px;">
+      <input type="text" class="userId" th:value="${userId}">
+    </div>
     <div class="container">
       <div class="row">
         <div class="col-4">
@@ -203,8 +203,8 @@
                                 >[[${chatRoom.userCount}]]</span>/<span>[[${chatRoom.userLimit}]] </span>
                         </div>
                         
-                        <form th:if="${session?.loginUser}"
-                            th:action="@{/api/chatting/participant/{roomId}/{loginId}(roomId=${chatRoom.id}, loginId=${session.loginUser?.uid})}"
+                        <form th:if="${userId}"
+                            th:action="@{/api/chatting/participant/{roomId}(roomId=${chatRoom.id})}"
                             method="post">
                             <button type="submit"> 단톡 참석 </button>
                         </form>

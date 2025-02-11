@@ -4,6 +4,8 @@ import com.toty.chatting.application.ChatParticipanceService;
 import com.toty.chatting.application.ChatRoomService;
 import com.toty.chatting.application.User01Service;
 import com.toty.chatting.domain.model.ChatRoom;
+import com.toty.common.annotation.CurrentUser;
+import com.toty.user.domain.model.User;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,13 +30,16 @@ public class ChattingApiController {
         단톡방 목록에서
         단톡방별로, 버튼(참여)을 눌러야만 동작하게 설계되있음
      */
-    @PostMapping("/participant/{rid}/{uid}")
-    public String enterRoom(@PathVariable("rid") long rid, @PathVariable("uid") long uid
-            , RedirectAttributes reAtr) {
-        chatParticipanceService.userEnterRoom(rid, uid);
-
-        reAtr.addAttribute("rid", rid);
-        return "redirect:/view/chatting/room";
+    @PostMapping("/participant/{rid}")
+    public String enterRoom( @PathVariable("rid") long rid
+            , @CurrentUser User user, RedirectAttributes reAtr) {
+        Long userId = user.getId();
+        if (userId != null) {
+            chatParticipanceService.userEnterRoom(rid, userId);
+            reAtr.addAttribute("rid", rid);
+            return "redirect:/view/chatting/room";
+        }
+        return "redirect:/view/chatting/list";
     }
 
     /*
@@ -61,11 +66,12 @@ public class ChattingApiController {
                 단체 채팅방 생성
         validaton필요?
      */
-    @PostMapping("/room/{mid}")
+    @PostMapping("/room")
     @ResponseBody
-    public void createRoom( @PathVariable("mid") long mid
-            , @RequestParam("roomName") String roomName, @RequestParam("userLimit") int userLimit) {
-        chatRoomService.mentorCreateRoom(mid, roomName, userLimit);
+    public void createRoom( @RequestParam("roomName") String roomName, @RequestParam("userLimit") int userLimit
+        , @CurrentUser User user) {
+        Long userId = user.getId();
+        chatRoomService.mentorCreateRoom(userId, roomName, userLimit);
     }
 
     /*

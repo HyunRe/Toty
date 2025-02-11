@@ -7,6 +7,8 @@ import com.toty.chatting.domain.model.ChatRoom;
 import com.toty.chatting.domain.repository.ChatParticipantRepository;
 import com.toty.chatting.domain.repository.ChatRoomRepository;
 import com.toty.chatting.dto.response.ChatRoomListResponse;
+import com.toty.common.annotation.CurrentUser;
+import com.toty.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Controller;
@@ -31,11 +33,12 @@ public class ChattingViewController {
         유저, 단톡방 목록 화면
      */
     @RequestMapping("/list")
-    public String chatList(Model model) {
+    public String chatList(Model model, @CurrentUser User user) {
+        Long userId = user.getId();
 
         List<ChatRoomListResponse> chatRoomList = chatRoomService.getChatRoomListView();
         model.addAttribute("chatRoomList", chatRoomList);
-
+        model.addAttribute("userId", userId);
         return "chatting/chatList";
     }
 
