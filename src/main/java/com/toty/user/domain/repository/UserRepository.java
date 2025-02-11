@@ -21,6 +21,7 @@ public interface UserRepository extends Repository<User, Long> {
     boolean existsByNickname(String nickname);
 
     User save(User user);
-  
+
+    @Query("SELECT new com.toty.roleRefreshScheduler.dto.UserIdAndRoleDto(u.id, u.role) FROM User u WHERE u.isDeleted = false")
     List<UserIdAndRoleDto> findAllByIsDeletedFalse();
 }

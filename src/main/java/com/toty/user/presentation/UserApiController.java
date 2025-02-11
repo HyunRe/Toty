@@ -2,12 +2,14 @@ package com.toty.user.presentation;
 
 import com.toty.base.response.SuccessResponse;
 import com.toty.common.annotation.CurrentUser;
+import com.toty.springconfig.security.jwt.JwtTokenUtil;
 import com.toty.user.application.UserInfoService;
 import com.toty.user.application.UserService;
 import com.toty.user.application.UserSignUpService;
 import com.toty.user.domain.model.User;
 import com.toty.user.dto.request.UserInfoUpdateRequest;
 import com.toty.user.dto.response.UserInfoResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ public class UserApiController {
     private final UserService userService;
     private final UserSignUpService userSignUpService;
     private final UserInfoService userInfoService;
+    private final JwtTokenUtil jwtTokenUtil;
 
     // 회원가입 - 이메일 중복 확인
     @GetMapping("/test")
@@ -81,7 +84,8 @@ public class UserApiController {
 
     // 회원 탈퇴
     @DeleteMapping("/")
-    public ResponseEntity delete(@CurrentUser User user) {
+    public ResponseEntity delete(@CurrentUser User user, HttpServletResponse response) {
+        response.addCookie(jwtTokenUtil.accessTokenRemover());
         userService.deleteUser(user.getId());
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
@@ -118,4 +122,6 @@ public class UserApiController {
         );
         return ResponseEntity.ok(successResponse);
     }
+
+
 }
