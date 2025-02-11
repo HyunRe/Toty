@@ -8,7 +8,7 @@
     <meta content="Free HTML Templates" name="description" />
 
     <!-- Favicon -->
-    <link href="img/favicon.ico" rel="icon" />
+    <link href="/img/favicon.ico" rel="icon" />
 
 
     <!-- Google Web Fonts -->
@@ -27,14 +27,17 @@
     crossorigin="anonymous"
     referrerpolicy="no-referrer"
   />
-    
+
     <!--Sweet Alert2-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.20/bulma.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"></script>
 
     <!-- Customized Bootstrap Stylesheet -->
-    <link href="css/style.css" rel="stylesheet" />
-    <link rel="stylesheet" href="css/globals.css" />
+    <link href="/css/style.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/globals.css" />
+
+    <!--  -->
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
 
     <style>
         .alarmList {
@@ -74,7 +77,7 @@
       <div class="row align-items-center py-3 px-xl-1">
         <div class="col-lg-3 d-none d-lg-block">
           <a href="index.html">
-          <img src="img/logo.png" style="margin-left: 25%; width: 40%;">
+          <img src="/img/logo.png" style="margin-left: 25%; width: 40%;">
         </a>
         </div>
         <div class="col-lg-5 text-left">
@@ -154,13 +157,90 @@
         </div>
       </div>
     </div>
-        <!-- Fragment declaration -->
-      
     <!-- Navbar End -->
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+     <!-- Fragment declaration -->
+    <h3 th:if="${session?.loginUser}">로그인됨 : [[${session.loginUser.userName}]]</h3>
     
+    <div class="container">
+      <div class="row">
+        <div class="col-8">
+          <h1>환영합니다. [[${room.mentor.userName}]]님의 단톡방 입니다.</h1>
+          <div>주제 : [[${room.roomName}]]</div>
+        </div>
+        <div class="col-3">
+          <button onclick="exitRoom()">채팅방 나가기</button>
+          <button th:if="${session.loginUser.uid == room.mentor.uid}" 
+              onclick="endRoom()">채팅방 종료하기([[${session.loginUser.role.name()}]])</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-8">
+          <div>인원 : <span id="userCount">[[${chatterList.size()}]]</span> / [[${room.userLimit}]]</div>
+          <div style="height: 20px;"></div>
+          <div class="chat-window">
+            <!-- Header -->
+            <div class="header d-flex justify-content-between py-3">
+                <div>
+                    <a href="/view/chatting/list"><i class="fa-solid fa-arrow-left mx-2" style="color: white;"></i></a>
+                </div>
+                <div>
+                    <i class="fa-solid fa-magnifying-glass me-2"></i>
+                    <i class="fa-solid fa-gear me-2"></i>
+                    <i id="statusIcon" class="fa-solid fa-link"></i>
+                </div>
+            </div>
+            
+            <!-- Chat Container가 동적으로 바뀜 -->
+            <div class="chat-container" >
+                <div id="chatContainer">
+                </div>
+            </div>
+            <input class="form-control mt-2" style="margin: 10px; margin-right: 10px;" 
+              type="text" id="messageInput" 
+              placeholder="메시지 입력" onkeydown="handleEnterKey(event)">
+          </div>
+        </div>
+        <div class="col-3">
+          <h3><strong>참석자 목록</strong></h3>
+          <input type="hidden" id="userName" th:value="${session.loginUser.userName}">
+          <input type="hidden" id="userId" th:value="${session.loginUser.uid}">
+          <input type="hidden" id="userRole" th:value="${session.loginUser.role.name()}">
+          <input type="hidden" id="roomId" th:value="${room.id}">
+          <input type="hidden" id="roomMentorId" th:value="${room.mentor.uid}">
+              <!--
+                  <input type="hidden" id="chattingStatus" th:value="${session.chattingStatus}">
+                  <input type="hidden" id="serverPort" th:value="${session.serverPort}">
+                  <input type="hidden" id="serverIp" th:value="${session.serverIp}">   
+              -->
+          <table class="table">
+              <thead>
+                  <tr>
+                      <td style="width: 30%;"></td>
+                      <td style="width: 50%;"></td>
+                  </tr>
+              </thead>
+
+              <!-- js파일에 있음, Chatter List( 동적으로 바뀜 ) -->
+              <tbody id="chatters">
+                  <tr th:each="user : ${chatterList}" th:class="'user-' + ${user.id}">
+                      <td> 
+                          <img src="/img/chatting/undraw_profile.svg" style="width: 50px; height: 50px;">
+                      </td>
+                      <td th:text="${user.chatter.userName}">참석자 이름</td>
+                  </tr>
+              </tbody>
+
+          </table>
+        </div>
+      </div>
+    </div>
+
+        <!-- JavaScript Libraries -->
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+
+    <link href="/css/chatting/chatRoom.css" rel="stylesheet">
+    <script src="/js/chatting/chatRoom.js"></script>
   <script>
   
     document.getElementById('header-noti').addEventListener("click", function() {

@@ -138,7 +138,7 @@ function showMessage(sender, content, sendedAt, isMine) {
                 <span style="font-size: 1rem;">${sender}</span>
             </div>
             <div class="message received">
-                <p style="font-size: 1rem;">${content}</p>
+                <p style="font-size: 1.3rem;">${content}</p>
                 <span style="font-size: 1rem;">${sendedAt}</span>
             </div>
         `;
