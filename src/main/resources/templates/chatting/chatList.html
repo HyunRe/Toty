@@ -213,46 +213,6 @@
             </div>
         </div>
       </div>
-        
-      <div style="background-color: gray;">
-          <h2>임시 화면( 삭제 예정 )</h2>
-          <h3>회원 추가</h3>
-          <form action="/view/chatting/user" method="post">
-              <input type="text" name="userName"> <button type="submit">일반 회원</button>
-          </form>
-          <form action="/view/chatting/mentor" method="post">
-              <input type="text" name="userName"> <button type="submit">멘토</button>
-          </form>
-          <hr>
-          <h2>유저 목록</h2>
-          <div>이름 클릭하면 로그인</div>
-          <table>
-              <tr>
-                  <th>이름</th>
-                  <th>역할</th>
-                  <th>단톡방 개설</th>
-              </tr>
-              <tr th:each="user: ${userList}">
-                  <td>
-                      <button class="loginBtn" th:data-user-id="${user.uid}">[[${user.userName}]]</button>
-                  </td>
-                
-                  <td th:text="${user.role}"></td>
-                  <td>
-                      <div th:if="${user.role.name() == 'MENTOR'}">
-                          <input type="text" th:class="'roomName-' + ${user.uid}" placeholder="단톡방 이름">
-                          <select th:class="'userLimit-' + ${user.uid}">
-                              <option value="5">5</option>
-                              <option value="10">10</option>
-                              <option value="15">15</option>
-                          </select>
-                          <!-- <input type="text" th:class="'userLimit-' + ${user.uid}" placeholder="인원 제한"> -->
-                          <button class="createRoom" th:data-user-id="${user.uid}">단톡방 생성</button>
-                      </div>
-                  </td>
-              </tr>
-          </table>
-      </div>
     </div>
     
 
