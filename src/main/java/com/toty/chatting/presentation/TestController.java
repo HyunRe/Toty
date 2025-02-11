@@ -13,4 +13,9 @@ public class TestController {
     public String aa(@RequestParam("rid") long rid) {
         return "hello" + rid;
     }
+
+    @RequestMapping("/l")
+    public String aasa() {
+        return "user/signIn";
+    }
 }
