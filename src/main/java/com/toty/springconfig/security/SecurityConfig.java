@@ -48,7 +48,6 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 )
                 .formLogin(auth -> auth
-                        .loginPage("/login") // template 이하 경로
                         .loginProcessingUrl("/api/users/sign-in")  // post 엔드포인트
                         .usernameParameter("email")
                         .passwordParameter("pwd")
@@ -73,12 +72,9 @@ public class SecurityConfig {
                         .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-//                .requestCache(requestCache -> requestCache
-//                        .requestCache(cookieRequestCache));
 
         // 토큰 관련 Filter 추가
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // /api/users/sign-in, /api/auth/refresh 제외 모든 경로
-//        http.addFilterBefore(refreshTokenAuthenticationFilter(am), UsernamePasswordAuthenticationFilter.class); // /api/auth/refresh 만
         http.addFilterAfter(accessTokenValidationFilter, ExceptionTranslationFilter.class); // /api/auth/refresh 경로만 -> ok면
 
         return http.build();
