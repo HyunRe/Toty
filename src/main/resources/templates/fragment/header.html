@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
+<head th:fragment="headerhead">
   <meta charset="utf-8"/>
   <title>TOTY</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -46,7 +46,7 @@
       </div>
 
       <div class="col-lg-5 text-left">
-        <form action="/api/search/posts" method="get">
+        <form action="/search/posts" method="get">
           <div class="control-group" style="float: left">
             <select class="form-control" name="field">
               <option value="TITLE">제목</option>
@@ -55,7 +55,7 @@
             </select>
           </div>
           <div class="input-group">
-            <input type="text" class="form-control" placeholder="검색창"/>
+            <input type="text" class="form-control" name = "keyword" placeholder="검색창"/>
             <div class="input-group-append">
                   <span
                       class="input-group-text bg-transparent text-primary"
