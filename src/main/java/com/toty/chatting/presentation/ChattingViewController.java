@@ -36,10 +36,6 @@ public class ChattingViewController {
         List<ChatRoomListResponse> chatRoomList = chatRoomService.getChatRoomListView();
         model.addAttribute("chatRoomList", chatRoomList);
 
-        // 삭제 예정
-//        List<User01> userList = user01Repository.findAll();
-//        model.addAttribute("userList", userList);
-
         return "chatting/chatList";
     }
 
