@@ -22,7 +22,7 @@ public class ChatRoom {
     // 단톡방 개설자
     @ManyToOne
     @JoinColumn(name = "mento_id")
-    private User01 mentor;
+    private User mentor;
 
     // 단톡방 이름
     private String roomName;

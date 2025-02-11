@@ -7,7 +7,6 @@ import com.toty.chatting.domain.model.ChatRoom;
 import com.toty.chatting.domain.model.User01;
 import com.toty.chatting.domain.repository.ChatParticipantRepository;
 import com.toty.chatting.domain.repository.ChatRoomRepository;
-import com.toty.chatting.domain.repository.User01Repository;
 import com.toty.chatting.dto.response.ChatRoomListResponse;
 import com.toty.common.baseException.JsonProcessingCustomException;
 import lombok.RequiredArgsConstructor;

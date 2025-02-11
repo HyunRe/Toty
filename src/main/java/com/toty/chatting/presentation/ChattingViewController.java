@@ -8,7 +8,6 @@ import com.toty.chatting.domain.model.Role;
 import com.toty.chatting.domain.model.User01;
 import com.toty.chatting.domain.repository.ChatParticipantRepository;
 import com.toty.chatting.domain.repository.ChatRoomRepository;
-import com.toty.chatting.domain.repository.User01Repository;
 import com.toty.chatting.dto.response.ChatRoomListResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 

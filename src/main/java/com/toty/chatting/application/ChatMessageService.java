@@ -8,7 +8,6 @@ import com.toty.chatting.domain.model.User01;
 import com.toty.chatting.domain.repository.ChatMessageRepository;
 import com.toty.chatting.domain.repository.ChatParticipantRepository;
 import com.toty.chatting.domain.repository.ChatRoomRepository;
-import com.toty.chatting.domain.repository.User01Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

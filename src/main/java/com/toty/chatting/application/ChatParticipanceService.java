@@ -5,7 +5,6 @@ import com.toty.chatting.domain.model.ChatRoom;
 import com.toty.chatting.domain.model.User01;
 import com.toty.chatting.domain.repository.ChatParticipantRepository;
 import com.toty.chatting.domain.repository.ChatRoomRepository;
-import com.toty.chatting.domain.repository.User01Repository;
 import com.toty.chatting.dto.message.ParticipantMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
