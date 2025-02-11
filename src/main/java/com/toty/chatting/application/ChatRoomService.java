@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toty.chatting.domain.model.ChatParticipant;
 import com.toty.chatting.domain.model.ChatRoom;
-import com.toty.chatting.domain.model.User01;
 import com.toty.chatting.domain.repository.ChatParticipantRepository;
 import com.toty.chatting.domain.repository.ChatRoomRepository;
 import com.toty.chatting.dto.response.ChatRoomListResponse;
@@ -24,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatRoomService {
 
-    private final User01Repository user01Repository;
+//    private final User01Repository user01Repository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatParticipantRepository chatParticipantRepository;
 
@@ -98,7 +97,7 @@ public class ChatRoomService {
 
         ChatRoomListResponse chatRoomDTO = ChatRoomListResponse.builder()
                 .id(entity.getId())
-                .mentor(entity.getMentor().getUserName())
+                .mentor(entity.getMentor().getNickname())
                 .roomName(entity.getRoomName()).createdAt(formattedCreatedAt)
                 .userLimit(entity.getUserLimit()).userCount(currentParticipants.size())
                 .build();

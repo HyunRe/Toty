@@ -4,8 +4,6 @@ package com.toty.chatting.presentation;
 import com.toty.chatting.application.ChatRoomService;
 import com.toty.chatting.domain.model.ChatParticipant;
 import com.toty.chatting.domain.model.ChatRoom;
-import com.toty.chatting.domain.model.Role;
-import com.toty.chatting.domain.model.User01;
 import com.toty.chatting.domain.repository.ChatParticipantRepository;
 import com.toty.chatting.domain.repository.ChatRoomRepository;
 import com.toty.chatting.dto.response.ChatRoomListResponse;
