@@ -25,7 +25,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
-    private MyUserDetailsService myUserDetailsService; // todo oauth2user
+    private MyUserDetailsService myUserDetailsService;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -37,7 +37,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain chain)
             throws ServletException, IOException {
-        System.out.println("JWTrequestFilter------");
+        System.out.println("JwtRequestFilter.doFilterInternal");
         String username = null;
         String jwt = null;
 
@@ -49,8 +49,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 for (Cookie cookie : cookies) {
                     if (cookie.getName().equals("accessToken")) {
                         authorization = cookie.getValue();
-                        System.out.println(
-                                "jwtTokenUtil.isTokenExpired(authorization): " + authorization);
+
                         System.out.println("jwtTokenUtil.isTokenExpired(authorization): "
                                 + jwtTokenUtil.isTokenExpired(authorization)); // 예외 발생
 
