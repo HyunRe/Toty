@@ -51,7 +51,7 @@ jobs:
           json: ${ secrets.FIREBASE_ACCOUNT_KEY }
 
       - name: Upload key.json to S3
-        if: contains(github.ref, 'staging')
+        if: contains(github.ref, 'main')
         run: |
           aws s3 cp ./src/main/resources/toty-6d4b4-firebase-adminsdk-fbsvc-f5eb24e27a.json s3://$S3_BUCKET_NAME/jsonkey/key.json
 
