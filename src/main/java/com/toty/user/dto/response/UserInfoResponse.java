@@ -32,7 +32,7 @@ public class UserInfoResponse {
 
     private String profileImgUrl;
 
-    private List<LinkInfo> links; // List<LinkDto>
+    private List<LinkDto> links;
 
     private Long followerCount;
 
@@ -49,7 +49,7 @@ public class UserInfoResponse {
                             boolean emailSubscribed, boolean smsSubscribed,
                             boolean notificationAllowed,
                             String status_message, String phoneNumber, List<String> tags,
-                            String profileImgUrl, List<LinkInfo> links,
+                            String profileImgUrl, List<LinkDto> links,
                             Long followerCount, Long followingCount, String username, boolean isFollowing,
                             Role role, LocalDateTime createdAt) {
         this.id = id;

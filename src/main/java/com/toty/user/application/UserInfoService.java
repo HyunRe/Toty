@@ -15,7 +15,7 @@ import com.toty.user.dto.request.LinkUpdateRequest;
 import com.toty.user.dto.request.PhoneNumberUpdateRequest;
 import com.toty.user.dto.request.TagUpdateRequest;
 import com.toty.user.dto.request.UserInfoUpdateRequest;
-import com.toty.user.dto.response.LinkInfo;
+import com.toty.user.dto.response.LinkDto;
 import com.toty.user.dto.response.UserInfoResponse;
 import jakarta.transaction.Transactional;
 import java.util.Arrays;
@@ -55,9 +55,9 @@ public class UserInfoService {
                 .stream()
                 .map(userTag -> userTag.getTag().getTag())
                 .toList();
-        List<LinkInfo> userLinks = userLinkRepository.findByUserId(targetId)
+        List<LinkDto> userLinks = userLinkRepository.findByUserId(targetId)
                 .stream()
-                .map(userLink -> new LinkInfo(userLink.getSite().getValue(), userLink.getUrl()))
+                .map(userLink -> new LinkDto(userLink.getSite().getValue(), userLink.getUrl()))
                 .toList();
         Long followingCount = followingRepository.countFollowingsByUserId(targetId);
         Long followerCount = followingRepository.countFollowersByUserId(targetId);

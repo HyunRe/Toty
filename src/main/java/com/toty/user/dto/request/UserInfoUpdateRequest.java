@@ -1,6 +1,6 @@
 package com.toty.user.dto.request;
 
-import com.toty.user.dto.response.LinkInfo;
+import com.toty.user.dto.response.LinkDto;
 import java.util.List;
 
 import lombok.AccessLevel;
@@ -17,5 +17,5 @@ public class UserInfoUpdateRequest {
     private String statusMessage; // nullable
     private String phoneNumber; // nullable(social)
     private List<String> tags; // nullable
-    private List<LinkInfo> links; // nullable
+    private List<LinkDto> links; // nullable
 }
