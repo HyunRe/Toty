@@ -71,65 +71,39 @@ public class PostApiController {
         return ResponseEntity.ok(post);
     }
 
-    // 이 밑은 테스트 용도
-
-    // 전체 게시글 목록 조회 (test)
+    // 전체 게시글 목록 조회
     @GetMapping("/list")
-    public ResponseEntity<SuccessResponse> postList(@RequestParam(name = "page", defaultValue = "1") int page,
-                                                    @RequestParam(name = "filter", required = false) String filter) {
-        PaginationResult result = postPaginationService.getPagedPosts(page, filter);
-        SuccessResponse successResponse = new SuccessResponse(
-                HttpStatus.OK.value(),
-                "전체 게시글 목록 조회",
-                result.getContent().size()
-        );
-
-        return ResponseEntity.ok(successResponse);
+    public ResponseEntity<PaginationResult> postList(@RequestParam(name = "page", defaultValue = "1") int page,
+                                                    @RequestParam(name = "sort", required = false) String sort) {
+        PaginationResult result = postPaginationService.getPagedPosts(page, sort);
+        return ResponseEntity.ok(result);
     }
 
-    // 내가 작성한 게시글 목록 조회 (test)
+    // 내가 작성한 게시글 목록 조회
     @GetMapping("/myList")
-    public ResponseEntity<SuccessResponse> myPostList(@CurrentUser User user,
-                                                      @RequestParam(name = "page", defaultValue = "1") int page,
-                                                      @RequestParam(name = "postCategory", required = false) String postCategory) {
+    public ResponseEntity<PaginationResult> myPostList(@CurrentUser User user,
+                                                       @RequestParam(name = "page", defaultValue = "1") int page,
+                                                       @RequestParam(name = "postCategory", required = false) String postCategory) {
         PaginationResult result = postPaginationService.getPagedPostsByUserId(page, user.getId(), postCategory);
-        SuccessResponse successResponse = new SuccessResponse(
-                HttpStatus.OK.value(),
-                "내가 작성한 게시글 목록 조회",
-                result.getContent().size()
-        );
-
-        return ResponseEntity.ok(successResponse);
+        return ResponseEntity.ok(result);
     }
 
-    // 카테고리 별 목록 조회 (test)
+    // 카테고리 별 목록 조회
     @GetMapping("/categoryList")
-    public ResponseEntity<SuccessResponse> postCategoryList(@RequestParam(name = "page", defaultValue = "1") int page,
-                                                            @RequestParam(name = "postCategory", required = false) String postCategory) {
+    public ResponseEntity<PaginationResult> postCategoryList(@RequestParam(name = "page", defaultValue = "1") int page,
+                                                             @RequestParam(name = "postCategory", required = false) String postCategory) {
         PaginationResult result = postPaginationService.getPagedPostsByCategory(page, postCategory);
-        SuccessResponse successResponse = new SuccessResponse(
-                HttpStatus.OK.value(),
-                "카테고리 별 목록 조회",
-                result.getContent().size()
-        );
-
-        return ResponseEntity.ok(successResponse);
+        return ResponseEntity.ok(result);
     }
 
-    // 카테고리 별 게시글 상세 보기 (test)
+    // 카테고리 별 게시글 상세 보기
     @GetMapping("/{id}/detail")
-    public ResponseEntity<SuccessResponse> postDetail(@PathVariable Long id,
-                                                      @RequestParam(name = "page", defaultValue = "1") int page,
-                                                      @RequestParam(name = "postCategory", required = false) String postCategory) {
+    public ResponseEntity<PostDetailResponse> postDetail(@PathVariable Long id,
+                                                         @RequestParam(name = "page", defaultValue = "1") int page,
+                                                         @RequestParam(name = "postCategory", required = false) String postCategory) {
         postService.incrementViewCount(id);
 
         PostDetailResponse response = postPaginationService.getPostDetailByCategory(page, id, postCategory);
-        SuccessResponse successResponse = new SuccessResponse(
-                HttpStatus.OK.value(),
-                "카테고리 별 게시글 상세 보기",
-                response
-        );
-
-        return ResponseEntity.ok(successResponse);
+        return ResponseEntity.ok(response);
     }
 }

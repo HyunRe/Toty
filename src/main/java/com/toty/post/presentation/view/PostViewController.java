@@ -36,12 +36,12 @@ public class PostViewController {
     // 전체 게시글 목록 조회
     @GetMapping("/list")
     public String postList(@RequestParam(name = "page", defaultValue = "1") int page,
-                           @RequestParam(name = "filter", required = false) String filter,
+                           @RequestParam(name = "sort", required = false) String sort,
                            Model model) {
-        PaginationResult post = postPaginationService.getPagedPosts(page, filter);
+        PaginationResult post = postPaginationService.getPagedPosts(page, sort);
         model.addAttribute("post", post);
-        model.addAttribute("filter", filter);
-
+        model.addAttribute("sort", sort);
+        model.addAttribute("page", page);
         return "post/list";
     }
 
@@ -51,11 +51,11 @@ public class PostViewController {
                              @RequestParam(name = "page", defaultValue = "1") int page,
                              @RequestParam(name = "postCategory", required = false) String postCategory,
                              Model model) {
-        PaginationResult result = postPaginationService.getPagedPostsByUserId(page, user.getId(), postCategory);
-        model.addAttribute("result", result);
+        PaginationResult post = postPaginationService.getPagedPostsByUserId(page, user.getId(), postCategory);
+        model.addAttribute("post", post);
         model.addAttribute("postCategory", postCategory);
-
-        return "post/myList";
+        model.addAttribute("page", page);
+        return "user/myList";
     }
 
     // 카테고리 별 목록 조회
@@ -63,10 +63,9 @@ public class PostViewController {
     public String postCategoryList(@RequestParam(name = "page", defaultValue = "1") int page,
                                    @RequestParam(name = "postCategory", required = false) String postCategory,
                                    Model model) {
-        PaginationResult result = postPaginationService.getPagedPostsByCategory(page, postCategory);
-        model.addAttribute("result", result);
+        PaginationResult post = postPaginationService.getPagedPostsByCategory(page, postCategory);
+        model.addAttribute("post", post);
         model.addAttribute("postCategory", postCategory);
-
         return "post/categoryList";
     }
 
@@ -87,7 +86,6 @@ public class PostViewController {
         model.addAttribute("likeAction", likeAction);
         model.addAttribute("likeCount", likeCount);
         model.addAttribute("postCategory", postCategory);
-
         return "post/detail";
     }
 
