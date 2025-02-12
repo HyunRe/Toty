@@ -51,7 +51,7 @@ public class UserViewController {
     // 리프레시 토큰 만료 이후 재로그인(액세스 토큰 유효성 검사x)
     @GetMapping("/login")
     public String loginPage() {
-        return "common/home"; // todo
+        return "common/login"; // todo
     }
 
     // 나의/상대방의 정보 보기
