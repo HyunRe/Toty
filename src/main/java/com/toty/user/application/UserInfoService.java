@@ -11,6 +11,7 @@ import com.toty.user.domain.repository.UserRepository;
 import com.toty.user.domain.repository.UserTagRepository;
 import com.toty.user.dto.request.BasicInfoUpdateRequest;
 import com.toty.user.dto.request.LinkUpdateRequest;
+import com.toty.user.dto.request.PhoneNumberUpdateRequest;
 import com.toty.user.dto.request.TagUpdateRequest;
 import com.toty.user.dto.request.UserInfoUpdateRequest;
 import com.toty.user.dto.response.LinkInfo;
@@ -143,9 +144,9 @@ public class UserInfoService {
     }
 
     // 휴대폰 번호 변경
-    public void updatePhoneNumber(Long userId, String phoneNumber) {
+    public void updatePhoneNumber(Long userId, PhoneNumberUpdateRequest phoneNumberDto) {
         User foundUser = userService.findById(userId);
-        foundUser.updatePhoneNumber(phoneNumber);
+        foundUser.updatePhoneNumber(phoneNumberDto.getPhoneNumber());
     }
 
     // 사용 안함
@@ -199,7 +200,7 @@ public class UserInfoService {
     }
 
     private static Site siteStringToEnum(String siteValue) {
-        return siteValue.equals("GITHUB") ? Site.GITHUB : Site.BLOG;
+        return siteValue.toLowerCase().equals("github") ? Site.GITHUB : Site.BLOG;
     }
 
 }

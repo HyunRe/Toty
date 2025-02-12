@@ -9,9 +9,8 @@ import com.toty.user.application.UserSignUpService;
 import com.toty.user.domain.model.User;
 import com.toty.user.dto.request.BasicInfoUpdateRequest;
 import com.toty.user.dto.request.LinkUpdateRequest;
+import com.toty.user.dto.request.PhoneNumberUpdateRequest;
 import com.toty.user.dto.request.TagUpdateRequest;
-import com.toty.user.dto.request.UserInfoUpdateRequest;
-import com.toty.user.dto.response.UserInfoResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-//
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -30,12 +29,6 @@ public class UserApiController {
     private final UserInfoService userInfoService;
     private final JwtTokenUtil jwtTokenUtil;
 
-    // 회원가입 - 이메일 중복 확인
-    @GetMapping("/test")
-    public ResponseEntity test(@CurrentUser User user) {
-        System.out.println("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
-        return ResponseEntity.ok(user);
-    }
 
     // 회원가입 - 이메일 중복 확인
     @GetMapping("/check-email")
@@ -102,17 +95,17 @@ public class UserApiController {
 
     // 내 정보 수정
 //    @PostMapping("/update") // info -> update
-    public ResponseEntity updateUserInfo(@CurrentUser User user,
-                                                 @RequestPart UserInfoUpdateRequest newInfo,
-                                                 @RequestPart(required = false) MultipartFile imgFile) {
-        userInfoService.updateUserInfo(user.getId(), newInfo, imgFile);
-        SuccessResponse successResponse = new SuccessResponse(
-                HttpStatus.OK.value(),
-                "정보가 수정되었습니다.",
-                null
-        );
-        return ResponseEntity.ok(successResponse);
-    }
+//    public ResponseEntity updateUserInfo(@CurrentUser User user,
+//                                                 @RequestPart UserInfoUpdateRequest newInfo,
+//                                                 @RequestPart(required = false) MultipartFile imgFile) {
+//        userInfoService.updateUserInfo(user.getId(), newInfo, imgFile);
+//        SuccessResponse successResponse = new SuccessResponse(
+//                HttpStatus.OK.value(),
+//                "정보가 수정되었습니다.",
+//                null
+//        );
+//        return ResponseEntity.ok(successResponse);
+//    }
 
     // 내 기본 정보 수정(닉네임, 프로필 사진)
     @PostMapping("/update")
@@ -128,7 +121,7 @@ public class UserApiController {
     }
 
     // 내 링크 수정
-    @PostMapping
+    @PostMapping("/links")
     public ResponseEntity updateUserLinks(@CurrentUser User user,
             @RequestBody LinkUpdateRequest request) {
         userInfoService.updateUserLinks(user.getId(), request);
@@ -141,7 +134,7 @@ public class UserApiController {
     }
 
     // 내 태그 수정
-    @PostMapping
+    @PostMapping("/tags")
     public ResponseEntity updateUserTags(@CurrentUser User user,
             @RequestBody TagUpdateRequest request) {
         userInfoService.updateUserTags(user.getId(), request);
@@ -153,18 +146,16 @@ public class UserApiController {
         return ResponseEntity.ok(successResponse);
     }
 
-    // 상대방의 정보 보기
-    // 본인인지 아닌지 확인 -> 아니면 약식 정보만 전달
-    @GetMapping("/{id}/info") //
-    public ResponseEntity getUserInfo(@CurrentUser User user,
-            @PathVariable("id") Long id) {
-        UserInfoResponse userInfo = userInfoService.getUserInfo(user, id);
-//        SuccessResponse successResponse = new SuccessResponse(
-//                HttpStatus.OK.value(),
-//                "정보 조회에 성공했습니다.",
-//                userInfo
-//        );
-        return ResponseEntity.ok(userInfo);
+    @PostMapping("/phone-number")
+    public ResponseEntity updateUserPhoneNumber(@CurrentUser User user,
+            @RequestBody PhoneNumberUpdateRequest request) {
+        userInfoService.updatePhoneNumber(user.getId(), request);
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "태그가 수정되었습니다.",
+                null
+        );
+        return ResponseEntity.ok(successResponse);
     }
 
 
