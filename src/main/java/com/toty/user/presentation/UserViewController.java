@@ -69,10 +69,18 @@ public class UserViewController {
     }
 
     // 폼로그인 실패 창 띄우기
-    @GetMapping("/login-fail")
+    @GetMapping("/alert/login-fail")
     public String loginFail(Model model) {
         model.addAttribute("msg", "로그인에 실패했습니다");
         model.addAttribute("url", "/view/users/login");
+        return "common/alertMsg";
+    }
+
+    // 로그아웃 성공 안내 창
+    @GetMapping("/alert/logout")
+    public String logout(Model model) {
+        model.addAttribute("msg", "로그아웃 되었습니다.");
+        model.addAttribute("url", "/view/users/home");
         return "common/alertMsg";
     }
 }

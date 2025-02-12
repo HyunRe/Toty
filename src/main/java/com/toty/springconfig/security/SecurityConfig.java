@@ -62,7 +62,7 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .deleteCookies("accessToken")
                         .deleteCookies("refreshToken")
-                        .logoutSuccessUrl("/view/users/home")
+                        .logoutSuccessUrl("/view/users/alert/logout")
                 )
                 // 추가 예정
                 .oauth2Login(auth -> auth
@@ -85,7 +85,7 @@ public class SecurityConfig {
     @Bean
     public SimpleUrlAuthenticationFailureHandler loginFailureHandler() {
         SimpleUrlAuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
-        failureHandler.setDefaultFailureUrl("/view/users/login-fail"); // 인증 실패 시 response.sendRedirect(url);
+        failureHandler.setDefaultFailureUrl("/view/users/alert/login-fail"); // 인증 실패 시 response.sendRedirect(url);
         return failureHandler;
     }
 
