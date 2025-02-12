@@ -362,9 +362,8 @@ document.getElementById('nickname').addEventListener('input', function () {
 document.getElementById('formSubmit').addEventListener('click', checkForm);
 
 function checkForm() {
-
-  if (document.getElementById('checkEmailBtn').getAttribute('data-available')
-      === 'false') {
+  // 이메일 중복 확인
+  if (document.getElementById('checkEmailBtn').getAttribute('data-available') === 'false') {
     Swal.fire({
       icon: 'warning',
       text: '이메일 중복 확인을 해주세요.',
@@ -373,8 +372,8 @@ function checkForm() {
     return false;
   }
 
-  if (document.getElementById('checkNicknameBtn').getAttribute('data-available')
-      === 'false') {
+  // 닉네임 중복 확인
+  if (document.getElementById('checkNicknameBtn').getAttribute('data-available') === 'false') {
     Swal.fire({
       icon: 'warning',
       text: '닉네임 중복 확인을 해주세요.',
@@ -383,8 +382,8 @@ function checkForm() {
     return false;
   }
 
-  if (document.getElementById('pwd').value !== document.getElementById(
-      'pwd2').value) {
+  // 비밀번호 일치 확인
+  if (document.getElementById('pwd').value !== document.getElementById('pwd2').value) {
     Swal.fire({
       icon: 'warning',
       text: '비밀번호가 일치하지 않습니다.',
@@ -392,5 +391,20 @@ function checkForm() {
     });
     return false;
   }
-  document.getElementById('registerForm').submit();
+
+  // FormData -> JSON 변환
+  const formData = new FormData(document.getElementById('registerForm'));
+  const jsonData = {};
+  formData.forEach((value, key) => jsonData[key] = value);
+
+  // JSON 형식으로 POST 요청
+  fetch('/view/users/signup', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(jsonData)
+  })
 }
+
+
