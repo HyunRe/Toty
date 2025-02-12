@@ -30,6 +30,16 @@ public class PostSearchService {
     public Map<PostCategory, Page<PostEs>> searchPosts(String keyword, SearchField field, int size) {
         PageRequest pageRequest = PageRequest.of(0, size);
 
+        // 검색어가 공백인 경우
+        if (keyword.trim().isEmpty()) {
+           return Map.of(
+                   PostCategory.GENERAL, postSearchRepository.searchByCategory(PostCategory.GENERAL.toString() ,pageRequest),
+                   PostCategory.KNOWLEDGE, postSearchRepository.searchByCategory(PostCategory.KNOWLEDGE.toString(), pageRequest),
+                   PostCategory.QnA, postSearchRepository.searchByCategory(PostCategory.QnA.toString(), pageRequest)
+           );
+        }
+
+        // 검색어가 공백이 아닌 경우
         if (field == SearchField.TITLE) {
             return Map.of(
                     PostCategory.GENERAL, postSearchRepository.searchByTitleAndCategory(keyword, PostCategory.GENERAL.toString() ,pageRequest),
@@ -56,6 +66,16 @@ public class PostSearchService {
     public Map<PostCategory, Page<PostEs>> searchPostsByCategory(String keyword, SearchField field, PostCategory category, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
 
+        // 검색어가 공백인 경우
+        if (keyword.trim().isEmpty()) {
+            return Map.of(
+                    PostCategory.GENERAL, postSearchRepository.searchByCategory(PostCategory.GENERAL.toString() ,pageRequest),
+                    PostCategory.KNOWLEDGE, postSearchRepository.searchByCategory(PostCategory.KNOWLEDGE.toString(), pageRequest),
+                    PostCategory.QnA, postSearchRepository.searchByCategory(PostCategory.QnA.toString(), pageRequest)
+            );
+        }
+
+        // 검색어가 공백이 아닌 경우
         if (field == SearchField.TITLE) {
             return Map.of(
                     category, postSearchRepository.searchByTitleAndCategory(keyword, category.toString() ,pageRequest)
