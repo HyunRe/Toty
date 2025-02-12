@@ -5,6 +5,7 @@ import com.toty.user.domain.model.User;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +16,7 @@ public interface UserRepository extends Repository<User, Long> {
     Optional<User> findById(Long id);
 
     @Query("SELECT u FROM User u WHERE u.email = :email AND u.isDeleted = false")
-    Optional<User> findByEmail(String email);
+    Optional<User> findByEmail(@Param("email") String email);
 
     boolean existsByEmail(String email);
 
