@@ -70,7 +70,7 @@ public class UserViewController {
     @GetMapping("/login-fail")
     public String loginFail(Model model) {
         model.addAttribute("msg", "로그인에 실패했습니다");
-        model.addAttribute("url", "/api/users/sign-out");
+        model.addAttribute("url", "/view/users/login");
         return "common/alertMsg";
     }
 }
