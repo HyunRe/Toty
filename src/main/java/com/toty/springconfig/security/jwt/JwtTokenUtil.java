@@ -89,6 +89,7 @@ public class JwtTokenUtil {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge((int) REFRESH_TOKEN_TTL);
         cookie.setSecure(true);
+        cookie.setAttribute("SameSite", "None");
         if (isRefreshToken) {
             cookie.setPath("/api/auth");
         } else {
