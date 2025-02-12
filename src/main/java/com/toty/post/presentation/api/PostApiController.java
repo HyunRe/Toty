@@ -1,7 +1,6 @@
 package com.toty.post.presentation.api;
 
 import com.toty.common.pagination.PaginationResult;
-import com.toty.base.response.SuccessResponse;
 import com.toty.common.annotation.CurrentUser;
 import com.toty.post.application.PostImageService;
 import com.toty.post.application.PostLikeService;
@@ -14,7 +13,6 @@ import com.toty.post.dto.response.postdetail.PostDetailResponse;
 import com.toty.user.domain.model.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

@@ -17,7 +17,7 @@ public class PostTag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "post_id", nullable = false)
     @JsonBackReference
     private Post post;
