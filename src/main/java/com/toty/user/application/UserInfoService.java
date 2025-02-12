@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-// todo DTO 이름 수정
 @Service
 @RequiredArgsConstructor
 public class UserInfoService {
