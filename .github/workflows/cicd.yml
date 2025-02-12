@@ -39,6 +39,14 @@ jobs:
           echo "${{ secrets.APPLICATION_DEPLOY }}" > ./src/main/resources/application-deploy.yaml
         shell: bash
 
+      - name: Create firebase key.json file
+        if: contains(github.ref, 'main')
+        id: create-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "./src/main/resources/toty-6d4b4-firebase-adminsdk-fbsvc-f5eb24e27a.json"
+          json: ${ secrets.FIREBASE_ACCOUNT_KEY }
+
       # API E2E 테스트에서 데이터베이스 연결(SSH)을 위한 key 파일
       - name: Create SSH Key File
         run: |
