@@ -32,14 +32,6 @@ public class UserViewController {
         return "redirect:/view/users/home";
     }
 
-    // 정보 수정(View)
-    @GetMapping("/edit-form")
-    public String updateProc(@CurrentUser User user, Model model){
-        UserInfoResponse userInfo = userInfoService.getUserInfoByAccount(user.getId(), user.getId());
-        model.addAttribute("userInfo", userInfo);
-        return "update";
-    }
-
     // 기본 페이지
     @GetMapping("/home")
     public String home(){
