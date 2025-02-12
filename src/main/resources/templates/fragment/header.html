@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:fragment="headerhead">
   <meta charset="utf-8"/>
   <title>TOTY</title>
@@ -69,7 +70,7 @@
         </form>
       </div>
 
-      <div class="col-lg-2 col-3 text-center">
+      <div class="col-lg-2 col-3 text-center" sec:authorize="isAuthenticated()">
             <span class="bg-transparent text-primary" style="cursor: pointer">
               <i class="fa-regular fa-bell" id="header-noti"></i>
             </span>
@@ -106,6 +107,9 @@
               <a href="/info" class="nav-item nav-link">정보게시판</a>
               <a href="/free" class="nav-item nav-link">자유게시판</a>
             </div>
+            <a href="/view/users/login" sec:authorize="isAnonymous()">
+              <span style="float: right;">로그인</span>
+            </a>
           </div>
         </nav>
       </div>
