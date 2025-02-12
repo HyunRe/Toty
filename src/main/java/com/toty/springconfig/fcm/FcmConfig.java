@@ -27,6 +27,5 @@ public class FcmConfig {
     public FirebaseMessaging firebaseMessaging(FirebaseApp firebaseApp) {
         return FirebaseMessaging.getInstance(firebaseApp);
     }
-
 }
 
