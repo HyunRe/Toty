@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:replace="fragment/header :: headerhead"></th:block>
+    <th:block th:replace="~{fragment/header :: headerhead}"></th:block>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
@@ -35,7 +35,7 @@
 </head>
 <body>
     <!-- header -->
-    <div th:replace="fragment/header :: header"></div>
+    <div th:replace="~{fragment/header :: header}"></div>
 
     <div class = "container">
         <!-- 게시판 데이터 -->
@@ -77,9 +77,9 @@
                         console.log(response);
                         const boardData = response.data.data;
                         // 각 게시판의 데이터를 렌더링
-                        renderBoard(boardData.GENERAL, '#general-list', '#general-pagination', 1, 'GENERAL');
-                        renderBoard(boardData.KNOWLEDGE, '#knowledge-list', '#knowledge-pagination', 1, 'KNOWLEDGE');
-                        renderBoard(boardData.QnA, '#qna-list', '#qna-pagination', 1, 'QnA');
+                        renderBoard(boardData.General, '#general-list', '#general-pagination', 1, 'General');
+                        renderBoard(boardData.Knowledge, '#knowledge-list', '#knowledge-pagination', 1, 'Knowledge');
+                        renderBoard(boardData.Qna, '#qna-list', '#qna-pagination', 1, 'Qna');
                     })
                     .catch(() => {
                         alert('검색 데이터를 불러오는 데 실패했습니다.');
