@@ -14,6 +14,7 @@ public enum ErrorCode {
     // 사용자
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
     USER_NOT_MENTOR(HttpStatus.FORBIDDEN, "해당 사용자는 멘토로 지정 되지 않았습니다."),
+    PROFILE_IMAGE_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "프로필 이미지를 저장하는 중 오류가 발생했습니다."),
 
     // 게시글
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),

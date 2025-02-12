@@ -28,7 +28,11 @@ public class UserApiController {
     private final UserSignUpService userSignUpService;
     private final UserInfoService userInfoService;
     private final JwtTokenUtil jwtTokenUtil;
-
+    // 회원가입 - 이메일 중복 확인
+    @GetMapping("/test")
+    public ResponseEntity testEndpoint(@CurrentUser User user) {
+        return ResponseEntity.ok(user);
+    }
 
     // 회원가입 - 이메일 중복 확인
     @GetMapping("/check-email")
