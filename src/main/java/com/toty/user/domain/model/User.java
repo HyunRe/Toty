@@ -85,4 +85,28 @@ public class User extends BaseTime {
     public void updateRole(Role role) {
         this.role = role;
     };
+
+    // 구독 변경
+    public void updateEmailSubscription(boolean emailSubscribed) {
+        this.subscribeInfo = this.subscribeInfo.updateEmailSubscription(emailSubscribed);
+    }
+
+    public void updateSmsSubscription(boolean smsSubscribed) {
+        this.subscribeInfo = this.subscribeInfo.updateSmsSubscription(smsSubscribed);
+    }
+
+    public void updateNotificationAllowed(boolean notificationAllowed) {
+        this.subscribeInfo = this.subscribeInfo.updateNotificationAllowed(notificationAllowed);
+    }
+
+    // 이미지 변경
+    public void updateprofileImg(String imgPath) {
+        this.profileImageUrl = imgPath;
+    }
+
+    // 휴대폰 번호 변경
+    public void updatePhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
 }

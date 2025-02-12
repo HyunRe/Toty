@@ -109,7 +109,9 @@ public class UserSignUpService {
 
     public boolean checkAuthCode(String phoneNumber, String authCode) {
         String redisAuthCode = redisService.getData(phoneNumber);
-        if (authCode.equals(redisAuthCode)) {
+        if (redisAuthCode == null) {
+            throw new IllegalArgumentException("인증번호가 만료되었습니다.");
+        } else if (authCode.equals(redisAuthCode)) {
             return true;
         } else {
             throw new IllegalArgumentException("인증번호가 일치하지 않습니다.");

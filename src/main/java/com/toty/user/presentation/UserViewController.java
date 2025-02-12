@@ -5,6 +5,7 @@ import com.toty.user.application.UserInfoService;
 import com.toty.user.application.UserSignUpService;
 import com.toty.user.domain.model.User;
 import com.toty.user.dto.request.UserSignUpRequest;
+import com.toty.user.dto.response.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,13 +33,12 @@ public class UserViewController {
     }
 
     // 정보 수정(View)
-    @GetMapping("/edit-form/{id}")
+    @GetMapping("/edit-form")
     public String updateProc(@CurrentUser User user, @PathVariable Long id, Model model){
         // 본인인지 확인 -> 아니면 예외
-//
-//        UserInfoResponse userInfo = userInfoService.getMyInfoForUpdate(user, id);
 
-//        model.addAttribute("userInfo", userInfo);
+        UserInfoResponse userInfo = userInfoService.getMyInfoForUpdate(user, user.getId());
+        model.addAttribute("userInfo", userInfo);
         return "update";
     }
 
@@ -51,18 +51,21 @@ public class UserViewController {
     // 리프레시 토큰 만료 이후 재로그인(액세스 토큰 유효성 검사x)
     @GetMapping("/login")
     public String loginPage() {
-        return "common/home"; // todo
+        return "common/login"; // todo
+    }
+
+    // 내 정보 보기
+    @GetMapping("/info") // -> 모델로 전달하고 view로 변경?
+    public String getMyInfo(@CurrentUser User user, Model model) {
+        model.addAttribute("userInfo", userInfoService.getUserInfo(user, user.getId()));
+        return "user/detail";
     }
 
     // 나의/상대방의 정보 보기
     // 본인인지 아닌지 확인 -> 아니면 약식 정보만 전달
     @GetMapping("/{id}/info") // -> 모델로 전달하고 view로 변경?
-    public String getUserInfo(@CurrentUser User user,
-            @PathVariable("id") Long id) {
-        if (user.getId() == id) {
-            return "user/detail";
-        } else {
-            return "user/list";
-        }
+    public String getUserInfo(@CurrentUser User user, @PathVariable("id") Long id, Model model) {
+        model.addAttribute("userInfo", userInfoService.getUserInfo(user, id));
+        return "user/info";
     }
 }

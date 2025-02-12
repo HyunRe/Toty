@@ -7,6 +7,9 @@ import com.toty.user.application.UserInfoService;
 import com.toty.user.application.UserService;
 import com.toty.user.application.UserSignUpService;
 import com.toty.user.domain.model.User;
+import com.toty.user.dto.request.BasicInfoUpdateRequest;
+import com.toty.user.dto.request.LinkUpdateRequest;
+import com.toty.user.dto.request.TagUpdateRequest;
 import com.toty.user.dto.request.UserInfoUpdateRequest;
 import com.toty.user.dto.response.UserInfoResponse;
 import jakarta.servlet.http.HttpServletResponse;
@@ -83,6 +86,7 @@ public class UserApiController {
         return ResponseEntity.ok(successResponse);
     }
 
+
     // 회원 탈퇴
     @DeleteMapping("/")
     public ResponseEntity delete(@CurrentUser User user, HttpServletResponse response) {
@@ -97,7 +101,7 @@ public class UserApiController {
     }
 
     // 내 정보 수정
-    @PatchMapping("/info")
+//    @PostMapping("/update") // info -> update
     public ResponseEntity updateUserInfo(@CurrentUser User user,
                                                  @RequestPart UserInfoUpdateRequest newInfo,
                                                  @RequestPart(required = false) MultipartFile imgFile) {
@@ -110,18 +114,57 @@ public class UserApiController {
         return ResponseEntity.ok(successResponse);
     }
 
+    // 내 기본 정보 수정(닉네임, 프로필 사진)
+    @PostMapping("/update")
+    public ResponseEntity updateUserBasicInfo(@CurrentUser User user,
+            @RequestBody BasicInfoUpdateRequest newInfo, @RequestPart(required = false) MultipartFile imgFile) {
+        userInfoService.updateUserBasicInfo(user.getId(), newInfo, imgFile);
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "정보가 수정되었습니다.",
+                null
+        );
+        return ResponseEntity.ok(successResponse);
+    }
+
+    // 내 링크 수정
+    @PostMapping
+    public ResponseEntity updateUserLinks(@CurrentUser User user,
+            @RequestBody LinkUpdateRequest request) {
+        userInfoService.updateUserLinks(user.getId(), request);
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "링크가 수정되었습니다.",
+                null
+        );
+        return ResponseEntity.ok(successResponse);
+    }
+
+    // 내 태그 수정
+    @PostMapping
+    public ResponseEntity updateUserTags(@CurrentUser User user,
+            @RequestBody TagUpdateRequest request) {
+        userInfoService.updateUserTags(user.getId(), request);
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "태그가 수정되었습니다.",
+                null
+        );
+        return ResponseEntity.ok(successResponse);
+    }
+
     // 상대방의 정보 보기
     // 본인인지 아닌지 확인 -> 아니면 약식 정보만 전달
     @GetMapping("/{id}/info") //
     public ResponseEntity getUserInfo(@CurrentUser User user,
             @PathVariable("id") Long id) {
         UserInfoResponse userInfo = userInfoService.getUserInfo(user, id);
-        SuccessResponse successResponse = new SuccessResponse(
-                HttpStatus.OK.value(),
-                "정보 조회에 성공했습니다.",
-                userInfo
-        );
-        return ResponseEntity.ok(successResponse);
+//        SuccessResponse successResponse = new SuccessResponse(
+//                HttpStatus.OK.value(),
+//                "정보 조회에 성공했습니다.",
+//                userInfo
+//        );
+        return ResponseEntity.ok(userInfo);
     }
 
 
