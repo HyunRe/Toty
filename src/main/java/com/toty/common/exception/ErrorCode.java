@@ -14,6 +14,7 @@ public enum ErrorCode {
     // 사용자
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
     USER_NOT_MENTOR(HttpStatus.FORBIDDEN, "해당 사용자는 멘토로 지정 되지 않았습니다."),
+    PROFILE_IMAGE_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "프로필 이미지를 저장하는 중 오류가 발생했습니다."),
 
     // 게시글
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
@@ -47,8 +48,10 @@ public enum ErrorCode {
     SMS_NOT_REGISTERED(HttpStatus.BAD_REQUEST, "전화번호 미등록 사용자입니다."),
 
     // sse
-    TOO_MANY_SSE_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "SSE 연결 요청이 너무 많습니다.");
-
+    TOO_MANY_SSE_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "SSE 연결 요청이 너무 많습니다."),
+    
+    // 채팅
+    FAIL_ROOM_CREATE(HttpStatus.FORBIDDEN, "단톡방을 생성할수 없습니다");
     private final HttpStatus httpStatus;
     private final String message;
 }

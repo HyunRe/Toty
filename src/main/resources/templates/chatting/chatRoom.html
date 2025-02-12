@@ -9,7 +9,7 @@
     <meta content="Free HTML Templates" name="description" />
 
     <!-- Favicon -->
-    <link href="/img/favicon.ico" rel="icon" />
+    <link href="/favicon.ico" rel="icon" />
 
 
     <!-- Google Web Fonts -->
@@ -152,6 +152,7 @@
                 <a href="shop.html" class="nav-item nav-link">Q/A게시판</a>
                 <a href="detail.html" class="nav-item nav-link">정보게시판</a>
                 <a href="contact.html" class="nav-item nav-link">자유게시판</a>
+                <a href="" class="nav-item nav-link">멘토 단체채팅</a>
               </div>
             </div>
           </nav>
@@ -163,19 +164,21 @@
     <input type="hidden" id="userName" th:value="${nickname}">
     <input type="hidden" id="userId" th:value="${userId}">
     <input type="hidden" id="roomId" th:value="${room.id}">
-    <input type="hidden" id="roomMentorId" th:value="${room.mentor.uid}">
+    <input type="hidden" id="roomMentorId" th:value="${room.mentor.id}">
     <input type="hidden" id="serverPort" th:value="${serverPort}">
     
     <div class="container">
       <div class="row">
         <div class="col-8">
-          <h3>환영합니다. [[${room.mentor.userName}]]님의 단톡방 입니다.</h3>
+          <h3>환영합니다. [[${room.mentor.nickname}]]님의 단톡방 입니다.</h3>
           <div>주제 : [[${room.roomName}]]</div>
         </div>
         <div class="col-3">
           <button sec:authorize="isAuthenticated()" onclick="exitRoom()">채팅방 나가기</button>
-          <button sec:authorize="hasRole('ROLE_MENTOR')"
-              onclick="endRoom()">채팅방 종료하기([[${session.loginUser.role.name()}]])</button>
+          <div sec:authorize="hasAuthority('MENTOR')">
+            <button th:if="${userId == room.mentor.id}" 
+              onclick="endRoom()">채팅방 종료하기</button>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -222,7 +225,7 @@
                       <td> 
                           <img src="/img/chatting/undraw_profile.svg" style="width: 50px; height: 50px;">
                       </td>
-                      <td th:text="${user.chatter.userName}">참석자 이름</td>
+                      <td th:text="${user.chatter.nickname}">참석자 이름</td>
                   </tr>
               </tbody>
 

@@ -25,4 +25,19 @@ public class SubscribeInfo {
         this.smsSubscribed = smsSubscribed;
         this.notificationAllowed = notificationAllowed;
     }
+
+    // 구독 변경
+    public SubscribeInfo updateEmailSubscription(boolean emailSubscribed) {
+        return new SubscribeInfo(emailSubscribed, this.smsSubscribed, this.notificationAllowed);
+    }
+
+    public SubscribeInfo updateSmsSubscription(boolean smsSubscribed) {
+        return new SubscribeInfo(this.emailSubscribed, smsSubscribed, this.notificationAllowed);
+    }
+
+    public SubscribeInfo updateNotificationAllowed(boolean notificationAllowed) {
+        return new SubscribeInfo(this.emailSubscribed, this.smsSubscribed, notificationAllowed);
+    }
+
+
 }
