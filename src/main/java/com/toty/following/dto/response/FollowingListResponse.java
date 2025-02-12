@@ -13,6 +13,7 @@ public class FollowingListResponse {
     List<Summary> userSummaries;
     PageInfo page;
 
+    @Getter
     @AllArgsConstructor
     public static class PageInfo {
         int currentPage;
@@ -23,6 +24,7 @@ public class FollowingListResponse {
 //        Long endPages;
     }
 
+    @Getter
     @AllArgsConstructor
     public static class Summary {
         Long id;

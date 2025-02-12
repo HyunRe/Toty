@@ -5,7 +5,6 @@ import com.toty.user.application.UserInfoService;
 import com.toty.user.application.UserSignUpService;
 import com.toty.user.domain.model.User;
 import com.toty.user.dto.request.UserSignUpRequest;
-import com.toty.user.dto.response.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,11 +17,6 @@ public class UserViewController {
 
     private final UserSignUpService userSignUpService;
     private final UserInfoService userInfoService;
-//    // 로그인 페이지 반환
-//    @GetMapping("/sign-in")
-//    public String signin(){
-//        return "user/signin";
-//    }
 
     // 회원 가입 페이지 반환
     @GetMapping("/signup")
@@ -34,7 +28,7 @@ public class UserViewController {
     @PostMapping("/signup")
     public String signUp(@RequestBody UserSignUpRequest userSignUpRequest, Model model) {
         userSignUpService.signUp(userSignUpRequest);
-        return "redirect:/api/users/home";
+        return "redirect:/view/users/home";
     }
 
     // 정보 수정(View)
@@ -49,30 +43,15 @@ public class UserViewController {
     }
 
     // 기본 페이지
-    @GetMapping("/home") // 액세스 토큰 유효성 검사x
+    @GetMapping("/home")
     public String home(){
-        // todo
-        return "common/home";
-    }
-
-    // 메세지 띄우기
-    @PostMapping("/alert")
-    public String alert() {
-        return "common/alertMsg";
-    }
-
-    // 로그인 성공 후 기본 리다이렉트
-    @GetMapping("/login-success")
-    public String loginSuccess(Model model) {
-        model.addAttribute("msg", "환영합니다.");
-        model.addAttribute("url", "/successUrl");
-        return "common/alertMsg";
+        return "home";
     }
 
     // 리프레시 토큰 만료 이후 재로그인(액세스 토큰 유효성 검사x)
     @GetMapping("/login")
     public String loginPage() {
-        return "common/home"; // todo
+        return "common/login";
     }
 
     // 나의/상대방의 정보 보기
@@ -85,5 +64,13 @@ public class UserViewController {
         } else {
             return "user/list";
         }
+    }
+
+    // 폼로그인 실패 창 띄우기
+    @GetMapping("/login-fail")
+    public String loginFail(Model model) {
+        model.addAttribute("msg", "로그인에 실패했습니다");
+        model.addAttribute("url", "/view/users/login");
+        return "common/alertMsg";
     }
 }

@@ -20,7 +20,8 @@ public class FormLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
 
     public FormLoginSuccessHandler(JwtTokenUtil jwtTokenUtil) {
 //        setRequestCache(new CookieRequestCache());
-        setDefaultTargetUrl("/view/users/login-success");
+        setDefaultTargetUrl("/view/users/home");
+        setAlwaysUseDefaultTargetUrl(true);
         this.jwtTokenUtil = jwtTokenUtil;
     }
 

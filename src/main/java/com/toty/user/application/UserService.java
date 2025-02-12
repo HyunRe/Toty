@@ -29,4 +29,17 @@ public class UserService {
         User foundUser = findById(dto.getId());
         foundUser.updateRole(dto.getRole());
     }
+
+    public void registerUser(User user) {
+        userRepository.save(user);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+    }
 }

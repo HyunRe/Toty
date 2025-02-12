@@ -10,13 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/view/follow")
 @Controller
@@ -28,7 +25,7 @@ public class FollowViewController {
     // 팔로워 목록 조회
     @GetMapping("/{uid}/followers")
     public String followersList(@CurrentUser User user,
-                                @PathParam("uid") Long id,
+                                @PathVariable("uid") Long id,
                                 @RequestParam(value = "p", defaultValue = "1") int page,
                                 Model model) {
         FollowingListResponse response = followService.pagedFollowings(id, true, page, user.getId());
@@ -40,7 +37,7 @@ public class FollowViewController {
     // 팔로잉 목록 조회
     @GetMapping("/{uid}/followings")
     public String followingList(@CurrentUser User user,
-                                @PathParam("uid") Long id,
+                                @PathVariable("uid") Long id,
                                 @RequestParam(value = "p", defaultValue = "1") int page,
                                 Model model) {
         FollowingListResponse response = followService.pagedFollowings(id, false, page, user.getId());
