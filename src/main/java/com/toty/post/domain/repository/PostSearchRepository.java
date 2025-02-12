@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 
 public interface PostSearchRepository extends ElasticsearchRepository<PostEs, String> {
     /**
-     * 제목으로 검색
+     * 제목으로 검색 (키워드 공백 x)
      */
     @SourceFilters(excludes = {"content","replies"})
     @Query("""
@@ -25,7 +25,7 @@ public interface PostSearchRepository extends ElasticsearchRepository<PostEs, St
     Page<PostEs> searchByTitleAndCategory(String keyword, String category, Pageable pageable);
 
     /**
-     * 본문으로 검색
+     * 본문으로 검색 (키워드 공백 x)
      */
     @SourceFilters(excludes = {"content","replies"})
     @Query("""
@@ -41,7 +41,7 @@ public interface PostSearchRepository extends ElasticsearchRepository<PostEs, St
     Page<PostEs> searchByContentAndCategory(String keyword, String category, Pageable pageable);
 
     /**
-     * 제목+본문으로 검색
+     * 제목+본문으로 검색 (키워드 공백 x)
      */
     @SourceFilters(excludes = {"content","replies"})
     @Query("""
@@ -62,5 +62,22 @@ public interface PostSearchRepository extends ElasticsearchRepository<PostEs, St
         }
     """)
     Page<PostEs> searchTitleAndContentAndCategory(String keyword, String category, Pageable pageable);
+
+    /**
+     * 키워드 공백 o
+     * 제목, 본문, 제목 + 본문 모두 공통으로 사용
+     */
+    @SourceFilters(excludes = {"content","replies"})
+    @Query("""
+    {
+      "bool": {
+        "must": [
+          { "term": { "category": "?0" } }
+        ]
+      }
+    }
+    """)
+    Page<PostEs> searchByCategory(String category, Pageable pageable);
+
 }
 
