@@ -1,0 +1,160 @@
+/* 게시글 상세 페이지 스타일 */
+.page-title {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.post-info {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.post-details {
+    margin-left: 15px;
+}
+
+.post-details h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.post-details p {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.post-meta {
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.post-meta p {
+    margin-right: 20px;
+    font-size: 0.9rem;
+}
+
+#save-btn {
+    font-size: 0.9rem;
+    padding: 10px;
+    background: none;
+    border: none;
+}
+
+#save-btn img {
+    cursor: pointer;
+}
+
+.post-content p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+hr {
+    border: 1px solid #ccc;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.comments-section h3 {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.comment-list {
+    margin-top: 20px;
+}
+
+.comment-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.comment-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.comment-item .comment-details {
+    margin-left: 15px;
+}
+
+.comment-item .comment-details p {
+    margin: 0;
+}
+
+.comment-item .comment-meta {
+    display: flex;
+    align-items: center;
+}
+
+.comment-form {
+    width: 100%;
+}
+
+.comment-form textarea {
+    width: 80%;
+    border-radius: 5px;
+    padding: 10px;
+    resize: none;
+}
+
+.comment-form button {
+    width: 15%;
+    font-size: 1rem;
+    padding: 10px;
+    margin-left: 10px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* 수정, 삭제 버튼 */
+.comment-item .comment-actions {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: flex;
+    gap: 10px;
+}
+
+.comment-item .comment-actions button {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: #007bff;
+    cursor: pointer;
+}
+
+.comment-item .comment-form {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.comment-item .comment-form textarea {
+    width: 100%;
+    border-radius: 5px;
+    padding: 10px;
+    resize: none;
+}
+
+.comment-item .comment-form button {
+    width: 100%;
+}
