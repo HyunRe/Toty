@@ -83,4 +83,33 @@ public class UserViewController {
         model.addAttribute("url", "/view/users/home");
         return "common/alertMsg";
     }
+
+
+    // 업데이트 창 (내 정보 수정)
+    @GetMapping("/updateInfo")
+    public String getUpdateInfo(@CurrentUser User user, Model model) {
+        model.addAttribute("userInfo", user);
+        return "user/updateInfo";
+    }
+
+    /// 업데이트 창 (링크)
+    @GetMapping("/updateLink")
+    public String getUpdateLink(@CurrentUser User user, Model model) {
+        model.addAttribute("userInfo", user); // 링크로 수정 필요
+        return "user/updateLink";
+    }
+
+    /// 업데이트 창 (휴대폰)
+    @GetMapping("/updatePhone")
+    public String getUpdatePhone(@CurrentUser User user, Model model) {
+        return "user/updatePhone";
+    }
+
+    /// 업데이트 창 (태그)
+    @GetMapping("/updateTag")
+    public String getUpdateTag(@CurrentUser User user, Model model) {
+        model.addAttribute("userInfo", user); // 태그로 수정 필요
+        return "user/updateTag";
+    }
+
 }

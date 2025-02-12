@@ -1,529 +1,74 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="utf-8"/>
-  <title>MyFeed</title>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <meta content="Free HTML Templates" name="keywords"/>
-  <meta content="Free HTML Templates" name="description"/>
+  <th:block th:replace="fragment/header :: headerhead"></th:block>
 
-  <!-- Favicon -->
-  <!--  <link href="/static/img/favicon.ico" rel="icon" />-->
-
-
-  <!-- Google Web Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet">
-  <!-- Font Awesome -->
-  <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
-      rel="stylesheet"
-  />
-  <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-      integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-  />
-
-  <!-- Libraries Stylesheet -->
-  <link href="/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet"/>
-
-  <!--Sweet Alert2-->
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"></script>
-
-  <!-- Customized Bootstrap Stylesheet -->
-  <link href="/css/style.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="/css/globals.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+  </style>
 </head>
-
 <body>
-<!-- Topbar Start -->
-<div class="container-fluid">
-  <div class="row bg-secondary py-2 px-xl-5">
-    <div class="col-lg-6 d-none d-lg-block">
-    </div>
-  </div>
-</div>
-<div class="row align-items-center py-3 px-xl-5">
-  <div class="col-lg-3 d-none d-lg-block">
-    <a href="/home">
-      <img src="/img/logo.png" style="margin-left: 5%; width: 40%;">
-    </a>
-  </div>
-  <div class="col-lg-6 col-6 text-left">
-    <form action="/search/posts" method="get">
-      <div class="input-group">
-        <!-- 드롭다운 추가 -->
-        <div class="input-group-prepend">
-          <select class="custom-select" name="field" style="border-radius: 5px;">
-            <option value="TITLE">제목</option>
-            <option value="CONTENT">본문</option>
-            <option value="TITLE_CONTENT">제목 + 본문</option>
-          </select>
-        </div>
+<!-- header -->
+<div th:replace="fragment/header :: header"></div>
 
-        <!-- 검색 입력창 -->
-        <input
-                type="text"
-                class="form-control"
-                name="keyword"
-                placeholder="검색창"
-                required
-        />
-
-        <!-- 검색 버튼 -->
-        <div class="input-group-append">
-          <span class="input-group-text bg-transparent text-primary" style="cursor: pointer;"
-                onclick="this.closest('form').submit()">
-            <i class="fa fa-search"></i>
-          </span>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
-</div>
-<!-- Topbar End -->
-
-<!-- Navbar Start -->
-<div class="container-fluid mb-2">
-  <div class="row border-top px-xl-5">
-    <div class="col-lg-9">
-      <nav
-          class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0"
-      >
-        <div
-            class="collapse navbar-collapse justify-content-between"
-            id="navbarCollapse"
-        >
-          <div class="navbar-nav mr-auto py-0">
-            <a href="index.html" class="nav-item nav-link active">홈</a>
-            <a href="/api/posts/list" class="nav-item nav-link">게시판</a>
-            <a href="detail.html" class="nav-item nav-link">메뉴1</a>
-            <div class="nav-item dropdown">
-              <a
-                  href="#"
-                  class="nav-link dropdown-toggle"
-                  data-toggle="dropdown"
-              >드롭다운</a
-              >
-              <div class="dropdown-menu rounded-0 m-0">
-                <a href="cart.html" class="dropdown-item">하위1</a>
-                <a href="checkout.html" class="dropdown-item">하위2</a>
-              </div>
-            </div>
-            <a href="contact.html" class="nav-item nav-link">메뉴2</a>
-          </div>
-        </div>
-      </nav>
-    </div>
-  </div>
-</div>
-<!-- Navbar End -->
-
-
-<div class="container-fluid pt-1">
-  <div class="row"
-       style="justify-content: space-between; flex-wrap: nowrap; margin: auto; width: 70%;">
-    <div class="col-9 mb-0">
-      <a href="/api/posts/create">
-        <span style="float: right;">전체보기</span>
-      </a>
-    </div>
+<div class="container">
+  <!-- 통합 게시글 리스트 -->
+  <div class="col-12 mb-3">
+    <table class="table" style="text-align: center">
+      <tbody id="post-list">
+      <!-- 게시글 리스트가 렌더링되는 부분 -->
+      </tbody>
+    </table>
   </div>
 </div>
 
-<div class="container-fluid pt-1">
-  <!-- <div class="container"> -->
-  <div class="row"
-       style="justify-content: space-between; flex-wrap: nowrap; margin: auto; width: 70%;">
-    <div class="col-9 mb-3">
+<script th:inline="javascript">
+  document.addEventListener("DOMContentLoaded", function() {
+    const pageSize = 20;  // 한 번에 보여줄 게시물 수 (20개 고정)
 
-      <table class="table" style="text-align: center;">
-        <tbody>
-        <tr>
-          <!-- <th scope="row"></th> -->
-          <td style=" width: 5%;">
-            <img src="/img/undraw_profile.svg" style="height: 54px;">
-          </td>
-          <td style="width: 55%; text-align: left;">
-            <a href="#"><span>제목 [22]</span> </a>
+    // 통합 게시글 API 호출
+    function loadPosts() {
+      axios.get('/api/search/posts', {
+        params: {
+          field: 'TITLE',
+          size: pageSize
+        }
+      }).then(response => {
+        const posts = response.data.data.General.content;
+        renderPostList(posts);
+      }).catch(() => {
+        alert('게시글 데이터를 불러오는 데 실패했습니다.');
+      });
+    }
 
-          </td>
-          <td style="width: 10%;">게시자</td>
-          <td style="width: 10%;">등록 날짜</td>
-        </tr>
+    // 게시글 리스트 렌더링
+    function renderPostList(posts) {
+      const listElement = document.querySelector('#post-list');
+      listElement.innerHTML = '';
 
-        <!-- 아래 지우기 -->
-        <tr>
-          <!-- <th scope="row"></th> -->
-          <td style=" width: 5%;">
-            <img src="/img/undraw_profile.svg" style="height: 54px;">
-          </td>
-          <td style="width: 55%; text-align: left;">
-            <a href="#"><span>제목 [22]</span> </a>
+      if (posts.length === 0) {
+        listElement.innerHTML = '<tr><td colspan="3">게시글이 없습니다.</td></tr>';
+      } else {
+        posts.forEach(post => {
+          const listItem = document.createElement('tr');
 
-          </td>
-          <td style="width: 10%;">게시자</td>
-          <td style="width: 10%;">등록 날짜</td>
-        </tr>
-        <tr>
-          <!-- <th scope="row"></th> -->
-          <td style=" width: 5%;">
-            <img src="/img/undraw_profile.svg" style="height: 54px;">
-          </td>
-          <td style="width: 55%; text-align: left;">
-            <a href="#"><span>제목 [22]</span> </a>
+          const createdAt = new Date(post.createdAt);
+          const formattedDate = createdAt.toISOString().slice(0, 16).replace("T", " ");
+          listItem.innerHTML = `
+                            <td style="width: 55%; text-align: left">
+                                <a href="/posts/${post.id}">${post.title}</a>
+                            </td>
+                            <td style="width: 20%">${post.nickname}</td>
+                            <td style="width: 20%">${formattedDate}</td>
+                        `;
+          listElement.appendChild(listItem);
+        });
+      }
+    }
 
-          </td>
-          <td style="width: 10%;">게시자</td>
-          <td style="width: 10%;">등록 날짜</td>
-        </tr>
-        <tr>
-          <!-- <th scope="row"></th> -->
-          <td style=" width: 5%;">
-            <img src="/img/undraw_profile.svg" style="height: 54px;">
-          </td>
-          <td style="width: 55%; text-align: left;">
-            <a href="#"><span>제목 [22]</span> </a>
-
-          </td>
-          <td style="width: 10%;">게시자</td>
-          <td style="width: 10%;">등록 날짜</td>
-        </tr>
-        <tr>
-          <!-- <th scope="row"></th> -->
-          <td style=" width: 5%;">
-            <img src="/img/undraw_profile.svg" style="height: 54px;">
-          </td>
-          <td style="width: 55%; text-align: left;">
-            <a href="#"><span>제목 [22]</span> </a>
-
-          </td>
-          <td style="width: 10%;">게시자</td>
-          <td style="width: 10%;">등록 날짜</td>
-        </tr>
-        <tr>
-          <!-- <th scope="row"></th> -->
-          <td style=" width: 5%;">
-            <img src="/img/undraw_profile.svg" style="height: 54px;">
-          </td>
-          <td style="width: 55%; text-align: left;">
-            <a href="#"><span>제목 [22]</span> </a>
-
-          </td>
-          <td style="width: 10%;">게시자</td>
-          <td style="width: 10%;">등록 날짜</td>
-        </tr>
-        <tr>
-          <!-- <th scope="row"></th> -->
-          <td style=" width: 5%;">
-            <img src="/img/undraw_profile.svg" style="height: 54px;">
-          </td>
-          <td style="width: 55%; text-align: left;">
-            <a href="#"><span>제목 [22]</span> </a>
-
-          </td>
-          <td style="width: 10%;">게시자</td>
-          <td style="width: 10%;">등록 날짜</td>
-        </tr>
-        <tr>
-          <!-- <th scope="row"></th> -->
-          <td style=" width: 5%;">
-            <img src="/img/undraw_profile.svg" style="height: 54px;">
-          </td>
-          <td style="width: 55%; text-align: left;">
-            <a href="#"><span>제목 [22]</span> </a>
-
-          </td>
-          <td style="width: 10%;">게시자</td>
-          <td style="width: 10%;">등록 날짜</td>
-        </tr>
-        <tr>
-          <!-- <th scope="row"></th> -->
-          <td style=" width: 5%;">
-            <img src="/img/undraw_profile.svg" style="height: 54px;">
-          </td>
-          <td style="width: 55%; text-align: left;">
-            <a href="#"><span>제목 [22]</span> </a>
-
-          </td>
-          <td style="width: 10%;">게시자</td>
-          <td style="width: 10%;">등록 날짜</td>
-        </tr>
-        <tr>
-          <!-- <th scope="row"></th> -->
-          <td style=" width: 5%;">
-            <img src="/img/undraw_profile.svg" style="height: 54px;">
-          </td>
-          <td style="width: 55%; text-align: left;">
-            <a href="#"><span>제목 [22]</span> </a>
-
-          </td>
-          <td style="width: 10%;">게시자</td>
-          <td style="width: 10%;">등록 날짜</td>
-        </tr>
-        <tr>
-          <!-- <th scope="row"></th> -->
-          <td style=" width: 5%;">
-            <img src="/img/undraw_profile.svg" style="height: 54px;">
-          </td>
-          <td style="width: 55%; text-align: left;">
-            <a href="#"><span>제목 [22]</span> </a>
-
-          </td>
-          <td style="width: 10%;">게시자</td>
-          <td style="width: 10%;">등록 날짜</td>
-        </tr>
-        </tbody>
-      </table>
-
-      <!-- pagination -->
-      <ul class="pagination justify-content-center my-4">
-						<span th:if="${session.currentBookEsPage gt 10}">
-							<li class="page-item"><a class="page-link"
-                                       th:href="@{/bookEs/list(p=${startPage-1},f=${field},q=${query})}"><i
-                  class="fa-solid fa-less-than"></i></a></li>
-						</span>
-        <span th:if="${session.currentBookEsPage le 10}">
-							<li class="page-item"><a class="page-link" href="#"><i
-                  class="fa-solid fa-less-than"></i></a></li>
-						</span>
-        <span th:each="page: ${pageList}">
-							<span th:switch="${page}">
-								<th:block th:case="${session.currentBookEsPage}">
-									<li class="page-item active">
-										<a class="page-link" href="#">[[${page}]]</a>
-									</li>
-								</th:block>
-								<th:block th:case="*">
-									<li class="page-item">
-										<a class="page-link" th:href="@{/bookEs/list(p=${page},f=${field},q=${query})}">[[${page}]]</a>
-									</li>
-								</th:block>
-							</span>
-						</span>
-        <span th:if="${totalPages gt endPage}">
-							<li class="page-item"><a class="page-link"
-                                       th:href="@{/bookEs/list(p=${endPage+1},f=${field},q=${query})}"><i
-                  class="fa-solid fa-greater-than"></i></a></li>
-						</span>
-        <span th:if="${totalPages eq endPage}">
-							<li class="page-item"><a class="page-link" href="#"><i
-                  class="fa-solid fa-greater-than"></i></a></li>
-						</span>
-      </ul>
-
-    </div>
-
-    <div class="col-3 mb-3" style="left: 3%; height: 100%;">
-      <!-- 로그인 상태 확인 -->
-      <!--/*@thymesVar id="cookies" type=""*/-->
-      <div th:if="${username != 'Guest'}">
-        <div class="user-info">
-          <table class="userInfoTable" style="border: 1px solid #dedede" ; width="100%">
-            <tr>
-              <td style=" width: 25%; padding: 5%;">
-                <img th:src="${profileImage != null ? profileImage : '/img/undraw_profile.svg'}"
-                     style="height: 100px;">
-              </td>
-              <td style="padding: 5%; text-align: center; vertical-align: middle;"><p>환영합니다, <br><span th:text="${username}"></span>님!</p></td>
-            </tr>
-            <tr style="text-align: center; height: 50px;">
-              <td style="vertical-align: middle; width: 50%">
-<!--                <a href="/api/users/register">-->
-                  <div class="text-wrapper-2" id="userInfo" style="cursor: pointer">&nbsp;내정보&nbsp;</div>
-<!--                </a>-->
-                </td>
-              <td style="vertical-align: middle;">
-                <a>
-                <div class="text-wrapper-3" id="logout" style="cursor: pointer">로그아웃</div>
-                </a>
-        </td>
-            </tr>
-
-            <!--          <p>이메일: <span th:text="${session.loggedInUser.email}"></span></p>-->
-            <!--          <form action="/api/users/logout" method="post">-->
-            <!--            <button type="submit" class="btn btn-secondary" style="width: 100%; height: 100%;">로그아웃</button>-->
-            <!--          </form>-->
-          </table>
-        </div>
-      </div>
-
-      <!-- 비로그인 상태 -->
-      <div th:if="${username == 'Guest' || username == '' || username == null}">
-        <div>
-          <form action="/api/users/custom-login" method="post">
-            <div class="login">
-              <div class="group">
-                <div class="overlap-group">
-                  <div class="rectangle"></div>
-                  <div class="div">
-                    <input type="email" name="email" placeholder=" 아이디"/>
-                  </div>
-                  <div class="rectangle-2">
-                    <button type="button" class="btn btn-kakao" style="width: 100%; height: 100%;">
-                      <i
-                          class="fa-solid fa-comment" style="color: #050400"></i
-                      >&nbsp;&nbsp;kakao 로그인
-                    </button>
-                  </div>
-
-                  <div class="rectangle-5">
-                    <button type="button" class="btn btn-github"
-                            style="width: 100%; height: 100%; color: #ffffff; background-color: #3d3d3d;">
-                      <i class="fa-brands fa-github" style="color: #e8e8e8;"></i>&nbsp;&nbsp;github
-                      로그인
-                    </button>
-                  </div>
-
-                  <div class="rectangle-6">
-                    <button type="button" class="btn btn-github"
-                            style="width: 100%; height: 100%; color: #050400;"><i
-                        class="fa-brands fa-google"></i>&nbsp;&nbsp;google 로그인
-                    </button>
-                  </div>
-
-                  <div class="rectangle-3">
-                    <button type="submit" class="btn btn-secondary"
-                            style="width: 100%; height: 100%;">로그인
-                    </button>
-                  </div>
-                  <div class="rectangle-4">
-                    <input type="password" name="pwd" placeholder=" 비밀번호" autoComplete="off"/>
-                  </div>
-                  <div>
-                    <a href="/api/users/signup">
-                      <div class="text-wrapper-2">회원가입&nbsp;</div>
-                    </a>
-                    <div class="text-wrapper-3" onclick="find()">아이디/비밀번호 찾기</div>
-                  </div>
-                </div>
-              </div>
-          </form>
-        </div>
-      </div>
-
-
-      <div th:style="'margin: ' + (${username != 'Guest'} ? '20%' : '70%') + ' 0 10% 0;'">
-        <span style="margin: 3%; color: black; font-size: medium;">트랜드 랭킹</span>
-      </div>
-      <table class="table">
-        <tbody>
-        <tr>
-          <td>
-            <a href="" style="text-decoration:none;  color: inherit;">
-              <span class="badge bg-warning" style="vertical-align: middle;">1</span>
-              @키워드
-            </a>
-          </td>
-        </tr>
-        <!-- 하단 제거-->
-        <tr>
-          <td>
-            <a href="" style="text-decoration:none;  color: inherit;">
-              <span class="badge bg-warning" style="vertical-align: middle;">2</span>
-              @키워드
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="" style="text-decoration:none;  color: inherit;">
-              <span class="badge bg-warning" style="vertical-align: middle;">3</span>
-              @키워드
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="" style="text-decoration:none;  color: inherit;">
-              <span class="badge bg-warning" style="vertical-align: middle;">4</span>
-              @키워드
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="" style="text-decoration:none;  color: inherit;">
-              <span class="badge bg-warning" style="vertical-align: middle;">5</span>
-              @키워드
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="" style="text-decoration:none;  color: inherit;">
-              <span class="badge bg-warning" style="vertical-align: middle;">6</span>
-              @키워드
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="" style="text-decoration:none;  color: inherit;">
-              <span class="badge bg-warning" style="vertical-align: middle;">7</span>
-              @키워드
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="" style="text-decoration:none;  color: inherit;">
-              <span class="badge bg-warning" style="vertical-align: middle;">8</span>
-              @키워드
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="" style="text-decoration:none;  color: inherit;">
-              <span class="badge bg-warning" style="vertical-align: middle;">9</span>
-              @키워드
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="" style="text-decoration:none;  color: inherit;">
-              <span class="badge bg-warning" style="vertical-align: middle;">10</span>
-              @키워드
-            </a>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-    <!-- </div> -->
-  </div>
-
-
-  <!-- Back to Top -->
-  <a href="#" class="btn btn-secondary back-to-top"
-  ><i class="fa-solid fa-arrow-up"></i></a>
-
-  <!-- Categories End -->
-
-
-  <!-- JavaScript Libraries -->
-  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-  <script
-      src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-
-  <script src="/lib/easing/easing.min.js"></script>
-  <script src="/lib/owlcarousel/owl.carousel.min.js"></script>
-
-
-  <!-- Template Javascript -->
-  <script src="/js/home.js"></script>
-
-
+    // 페이지 로딩 시 게시글 불러오기
+    loadPosts();
+  });
+</script>
 </body>
 </html>

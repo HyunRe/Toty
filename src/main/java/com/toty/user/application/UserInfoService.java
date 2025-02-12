@@ -9,6 +9,7 @@ import com.toty.user.domain.model.User;
 import com.toty.user.domain.model.UserLink;
 import com.toty.user.domain.model.UserTag;
 import com.toty.user.domain.repository.UserLinkRepository;
+import com.toty.user.domain.repository.UserRepository;
 import com.toty.user.domain.repository.UserTagRepository;
 import com.toty.user.dto.request.BasicInfoUpdateRequest;
 import com.toty.user.dto.request.LinkUpdateRequest;
@@ -36,6 +37,7 @@ public class UserInfoService {
     private final UserLinkRepository userLinkRepository;
     private final FollowingRepository followingRepository;
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @Value("${user.img-path}")
     private String basePath;
@@ -78,7 +80,8 @@ public class UserInfoService {
                 .followingCount(followingCount)
                 .followerCount(followerCount)
                 .role(foundUser.getRole())
-                .isFollowing(!isOwner ? followingRepository.existsByFromUserIdAndToUserId(myId, targetId) : null)
+                .status_message(foundUser.getStatusMessage())
+//                .isFollowing(!isOwner ? followingRepository.existsByFromUserIdAndToUserId(myId, targetId) : null)
                 .createdAt(isOwner ? foundUser.getCreatedAt() : null)
                 .build();
     }
@@ -201,4 +204,11 @@ public class UserInfoService {
         return siteValue.toLowerCase().equals("github") ? Site.GITHUB : Site.BLOG;
     }
 
+    public void updateUserStatusMessage(User user, Long id, String request) {
+        if (isNotOwner(user, id)) {
+            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
+        }
+        user.saveStatusMessage(request);
+        userRepository.save(user);
+    }
 }

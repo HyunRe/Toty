@@ -77,7 +77,7 @@
         <span class="bg-transparent text-primary" style="cursor: pointer">
               <i class="fa-regular fa-message" id="header-chat"></i>
             </span>
-        <span class="bg-transparent text-primary" style="cursor: pointer">
+        <span class="bg-transparent text-primary" style="cursor: pointer" id="infoBtn">
               <i class="fa-regular fa-user" id="header-profile"></i>
             </span>
       </div>
@@ -102,10 +102,10 @@
               id="navbarCollapse"
           >
             <div class="navbar-nav mr-auto py-0">
-              <a href="/" class="nav-item nav-link active">홈</a>
-              <a href="/qa" class="nav-item nav-link">Q/A게시판</a>
-              <a href="/info" class="nav-item nav-link">정보게시판</a>
-              <a href="/free" class="nav-item nav-link">자유게시판</a>
+              <a href="/view/users/home" class="nav-item nav-link active">홈</a>
+              <a th:href="@{/categoryList(page=1, postCategory='QnA')}" class="nav-item nav-link">Q/A게시판</a>
+              <a th:href="@{/categoryList(page=1, postCategory='KNOWLEDGE')}" class="nav-item nav-link">정보게시판</a>
+              <a th:href="@{/categoryList(page=1, postCategory='GENERAL')}" class="nav-item nav-link">자유게시판</a>
             </div>
             <a href="/view/users/login" sec:authorize="isAnonymous()">
               <span style="float: right;">로그인</span>
@@ -125,6 +125,10 @@
     .getElementById("header-noti")
     .addEventListener("click", function () {
       document.querySelector(".alarmList").classList.toggle("show");
+    });
+
+    document.getElementById("infoBtn").addEventListener("click", function () {
+      location.href = "/view/users/info";
     });
   </script>
 </div>
