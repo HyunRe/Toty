@@ -27,19 +27,20 @@
       referrerpolicy="no-referrer"
   />
 
-  <!-- Libraries Stylesheet -->
-  <link href="/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet"/>
 
   <!--Sweet Alert2-->
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js" type="application/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"
+          type="application/javascript"></script>
 
 
-  <!-- Customized Bootstrap Stylesheet -->
-  <link href="/css/style.css" rel="stylesheet" type="text/css"/>
-  <link rel="stylesheet" href="/css/globals.css" type="text/css"/>
-  <link rel="stylesheet" href="/css/signup.css" type="text/css"/>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="/css/style.css" type="text/css"/>
+  <link rel="stylesheet" href="/css/bootstrap.css" type="text/css"/>
+  <!-- main css -->
+  <link rel="stylesheet" href="/css/register.css"/>
+
 
 </head>
 
@@ -49,7 +50,7 @@
   <div class="row align-items-center py-3 px-xl-5">
     <div class="col-lg-4" style="margin-left: 15%">
       <a href="/home">
-        <img src="../../static/img/toty-logo.png" style="margin-left: 5%; width: 40%" alt="logo"/>
+        <img src="/img/logo.png" style="margin-left: 5%; width: 40%" alt="logo"/>
       </a>
     </div>
   </div>
@@ -73,13 +74,18 @@
       <div class="mb-8">
         <h4 class="font-weight-semi-bold mb-5"
             style="font-size: 20px; text-align: center; color: darkgray;">SIGN-UP</h4>
-        <form action="/api/users/signup" id="signupForm" method="post" style="color: black; font-weight: 400;" onsubmit="return false">
+        <form action="/api/users/signup" id="registerForm" method="post"
+              style="color: black; font-weight: 400;" onsubmit="return false">
           <div class="row">
             <div class="col-md-7 form-group">
               <label>이메일</label>
               <div class="check-group">
                 <input class="form-control" type="email" id="email" name="email"
                        placeholder="사용하실 이메일을 입력해 주세요." required>
+                <button class="btn btn-info" id="checkEmailBtn" type="button"
+                        data-available="false"
+                >중복확인
+                </button>
               </div>
             </div>
 
@@ -96,14 +102,17 @@
             </div>
             <div class="col-md-7 form-group">
               <label>이름</label>
-                <input class="form-control" type="text" id="username" name="username"
-                       placeholder="실명을 입력해 주세요." required>
+              <input class="form-control" type="text" id="username" name="username"
+                     placeholder="실명을 입력해 주세요." required>
             </div>
             <div class="col-md-7 form-group">
               <label>닉네임</label>
               <div class="check-group">
                 <input class="form-control" name="nickname" id="nickname" type="text"
                        placeholder="사용하실 닉네임을 입력해 주세요." required>
+                <button class="btn btn-info" id="checkNicknameBtn" type="button"
+                        data-available="false">중복확인
+                </button>
               </div>
             </div>
             <div class="col-md-7 form-group">
@@ -120,47 +129,25 @@
                 <input class="form-control" type="text" maxlength="6"
                        placeholder="전송된 인증번호 6자리를 입력해 주세요." pattern="[0-9]+" style="width: 80%;">
                 <button class="btn btn-info" id="authNumRes" type="button"
-                        disabled="true">확인
+                        disabled >확인
                 </button>
               </div>
             </div>
 
-        <div class="col-md-7 form-group pt-3">
-          <button type="submit" id="formSubmit" class="btn btn-info" style="width: 100%;">회원가입</button>
-        </div>
-
-        <div class="social-login">
-          <button type="button" class="social-btn">
-              <img src="/kakao-icon.png" alt="Kakao">
-          </button>
-          <button type="button" class="social-btn">
-              <img src="/github-icon.png" alt="GitHub">
-          </button>
-          <button type="button" class="social-btn">
-              <img src="/google-icon.png" alt="Google">
-          </button>
-      </div>
-
+            <div class="col-md-7 form-group pt-3">
+              <button type="submit" id="formSubmit" class="btn btn-info" style="width: 100%;">회원가입
+              </button>
+            </div>
         </form>
       </div>
-  </div>
-
+    <script src="/js/main.js" type="application/javascript"></script>
     <!-- Categories End -->
 
     <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js" type="application/javascript"></script>
-    <script
-        src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js" type="application/javascript"></script>
-    <script src="/lib/easing/easing.min.js" type="application/javascript"></script>
-    <script src="/lib/owlcarousel/owl.carousel.min.js" type="application/javascript"></script>
-
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+            type="application/javascript"></script>
 
     <!-- Template Javascript -->
-    <script src="/js/main.js" type="application/javascript"></script>
+
 </body>
-
-<script>
-
-
-</script>
 </html>

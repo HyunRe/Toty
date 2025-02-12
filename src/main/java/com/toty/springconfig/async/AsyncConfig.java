@@ -12,7 +12,7 @@ import java.util.concurrent.Executor;
 public class AsyncConfig {
     @Bean(name = "notificationExecutor")
     public Executor notificationExecutor() {
-        int core = Runtime.getRuntime().availableProcessors() / 2; // CPU 코어 개수의 절반
+        int core = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);  // 최소 1로 설정
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(core);       // 기본 스레드 수 (CPU 개수)
         executor.setMaxPoolSize(core * 2);    // 최대 스레드 수 (CPU 개수 * 2)

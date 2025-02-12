@@ -58,18 +58,32 @@
     </a>
   </div>
   <div class="col-lg-6 col-6 text-left">
-    <form action="">
+    <form action="/search/posts" method="get">
       <div class="input-group">
+        <!-- 드롭다운 추가 -->
+        <div class="input-group-prepend">
+          <select class="custom-select" name="field" style="border-radius: 5px;">
+            <option value="TITLE">제목</option>
+            <option value="CONTENT">본문</option>
+            <option value="TITLE_CONTENT">제목 + 본문</option>
+          </select>
+        </div>
+
+        <!-- 검색 입력창 -->
         <input
-            type="text"
-            class="form-control"
-            placeholder="검색창"
+                type="text"
+                class="form-control"
+                name="keyword"
+                placeholder="검색창"
+                required
         />
+
+        <!-- 검색 버튼 -->
         <div class="input-group-append">
-                <span class="input-group-text bg-transparent text-primary" style="cursor: pointer;"
-                      onclick="document.forms[0].submit()">
-                  <i class="fa fa-search"></i>
-                </span>
+          <span class="input-group-text bg-transparent text-primary" style="cursor: pointer;"
+                onclick="this.closest('form').submit()">
+            <i class="fa fa-search"></i>
+          </span>
         </div>
       </div>
     </form>

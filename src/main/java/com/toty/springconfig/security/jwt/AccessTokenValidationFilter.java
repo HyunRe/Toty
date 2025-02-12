@@ -30,7 +30,7 @@ public class AccessTokenValidationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return path.equals("/api/auth/refresh") || path.equals("/api/users/login");
+        return path.endsWith("/login") || path.endsWith("/login-fail");
     }
 
     @Override
@@ -48,10 +48,6 @@ public class AccessTokenValidationFilter extends OncePerRequestFilter {
                 }
             }
         }
-
-//        if (accessToken.isBlank()) { // 액세스 토큰 없으면 로그인 페이지 리다이렉트
-//            throw new RefreshTokenExpiredException("재로그인이 필요합니다.");
-//        }
 
         try {
             if (!accessToken.isBlank()) { // 액세스 토큰이 있는데 만료된 사용자 -> 갱신하도록 리다이렉트

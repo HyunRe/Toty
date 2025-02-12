@@ -1,4 +1,4 @@
-package com.toty.chatting;
+package com.toty.springconfig.websocket;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -21,6 +21,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override // STOMP 엔드포인트 등록
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // 클라이언트는 해당 경로를 통해 WebSocket서버와 연결, 해당 경로에서 WebSocket연결을 수락
-        registry.addEndpoint("/chatRoom-v02-websocket");
+        registry.addEndpoint("/websocket-chatRoom");
     }
 }
