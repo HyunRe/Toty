@@ -34,10 +34,8 @@ public class UserViewController {
 
     // 정보 수정(View)
     @GetMapping("/edit-form")
-    public String updateProc(@CurrentUser User user, @PathVariable Long id, Model model){
-        // 본인인지 확인 -> 아니면 예외
-
-        UserInfoResponse userInfo = userInfoService.getMyInfoForUpdate(user, user.getId());
+    public String updateProc(@CurrentUser User user, Model model){
+        UserInfoResponse userInfo = userInfoService.getUserInfoByAccount(user.getId(), user.getId());
         model.addAttribute("userInfo", userInfo);
         return "update";
     }
@@ -55,16 +53,16 @@ public class UserViewController {
     }
 
     // 내 정보 조회
-    @GetMapping("/info") // -> 모델로 전달하고 view로 변경?
+    @GetMapping("/info")
     public String getMyInfo(@CurrentUser User user, Model model) {
-        model.addAttribute("userInfo", userInfoService.getUserInfo(user, user.getId()));
+        model.addAttribute("userInfo", userInfoService.getUserInfoByAccount(user.getId(), user.getId()));
         return "user/detail";
     }
 
     //상대방의 정보 조회
-    @GetMapping("/{id}/info") // -> 모델로 전달하고 view로 변경?
+    @GetMapping("/{id}/info")
     public String getUserInfo(@CurrentUser User user, @PathVariable("id") Long id, Model model) {
-        model.addAttribute("userInfo", userInfoService.getUserInfo(user, id));
+        model.addAttribute("userInfo", userInfoService.getUserInfoByAccount(user.getId(), id));
         return "user/info";
     }
 

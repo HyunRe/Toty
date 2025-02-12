@@ -1,5 +1,7 @@
 package com.toty.user.application;
 
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
 import com.toty.roleRefreshScheduler.dto.UserIdAndRoleDto;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.repository.UserRepository;
@@ -21,7 +23,7 @@ public class UserService {
 
     public User findById(Long userId) {
         User foundUser = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
         return foundUser;
     }
 

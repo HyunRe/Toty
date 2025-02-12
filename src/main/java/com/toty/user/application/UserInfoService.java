@@ -1,13 +1,14 @@
 package com.toty.user.application;
 
 import com.toty.common.domain.Tag;
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
 import com.toty.following.domain.FollowingRepository;
 import com.toty.user.domain.model.Site;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.model.UserLink;
 import com.toty.user.domain.model.UserTag;
 import com.toty.user.domain.repository.UserLinkRepository;
-import com.toty.user.domain.repository.UserRepository;
 import com.toty.user.domain.repository.UserTagRepository;
 import com.toty.user.dto.request.BasicInfoUpdateRequest;
 import com.toty.user.dto.request.LinkUpdateRequest;
@@ -27,11 +28,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+// todo DTO 이름 수정
 @Service
 @RequiredArgsConstructor
 public class UserInfoService {
 
-    private final UserRepository userRepository;
     private final UserTagRepository userTagRepository;
     private final UserLinkRepository userLinkRepository;
     private final FollowingRepository followingRepository;
@@ -41,16 +42,15 @@ public class UserInfoService {
     private String basePath;
 
     // 본인 확인
-    private boolean isSelfAccount(User user, Long id){
+    private boolean isNotOwner(User user, Long id){
         // id의 Null 여부는 presentation에서 검증 필요
-        return user.getId().equals(id);
+        return !user.getId().equals(id);
     }
 
     // 사용자 정보 전체 조회
-    private UserInfoResponse getUserInfoByAccount(Long myId, Long targetId, boolean isOwner) {
-        User foundUser = userRepository.findById(targetId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-        
+    public UserInfoResponse getUserInfoByAccount(Long myId, Long targetId) {
+        User foundUser = userService.findById(targetId);
+
         List<String> userTags = userTagRepository.findByUserId(targetId)
                 .stream()
                 .map(userTag -> userTag.getTag().getTag())
@@ -61,6 +61,8 @@ public class UserInfoService {
                 .toList();
         Long followingCount = followingRepository.countFollowingsByUserId(targetId);
         Long followerCount = followingRepository.countFollowersByUserId(targetId);
+
+        boolean isOwner = myId.equals(targetId);
 
         return UserInfoResponse.builder()
                 .id(foundUser.getId())
@@ -82,19 +84,19 @@ public class UserInfoService {
                 .build();
     }
 
-    // 사용자 정보 조회
-    public UserInfoResponse getUserInfo(User requester, Long targetId) {
-        if (isSelfAccount(requester, targetId)) {
-            return getUserInfoByAccount(requester.getId(), targetId, true);
-        } else {
-            return getUserInfoByAccount(requester.getId(), targetId, false);
-        }
-    }
 
     // 기본 정보 수정(닉네임, 사진, 구독)
     @Transactional
-    public void updateUserBasicInfo(Long userId, BasicInfoUpdateRequest newInfo, MultipartFile imgFile) {
+    public void updateUserBasicInfo(User user, Long userId, BasicInfoUpdateRequest newInfo, MultipartFile imgFile) {
+        if (isNotOwner(user, userId)) {
+            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
+        }
         User foundUser = userService.findById(userId);
+
+        if (!newInfo.getNickname().isBlank()) {
+            foundUser.updateNickname(newInfo.getNickname());
+        }
+
         if (imgFile != null && !imgFile.isEmpty()) {
             try {
                 String savePath = basePath + userId;
@@ -103,9 +105,7 @@ public class UserInfoService {
                 imgFile.transferTo(new File(imgPath)); // ex) --.jpg, --hi.png
                 foundUser.updateprofileImg(imgPath);
             } catch (IOException e) {
-                throw new RuntimeException();
-                // todo 예외 시
-                // throw new ExpectedException(ErrorCode.FileIOException);
+                 throw new ExpectedException(ErrorCode.IMAGE_SAVE_ERROR);
             }
         }
 
@@ -127,15 +127,22 @@ public class UserInfoService {
 
     // link 변경
     @Transactional
-    public void updateUserLinks(Long userId, LinkUpdateRequest request) {
+    public void updateUserLinks(User user, Long userId, LinkUpdateRequest request) {
+        if (isNotOwner(user, userId)) {
+            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
+        }
         userLinkRepository.deleteByUserId(userId);
         request.getLinks().forEach(link -> {
             userLinkRepository.save(new UserLink(userService.findById(userId), siteStringToEnum(link.getSite()), link.getUrl()));
         });
     }
 
-    //태그 선택
-    public void updateUserTags(Long userId, TagUpdateRequest tags) {
+    //태그 수정
+    @Transactional
+    public void updateUserTags(User user, Long userId, TagUpdateRequest tags) {
+        if (isNotOwner(user, userId)) {
+            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
+        }
         User foundUser = userService.findById(userId);
         userTagRepository.deleteByUserId(userId);
         tags.getTags().forEach(tag -> {
@@ -144,16 +151,21 @@ public class UserInfoService {
     }
 
     // 휴대폰 번호 변경
-    public void updatePhoneNumber(Long userId, PhoneNumberUpdateRequest phoneNumberDto) {
+    public void updatePhoneNumber(User user, Long userId, PhoneNumberUpdateRequest phoneNumberDto) {
+        if (isNotOwner(user, userId)) {
+            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
+        }
         User foundUser = userService.findById(userId);
         foundUser.updatePhoneNumber(phoneNumberDto.getPhoneNumber());
     }
 
-    // 사용 안함
+    // 전체 정보 수정
     @Transactional
-    public void updateUserInfo(Long userId, UserInfoUpdateRequest newInfo, MultipartFile imgFile) {
-        User foundUser = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+    public void updateUserInfo(User user, Long userId, UserInfoUpdateRequest newInfo, MultipartFile imgFile) {
+        if (isNotOwner(user, userId)) {
+            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
+        }
+        User foundUser = userService.findById(userId);
 
         if (imgFile != null && !imgFile.isEmpty()) {
             try {
@@ -162,9 +174,7 @@ public class UserInfoService {
                 imgFile.transferTo(new File(savePath+"."+contentType)); // ex) --.jpg, --hi.png
                 foundUser.updateInfo(newInfo, savePath);
             } catch (IOException e) {
-                throw new RuntimeException();
-                // todo 예외 시
-                // throw new ExpectedException(ErrorCode.FileIOException);
+                throw new ExpectedException(ErrorCode.IMAGE_SAVE_ERROR);
             }
         }
 
@@ -181,22 +191,11 @@ public class UserInfoService {
     }
 
 
-
-    // 사용 보류
-    public UserInfoResponse getMyInfoForUpdate(User user, Long id) {
-        if (isSelfAccount(user, id)) {
-            return getUserInfoByAccount(id, id,true);
-        } else {
-            throw new IllegalArgumentException("수정 권한이 없습니다.");
-        }
-    }
-
     // 문자열-> Tag enum을 리턴
     private static Tag tagStringToEnum(String tagValue) {
         return Arrays.stream(Tag.values())
                 .filter(t -> t.getTag().equalsIgnoreCase(tagValue))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Invalid tag: " + tagValue));
+                .findFirst().get();
     }
 
     private static Site siteStringToEnum(String siteValue) {

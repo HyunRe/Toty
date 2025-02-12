@@ -109,4 +109,9 @@ public class User extends BaseTime {
         this.phoneNumber = phoneNumber;
     }
 
+    // 닉네임 변경
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
 }

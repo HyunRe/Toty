@@ -93,25 +93,11 @@ public class UserApiController {
         return ResponseEntity.ok(successResponse);
     }
 
-    // 내 정보 수정
-//    @PostMapping("/update") // info -> update
-//    public ResponseEntity updateUserInfo(@CurrentUser User user,
-//                                                 @RequestPart UserInfoUpdateRequest newInfo,
-//                                                 @RequestPart(required = false) MultipartFile imgFile) {
-//        userInfoService.updateUserInfo(user.getId(), newInfo, imgFile);
-//        SuccessResponse successResponse = new SuccessResponse(
-//                HttpStatus.OK.value(),
-//                "정보가 수정되었습니다.",
-//                null
-//        );
-//        return ResponseEntity.ok(successResponse);
-//    }
-
     // 내 기본 정보 수정(닉네임, 프로필 사진)
     @PostMapping("/update")
     public ResponseEntity updateUserBasicInfo(@CurrentUser User user,
             @RequestBody BasicInfoUpdateRequest newInfo, @RequestPart(required = false) MultipartFile imgFile) {
-        userInfoService.updateUserBasicInfo(user.getId(), newInfo, imgFile);
+        userInfoService.updateUserBasicInfo(user, user.getId(), newInfo, imgFile);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 "정보가 수정되었습니다.",
@@ -124,7 +110,7 @@ public class UserApiController {
     @PostMapping("/links")
     public ResponseEntity updateUserLinks(@CurrentUser User user,
             @RequestBody LinkUpdateRequest request) {
-        userInfoService.updateUserLinks(user.getId(), request);
+        userInfoService.updateUserLinks(user, user.getId(), request);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 "링크가 수정되었습니다.",
@@ -137,7 +123,7 @@ public class UserApiController {
     @PostMapping("/tags")
     public ResponseEntity updateUserTags(@CurrentUser User user,
             @RequestBody TagUpdateRequest request) {
-        userInfoService.updateUserTags(user.getId(), request);
+        userInfoService.updateUserTags(user, user.getId(), request);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 "태그가 수정되었습니다.",
@@ -149,7 +135,7 @@ public class UserApiController {
     @PostMapping("/phone-number")
     public ResponseEntity updateUserPhoneNumber(@CurrentUser User user,
             @RequestBody PhoneNumberUpdateRequest request) {
-        userInfoService.updatePhoneNumber(user.getId(), request);
+        userInfoService.updatePhoneNumber(user, user.getId(), request);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 "태그가 수정되었습니다.",
