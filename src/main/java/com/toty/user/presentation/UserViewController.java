@@ -51,7 +51,7 @@ public class UserViewController {
     // 리프레시 토큰 만료 이후 재로그인(액세스 토큰 유효성 검사x)
     @GetMapping("/login")
     public String loginPage() {
-        return "common/login"; // todo
+        return "common/login";
     }
 
     // 나의/상대방의 정보 보기
@@ -64,5 +64,13 @@ public class UserViewController {
         } else {
             return "user/list";
         }
+    }
+
+    // 폼로그인 실패 창 띄우기
+    @GetMapping("/login-fail")
+    public String loginFail(Model model) {
+        model.addAttribute("msg", "로그인에 실패했습니다");
+        model.addAttribute("url", "/view/users/login");
+        return "common/alertMsg";
     }
 }
