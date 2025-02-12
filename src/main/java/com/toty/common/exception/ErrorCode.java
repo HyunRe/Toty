@@ -49,8 +49,10 @@ public enum ErrorCode {
     SMS_NOT_REGISTERED(HttpStatus.BAD_REQUEST, "전화번호 미등록 사용자입니다."),
 
     // sse
-    TOO_MANY_SSE_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "SSE 연결 요청이 너무 많습니다.");
-
+    TOO_MANY_SSE_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "SSE 연결 요청이 너무 많습니다."),
+    
+    // 채팅
+    FAIL_ROOM_CREATE(HttpStatus.FORBIDDEN, "단톡방을 생성할수 없습니다");
     private final HttpStatus httpStatus;
     private final String message;
 }

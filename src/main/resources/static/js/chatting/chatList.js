@@ -67,7 +67,7 @@ function createRoom() {
                 error:function(xhr) {
                     let response = xhr.responseJSON;
                     console.log(response);
-                    alert("단톡방 생성 실패 \n" + response.message);
+                    alert("단톡방 생성 실패 \n" + response.errorMessage);
                 }
             });
         } else { // 그냥 닫힘
