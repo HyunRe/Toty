@@ -9,7 +9,7 @@
     <meta content="Free HTML Templates" name="description" />
 
     <!-- Favicon -->
-    <link href="/img/favicon.ico" rel="icon" />
+    <link href="/favicon.ico" rel="icon" />
 
 
     <!-- Google Web Fonts -->
@@ -151,6 +151,7 @@
                 <a href="shop.html" class="nav-item nav-link">Q/A게시판</a>
                 <a href="detail.html" class="nav-item nav-link">정보게시판</a>
                 <a href="contact.html" class="nav-item nav-link">자유게시판</a>
+                <a href="" class="nav-item nav-link">멘토 단체채팅</a>
               </div>
             </div>
           </nav>
@@ -179,7 +180,7 @@
           </div>
         </div>
         <div class="col-4">
-          <div sec:authorize="hasRole('ROLE_MENTOR')">
+          <div sec:authorize="hasAuthority('MENTOR')">
             <button onclick="createRoom()">단톡방 생성하기</button>
           </div>
         </div>
