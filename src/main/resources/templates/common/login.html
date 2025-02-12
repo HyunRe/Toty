@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+  <title>TOTY_로그인</title>
+
+  <!-- Font Awesome -->
+  <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+      rel="stylesheet"
+  />
+  <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+  />
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css"/>
+
+  <!-- main css -->
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/user.css"/>
+</head>
+<body>
+<header class="header_area">
+
+  <div class="main_menu">
+    <div class="container">
+      <nav class="navbar navbar-expand-lg navbar-light w-100">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <a class="navbar-brand logo_h" href="/" style="margin: auto;">
+          <img src="/img/logo.png" style="width: 170px;" alt="logo" href="/"/>
+        </a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+
+<div class="container">
+  <div>
+    <div class="section pt-5">
+      <div class="row" style="justify-content: center;">
+        <div class="col-lg-8 col-md-8">
+          <h3 class="mb-30 title_color" style="text-align: center;">안녕하세요!</h3>
+          <form action="/api/users/sign-in" method="post" id="logInForm">
+            <div class="mt-10">
+              <input type="text" name="email" placeholder="이메일" onfocus="this.placeholder = ''"
+                     onblur="this.placeholder = '이메일'"
+                     required class="single-input"
+
+              >
+            </div>
+            <div class="mt-10">
+              <input type="password" name="pwd" placeholder="비밀번호" onfocus="this.placeholder = ''"
+                     onblur="this.placeholder = '비밀번호'"
+                     required class="single-input"
+
+              >
+            </div>
+            <div class="mt-10">
+              <p class="sub text-uppercase" style="color: black;">
+                <i class="ti-help-alt" aria-hidden="true" style="margin: 1%;"></i><a href="#">이메일 또는
+                비밀번호를 잊으셨나요?</a></p>
+            </div>
+
+            <div class="mt-10">
+              <button type="submit" id="logInBtn" class="main_btn"
+                      style="width: 100%; font-size: medium;">로그인
+              </button>
+            </div>
+            <div class="mt-10">
+              <a href="/view/users/signup" class="genric-btn default radius"
+                 style="width: 100%; font-size: medium;">회원가입</a>
+            </div>
+
+            <div class="mt-10">
+              <div class="col-lg-4 col-md-4"
+                   style="border-bottom: 1px solid lightgray; float: inline-start; height: 12px;"></div>
+              <div class="col-lg-4 col-md-4"
+                   style="float: inline-start; text-align: center; color: black;"><a href="#"
+                                                                                     style="color: black;">소셜
+                로그인</a>
+              </div>
+              <div class="col-lg-4 col-md-4"
+                   style="border-bottom: 1px solid lightgray; float: inline-end;height: 12px;"></div>
+
+              <div class="mt-10">
+                <button class="genric-btn"
+                        style="width: 100%; height: 45px; border-radius: 5px; background-color: #FEE500;border: none;font-size: medium;margin-top: 12px;">
+                  <i class="fa-solid" aria-hidden="true"> </i>KAKAO
+                </button>
+              </div>
+              <div class="mt-10">
+                <button class="genric-btn"
+                        style="width: 100%; height: 45px; border-radius: 5px; background-color: #dfdfdf;border: none;font-size: medium;margin-top: 12px;">
+                  <i class="fa-solid" aria-hidden="true">
+                  </i> GOOGLE
+                </button>
+              </div>
+              <div class="mt-10">
+                <button class="genric-btn"
+                        style="width: 100%; height: 45px; border-radius: 5px; background-color: #03CF5D;border: none;font-size: medium;margin-top: 12px; color: #fff;">
+                  <i class="fa-solid" aria-hidden="true" style="color: #fff;"></i> NAVER
+                </button>
+              </div>
+              <div class="mt-10">
+                <button class="genric-btn"
+                        style="width: 100%; height: 45px; border-radius: 5px; background-color: #fff;border: none;font-size: medium;margin-top: 12px; border: 2px solid darkgray">
+                  <i class="fa-brands fa-github" aria-hidden="true"></i> GITHUB
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

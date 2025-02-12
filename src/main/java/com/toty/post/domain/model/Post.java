@@ -1,5 +1,6 @@
 package com.toty.post.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.toty.common.domain.BaseTime;
 import com.toty.user.domain.model.User;
 import jakarta.persistence.*;
@@ -42,10 +43,8 @@ public class Post extends BaseTime {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostImage> postImages = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = false)
+    @JsonManagedReference
     private List<PostTag> postTags = new ArrayList<>();
 
     private <T> void addRelatedEntity(List<T> list, T entity, BiConsumer<T, Post> setPostMethod) {
@@ -67,16 +66,12 @@ public class Post extends BaseTime {
         addRelatedEntity(this.comments, comment, Comment::setPost);
     }
 
-    public void addPostImage(PostImage postImage) {
-        addRelatedEntity(this.postImages, postImage, PostImage::setPost);
-    }
-
     public void updateLikeCount(int likeCount) {
         this.likeCount = likeCount;
     }
 
     public Post(User user, PostCategory postCategory, String title, String content, int viewCount, int likeCount,
-                List<Comment> comments, List<PostImage> postImages, List<PostTag> postTags) {
+                List<Comment> comments, List<PostTag> postTags) {
         this.user = user;
         this.postCategory = postCategory;
         this.title = title;
@@ -84,7 +79,14 @@ public class Post extends BaseTime {
         this.viewCount = viewCount;
         this.likeCount = likeCount;
         this.comments = comments;
-        this.postImages = postImages;
         this.postTags = postTags;
+    }
+
+    public Post updatePost(String title, String content, List<PostTag> postTags) {
+        this.title = title;
+        this.content = content;
+        this.postTags = postTags;
+
+        return this;
     }
 }

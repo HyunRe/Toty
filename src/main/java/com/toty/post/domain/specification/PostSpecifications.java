@@ -2,6 +2,7 @@ package com.toty.post.domain.specification;
 
 import com.toty.common.baseException.InvalidCategoryException;
 import com.toty.post.domain.model.Post;
+import com.toty.post.domain.model.PostCategory;
 import org.springframework.data.jpa.domain.Specification;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -53,11 +54,17 @@ public class PostSpecifications {
     // 특정 카테고리로 필터링
     public static Specification<Post> hasCategory(String postCategory) {
         return (root, query, criteriaBuilder) -> {
-            List<String> validCategories = List.of("Knowledge", "General", "Qna");
-            if (!validCategories.contains(postCategory)) {
+            if (postCategory == null || postCategory.isEmpty()) {
+                throw new IllegalArgumentException("카테고리는 null 또는 빈 문자열일 수 없습니다.");
+            }
+
+            List<PostCategory> validCategories = List.of(PostCategory.KNOWLEDGE, PostCategory.GENERAL, PostCategory.QnA);
+            PostCategory categoryEnum = PostCategory.valueOf(postCategory.toUpperCase()); // 입력된 값을 enum으로 변환
+            if (!validCategories.contains(categoryEnum)) {
                 throw new InvalidCategoryException(postCategory);
             }
-            return criteriaBuilder.equal(root.get("postCategory"), postCategory);
+
+            return criteriaBuilder.equal(root.get("postCategory"), categoryEnum);
         };
     }
 }

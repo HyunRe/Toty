@@ -1,119 +1,198 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>게시판 검색</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <th:block th:replace="fragment/header :: headerhead"></th:block>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .page-link {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 0 3px;
+            text-decoration: none;
+            color: black;
+            border-radius: 5px;
+        }
+        .page-link.active {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        /* 게시글 항목 사이사이에 가는 선 추가 */
+        #general-list li,
+        #knowledge-list li,
+        #qna-list li {
+            border-bottom: 1px solid #ddd; /* 연한 회색 선 */
+            padding: 10px 0; /* 위아래 여백 */
+        }
+        /* 마지막 항목에서 선 없애기 */
+        #general-list li:last-child,
+        #knowledge-list li:last-child,
+        #qna-list li:last-child {
+            border-bottom: none;
+        }
+    </style>
 </head>
 <body>
-<h1>게시판 검색 결과</h1>
+    <!-- header -->
+    <div th:replace="fragment/header :: header"></div>
 
-<!-- 검색 폼 -->
-<div>
-    <input type="text" id="keyword" value="테스트" placeholder="검색어를 입력하세요">
-    <select id="field">
-        <option value="TITLE" selected>제목</option>
-        <option value="CONTENT">내용</option>
-        <option value="AUTHOR">작성자</option>
-    </select>
-    <button id="searchButton">검색</button>
-</div>
+    <div class = "container">
+        <!-- 게시판 데이터 -->
+        <div id="general-board">
+            <h2>일반 게시판</h2>
+            <ul id="general-list"></ul>
+            <div id="general-pagination"></div>
+        </div>
 
-<div id="general-board">
-    <h2>일반 게시판</h2>
-    <ul id="general-list"></ul>
-    <div id="general-pagination"></div>
-</div>
+        <div id="knowledge-board">
+            <h2>정보 게시판</h2>
+            <ul id="knowledge-list"></ul>
+            <div id="knowledge-pagination"></div>
+        </div>
 
-<div id="info-board">
-    <h2>정보 게시판</h2>
-    <ul id="info-list"></ul>
-    <div id="info-pagination"></div>
-</div>
+        <div id="qna-board">
+            <h2>QnA 게시판</h2>
+            <ul id="qna-list"></ul>
+            <div id="qna-pagination"></div>
+        </div>
+    </div>
 
-<div id="qna-board">
-    <h2>QnA 게시판</h2>
-    <ul id="qna-list"></ul>
-    <div id="qna-pagination"></div>
-</div>
+    <script th:inline="javascript">
+        var keyword = [[ ${keyword} ]];
+        var field = [[ ${field} ]];
 
-<script>
-    $(document).ready(function() {
-        function fetchPosts(page = 1) {  // 페이지를 0부터 시작하도록 수정
-            const keyword = $('#keyword').val();
-            const field = $('#field').val();
+        document.addEventListener("DOMContentLoaded", function() {
+            const pageSize = 5;  // 각 페이지 당 게시물 수 고정
 
-            $.ajax({
-                url: '/api/search/posts',  // API URL을 맞게 수정
-                type: 'GET',
-                data: {
-                    keyword: keyword,
-                    field: field,
-                    page: page,
-                    size: 3
-                },
-                success: function(response) {
-                    const data = response.data;
+            // 통합 검색 API 호출
+            function searchPosts() {
+                axios.get('/api/search/posts', {
+                    params: {
+                        keyword: keyword,
+                        field: field,
+                        size: pageSize  // size를 5로 고정
+                    }})
+                    .then(response => {
+                        console.log(response);
+                        const boardData = response.data.data;
+                        // 각 게시판의 데이터를 렌더링
+                        renderBoard(boardData.GENERAL, '#general-list', '#general-pagination', 1, 'GENERAL');
+                        renderBoard(boardData.KNOWLEDGE, '#knowledge-list', '#knowledge-pagination', 1, 'KNOWLEDGE');
+                        renderBoard(boardData.QnA, '#qna-list', '#qna-pagination', 1, 'QnA');
+                    })
+                    .catch(() => {
+                        alert('검색 데이터를 불러오는 데 실패했습니다.');
+                    });
+            }
 
-                    // 일반 게시판
-                    renderBoard(data['GENERAL'], '#general-list', '#general-pagination', 'GENERAL', page);
+            // 카테고리별 데이터 렌더링 및 페이지네이션
+            function renderBoard(boardData, listSelector, paginationSelector, currentPage, category) {
+                const posts = boardData.content;
+                const totalPages = Math.ceil(boardData.totalElements / pageSize);  // 총 페이지 수 계산
 
-                    // 정보 게시판
-                    renderBoard(data['KNOWLEDGE'], '#info-list', '#info-pagination', 'KNOWLEDGE', page);
+                const listElement = document.querySelector(listSelector);
+                listElement.innerHTML = '';
 
-                    // QnA 게시판
-                    renderBoard(data['QnA'], '#qna-list', '#qna-pagination', 'QnA', page);
-                },
-                error: function() {
-                    alert('게시글을 불러오는 데 실패했습니다.');
+                // 데이터가 적은 경우 빈 항목을 추가하여 페이지 크기를 맞춤
+                const displayedPosts = [...posts];
+                while (displayedPosts.length < pageSize) {
+                    displayedPosts.push({ title: '', content: '' });  // 빈 항목 추가
                 }
-            });
-        }
 
-        function renderBoard(boardData, listSelector, paginationSelector, category, currentPage) {
-            const posts = boardData.content;
-            const totalPages = boardData.totalPages;
-            const currentPageIndex = boardData.number;
+                if (displayedPosts.length === 0) {
+                    listElement.innerHTML = '<li>게시글이 없습니다.</li>';
+                } else {
+                    displayedPosts.forEach(post => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = post.title || `<span style="color: transparent;">빈 항목</span>`; // 빈 항목 표시
+                        listElement.appendChild(listItem);
+                    });
+                }
 
-            // 게시글 목록 출력
-            $(listSelector).empty();
-            posts.forEach(post => {
-                $(listSelector).append(`
-                    <li>
-                        <h3>${post.title}</h3>
-                        <p>${post.content}</p>
-                    </li>
-                `);
-            });
-
-            // 페이지네이션 출력
-            $(paginationSelector).empty();
-            if (currentPageIndex > 0) {
-                $(paginationSelector).append(`<a href="#" class="page-link" data-page="${currentPageIndex - 1}">이전</a>`);
-            }
-            if (currentPageIndex < totalPages - 1) {
-                $(paginationSelector).append(`<a href="#" class="page-link" data-page="${currentPageIndex + 1}">다음</a>`);
+                renderPagination(paginationSelector, currentPage, totalPages, category);
             }
 
-            // 페이지 링크 클릭 시 처리
-            $(paginationSelector).find('.page-link').click(function(e) {
-                e.preventDefault();
-                const page = $(this).data('page');
-                fetchPosts(page);  // 페이지는 0부터 시작하므로 수정
-            });
-        }
+            // 페이지네이션 렌더링
+            function renderPagination(paginationSelector, currentPage, totalPages, category) {
+                const paginationElement = document.querySelector(paginationSelector);
+                paginationElement.innerHTML = '';
 
-        // 검색 버튼 클릭 시 게시글 목록 및 페이지네이션 갱신
-        $('#searchButton').click(function() {
-            fetchPosts(1);  // 첫 번째 페이지부터 검색
+                let maxPageToShow = 10;
+                let startPage = Math.floor((currentPage - 1) / maxPageToShow) * maxPageToShow + 1;
+                let endPage = Math.min(startPage + maxPageToShow - 1, totalPages);
+
+                // 이전 버튼 추가
+                if (startPage > 1) {
+                    const prevButton = document.createElement('a');
+                    prevButton.href = '#';
+                    prevButton.classList.add('page-link');
+                    prevButton.dataset.page = startPage - 1;
+                    prevButton.dataset.category = category;
+                    prevButton.textContent = '이전';
+                    paginationElement.appendChild(prevButton);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageLink = document.createElement('a');
+                    pageLink.href = '#';
+                    pageLink.classList.add('page-link');
+                    if (i === currentPage) {
+                        pageLink.classList.add('active');
+                    }
+                    pageLink.dataset.page = i;
+                    pageLink.dataset.category = category;
+                    pageLink.textContent = i;
+                    paginationElement.appendChild(pageLink);
+                }
+
+                // 다음 버튼 추가
+                if (endPage < totalPages) {
+                    const nextButton = document.createElement('a');
+                    nextButton.href = '#';
+                    nextButton.classList.add('page-link');
+                    nextButton.dataset.page = endPage + 1;
+                    nextButton.dataset.category = category;
+                    nextButton.textContent = '다음';
+                    paginationElement.appendChild(nextButton);
+                }
+
+                // 페이지 이동
+                paginationElement.querySelectorAll('.page-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const page = parseInt(link.dataset.page, 10);
+                        const category = link.dataset.category;
+                        fetchCategoryData(page, category);
+                    });
+                });
+            }
+
+            // 카테고리별 페이지 이동 시 데이터 호출
+            function fetchCategoryData(page, category) {
+                axios.get('/api/search/posts/category', {
+                    params: {
+                        keyword: keyword,
+                        field: field,
+                        category: category,
+                        page: page - 1,
+                        size: pageSize  // size를 5로 고정
+                    }
+                })
+                    .then(response => {
+                        const boardData = response.data.data;
+                        renderBoard(boardData[category], `#${category.toLowerCase()}-list`, `#${category.toLowerCase()}-pagination`, page, category);
+                    })
+                    .catch(() => {
+                        alert(`${category} 게시글을 불러오는 데 실패했습니다.`);
+                    });
+            }
+
+            // 페이지 로딩 시 기본 검색 실행
+            searchPosts();
         });
 
-        // 초기 페이지 로드 시 기본 검색
-        fetchPosts(1);  // 첫 페이지부터 로드
-    });
-</script>
 
+    </script>
 </body>
 </html>

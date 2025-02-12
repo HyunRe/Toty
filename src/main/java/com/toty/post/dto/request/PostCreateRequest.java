@@ -24,16 +24,13 @@ public class PostCreateRequest {
     @NotNull(message = "게시글 유형을 선택 하세요.")
     private PostCategory postCategory;
 
-    private List<MultipartFile> postImages = new ArrayList<>();
-
     @NotNull(message = "기술 태그를 선택 하세요.")
-    private List<PostTag> postTags = new ArrayList<>();
+    private List<String> postTags = new ArrayList<>();
 
-    public PostCreateRequest(String title, String content, PostCategory postCategory, List<MultipartFile> postImages, List<PostTag> postTags) {
+    public PostCreateRequest(String title, String content, PostCategory postCategory, List<String> postTags) {
         this.title = title;
         this.content = content;
         this.postCategory = postCategory;
-        this.postImages = postImages;
         this.postTags = postTags;
     }
 }

@@ -5,7 +5,6 @@ import com.toty.user.application.UserInfoService;
 import com.toty.user.application.UserSignUpService;
 import com.toty.user.domain.model.User;
 import com.toty.user.dto.request.UserSignUpRequest;
-import com.toty.user.dto.response.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +29,17 @@ public class UserViewController {
     public String signUp(@RequestBody UserSignUpRequest userSignUpRequest, Model model) {
         userSignUpService.signUp(userSignUpRequest);
         return "redirect:/view/users/home";
+    }
+
+    // 정보 수정(View)
+    @GetMapping("/edit-form/{id}")
+    public String updateProc(@CurrentUser User user, @PathVariable Long id, Model model){
+        // 본인인지 확인 -> 아니면 예외
+//
+//        UserInfoResponse userInfo = userInfoService.getMyInfoForUpdate(user, id);
+
+//        model.addAttribute("userInfo", userInfo);
+        return "update";
     }
 
     // 기본 페이지
@@ -58,4 +68,11 @@ public class UserViewController {
         return "user/info";
     }
 
+    // 폼로그인 실패 창 띄우기
+    @GetMapping("/login-fail")
+    public String loginFail(Model model) {
+        model.addAttribute("msg", "로그인에 실패했습니다");
+        model.addAttribute("url", "/view/users/login");
+        return "common/alertMsg";
+    }
 }
