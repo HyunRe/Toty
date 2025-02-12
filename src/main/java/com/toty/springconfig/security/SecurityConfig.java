@@ -39,6 +39,8 @@ public class SecurityConfig {
         http.csrf(auth -> auth.disable())       // CSRF 방어 기능 비활성화
                 .headers(x -> x.frameOptions(y -> y.disable()))
                 .authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/posts/images/**", "/css/**", "/js/**", "/img/**").permitAll()
+                        .requestMatchers("/view/posts/**", "/api/posts/**").permitAll()
                         // 테스트 엔드포인트
                         .requestMatchers("/api/users/test").hasAuthority("USER")
                         //멘토만 접근 가능한 url

@@ -1,5 +1,8 @@
 package com.toty.post.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.toty.common.domain.Tag;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,6 +19,7 @@ public class PostTag {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "post_id", nullable = false)
+    @JsonBackReference
     private Post post;
 
     @Column(name = "tag_name", nullable = false)

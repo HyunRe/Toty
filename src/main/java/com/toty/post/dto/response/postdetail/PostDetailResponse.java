@@ -3,13 +3,11 @@ package com.toty.post.dto.response.postdetail;
 import com.toty.common.domain.BaseTime;
 import com.toty.common.pagination.PaginationResult;
 import com.toty.post.domain.model.PostCategory;
-import com.toty.post.domain.model.PostImage;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,7 +20,6 @@ public abstract class PostDetailResponse extends BaseTime {
     private PostCategory postCategory;
     private String title;
     private String content;
-    private List<PostImage> postImages;
     private int viewCount;
     private int likeCount;
     private LocalDateTime earliestTime;
@@ -30,13 +27,12 @@ public abstract class PostDetailResponse extends BaseTime {
     // 댓글 정보
     private PaginationResult comments;
 
-    public PostDetailResponse(String nickname, String profileImageUrl, PostCategory postCategory, String title, String content, List<PostImage> postImages, int viewCount, int likeCount, LocalDateTime earliestTime, PaginationResult comments) {
+    public PostDetailResponse(String nickname, String profileImageUrl, PostCategory postCategory, String title, String content, int viewCount, int likeCount, LocalDateTime earliestTime, PaginationResult comments) {
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
         this.postCategory = postCategory;
         this.title = title;
         this.content = content;
-        this.postImages = postImages;
         this.viewCount = viewCount;
         this.likeCount = likeCount;
         this.earliestTime = earliestTime;

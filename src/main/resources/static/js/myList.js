@@ -1,17 +1,17 @@
-function changeCategory(category, page = 1) {
-    // 왼쪽 메뉴 항목 초기화
-    document.getElementById('profileMenu').classList.remove('active-menu');
-    document.getElementById('myPostsMenu').classList.remove('active-menu');
-    document.getElementById('savedPostsMenu').classList.remove('active-menu');
-
-    // 카테고리에 따라 왼쪽 메뉴 활성화
-    if (category === 'free') {
-        document.getElementById('myPostsMenu').classList.add('active-menu');
-    } else if (category === 'knowledge') {
-        document.getElementById('myPostsMenu').classList.add('active-menu');
-    } else if (category === 'qna') {
-        document.getElementById('savedPostsMenu').classList.add('active-menu');
-    }
+function changeCategory(postCategory, page = 1) {
+    console.log("category" + postCategory);
+//    // 왼쪽 메뉴 항목 초기화
+//    document.getElementById('profileMenu').classList.remove('active-menu');
+//    document.getElementById('myPostsMenu').classList.remove('active-menu');
+//    document.getElementById('savedPostsMenu').classList.remove('active-menu');
+//
+//    if (postCategory === 'General') {
+//        document.getElementById('myPostsMenu').classList.add('active-menu');
+//    } else if (postCategory === 'Knowledge') {
+//        document.getElementById('myPostsMenu').classList.add('active-menu');
+//    } else if (postCategory === 'qna') {
+//        document.getElementById('General').classList.add('active-menu');
+//    }
 
     const postList = document.getElementById('post-list');
     const currentPageElement = document.getElementById('currentPage');
@@ -19,22 +19,22 @@ function changeCategory(category, page = 1) {
     const totalElementsElement = document.getElementById('totalElements');
     const pagination = document.getElementById('pagination');
 
-    postList.innerHTML = ''; // Clear the list before adding new posts
-    pagination.innerHTML = ''; // Clear the pagination before updating
+    postList.innerHTML = ''; // 새로운 게시글을 추가하기 전에 기존 목록을 초기화
+    pagination.innerHTML = ''; // 페이지네이션을 업데이트하기 전에 초기화
 
-    // Example API endpoint to fetch posts - replace with your actual API or data fetching method
-    const apiEndpoint = `/api/posts?category=${category}&page=${page}`;
+    // 예시 API 엔드포인트 - 실제 API나 데이터 가져오는 방법으로 변경해야 함
+    const apiEndpoint = `/api/posts/myList?postCategory=${postCategory}&page=${page}`;
 
-    // Fetch posts based on the selected category and page
+    // 선택된 카테고리와 페이지에 맞는 게시글을 가져오기
     fetch(apiEndpoint)
         .then(response => response.json())
         .then(data => {
-            const posts = data.content;  // Assuming the API returns posts in "content" field
+            const posts = data.content;  // API 응답에서 "content" 필드에 게시글이 담겨 있다고 가정
             const totalElements = data.totalElements;
             const totalPages = data.totalPages;
-            const currentPage = data.number + 1;
+            const currentPage = data.currentPage;
 
-            // Update the page info
+            // 페이지 정보 업데이트
             currentPageElement.textContent = currentPage;
             totalPagesElement.textContent = totalPages;
             totalElementsElement.textContent = totalElements;
@@ -45,21 +45,21 @@ function changeCategory(category, page = 1) {
                 posts.forEach(post => {
                     const postItem = document.createElement('div');
                     postItem.classList.add('post-list-item');
-                    postItem.setAttribute('onclick', `location.href='/post/detail/${post.id}'`);
+                    postItem.setAttribute('onclick', `location.href='/api/posts/${post.id}/detail'`);
                     postItem.style.cursor = 'pointer';
 
-                    // Profile Image
+                    // 프로필 이미지
                     const img = document.createElement('img');
-                    img.setAttribute('src', post.profileImageUrl || 'profile.jpg'); // Fallback to a default profile image
+                    img.setAttribute('src', post.profileImageUrl || 'profile.jpg'); // 기본 프로필 이미지로 대체
                     img.setAttribute('alt', '프로필 이미지');
                     postItem.appendChild(img);
 
-                    // Details (Title, Nickname)
+                    // 세부 사항 (제목, 닉네임)
                     const details = document.createElement('div');
                     details.classList.add('details');
-                    
+
                     const titleLink = document.createElement('a');
-                    titleLink.setAttribute('href', `/post/detail/${post.id}`);
+                    titleLink.setAttribute('href', `/api/post/${post.id}/detail/`);
                     titleLink.textContent = post.title;
                     details.appendChild(titleLink);
 
@@ -68,7 +68,7 @@ function changeCategory(category, page = 1) {
                     nickname.textContent = `작성자: ${post.nickname}`;
                     details.appendChild(nickname);
 
-                    // Add Mentor badge if the post author is a mentor
+                    // 멘토 배지 추가 (작성자가 멘토인 경우)
                     if (post.role === 'MENTOR') {
                         const badge = document.createElement('span');
                         badge.classList.add('badge', 'badge-primary');
@@ -78,16 +78,17 @@ function changeCategory(category, page = 1) {
 
                     postItem.appendChild(details);
 
-                    // Info (View Count, Likes, Date)
+                    // 정보 (조회수, 좋아요, 작성일)
                     const info = document.createElement('div');
                     info.classList.add('info');
-                    
+
                     const viewLike = document.createElement('p');
                     viewLike.textContent = `조회수: ${post.viewCount} / 좋아요: ${post.likeCount}`;
                     info.appendChild(viewLike);
-                    
+
+                    const formattedDate = formatDate(post.earliestTime);
                     const date = document.createElement('p');
-                    date.textContent = `작성일: ${new Date(post.earliestTime).toLocaleString()}`;
+                    date.textContent = `작성일: ${formattedDate}`;
                     info.appendChild(date);
 
                     // 수정과 삭제 버튼 추가
@@ -95,7 +96,7 @@ function changeCategory(category, page = 1) {
                     buttons.classList.add('btn-group', 'btn-group-sm');
 
                     const editButton = document.createElement('button');
-                    editButton.classList.add('btn', 'btn-warning');
+                    editButton.classList.add('btn', 'btn-primary');
                     editButton.textContent = '수정';
                     editButton.onclick = (e) => {
                         e.stopPropagation();
@@ -103,7 +104,7 @@ function changeCategory(category, page = 1) {
                     };
 
                     const deleteButton = document.createElement('button');
-                    deleteButton.classList.add('btn', 'btn-danger');
+                    deleteButton.classList.add('btn', 'btn-secondary');
                     deleteButton.textContent = '삭제';
                     deleteButton.onclick = (e) => {
                         e.stopPropagation();
@@ -118,11 +119,11 @@ function changeCategory(category, page = 1) {
 
                     postItem.appendChild(info);
 
-                    // Append the post item to the post list
+                    // 게시글 항목을 리스트에 추가
                     postList.appendChild(postItem);
                 });
 
-                // Pagination: Add previous, page numbers, and next
+                // 페이지네이션: 이전, 페이지 번호, 다음 버튼 추가
                 const createPageLink = (pageNumber, text, isActive) => {
                     const li = document.createElement('li');
                     li.classList.add('page-item');
@@ -133,22 +134,43 @@ function changeCategory(category, page = 1) {
                     a.href = '#';
                     a.onclick = (e) => {
                         e.preventDefault();
-                        changeCategory(category, pageNumber);
+                        changeCategory(postCategory, pageNumber);
                     };
                     li.appendChild(a);
                     return li;
                 };
 
-                // Adding previous, page numbers, and next buttons
+                // 이전 버튼
                 if (currentPage > 1) {
-                    pagination.appendChild(createPageLink(currentPage - 1, '이전', false));
+                     pagination.append(createPageLink(currentPage - 1, "이전", false, false));
+                } else {
+                    pagination.append(createPageLink(1, "이전", false, true));  // 비활성화된 "이전" 버튼
                 }
-                for (let i = 1; i <= totalPages; i++) {
-                    pagination.appendChild(createPageLink(i, i, i === currentPage));
+
+                // 페이지 번호 (동적으로 생성)
+                const pageRange = 10; // 한 번에 표시할 페이지 번호의 범위
+                let startPage = Math.max(currentPage - Math.floor(pageRange / 2), 1);
+                let endPage = Math.min(startPage + pageRange - 1, totalPages);
+
+                for (let i = startPage; i <= endPage; i++) {
+                    pagination.append(createPageLink(i, i, i === currentPage, false));
                 }
+
+                // 다음 버튼
                 if (currentPage < totalPages) {
-                    pagination.appendChild(createPageLink(currentPage + 1, '다음', false));
+                    pagination.append(createPageLink(currentPage + 1, "다음", false, false));
+                } else {
+                    pagination.append(createPageLink(totalPages, "다음", false, true));  // 비활성화된 "다음" 버튼
                 }
             }
         });
+}
+
+// 날짜를 yyyy-mm-dd 형식으로 변환하는 함수
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }

@@ -10,3 +10,20 @@
 .form-check-inline {
     margin-left: 10px;
 }
+
+#postTags {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+}
+
+#postTags div {
+    display: flex;
+    align-items: center;
+    font-size: 12px; /* 글자 크기 줄이기 */
+}
+
+#postTags input[type="checkbox"] {
+    margin-right: 8px; /* 체크박스와 텍스트 사이 간격 */
+    transform: scale(0.8); /* 체크박스 크기 줄이기 */
+}
