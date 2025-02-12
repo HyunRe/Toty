@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
   <head>
     <meta charset="utf-8" />
     <title>TOTY</title>
@@ -172,8 +173,8 @@
           <div>주제 : [[${room.roomName}]]</div>
         </div>
         <div class="col-3">
-          <button onclick="exitRoom()">채팅방 나가기</button>
-          <button th:if="${userId == room.mentor.uid}" 
+          <button sec:authorize="isAuthenticated()" onclick="exitRoom()">채팅방 나가기</button>
+          <button sec:authorize="hasRole('ROLE_MENTOR')"
               onclick="endRoom()">채팅방 종료하기([[${session.loginUser.role.name()}]])</button>
         </div>
       </div>
