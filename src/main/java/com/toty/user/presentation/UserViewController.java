@@ -54,23 +54,33 @@ public class UserViewController {
         return "common/login";
     }
 
-    // 나의/상대방의 정보 보기
-    // 본인인지 아닌지 확인 -> 아니면 약식 정보만 전달
-    @GetMapping("/{id}/info") // -> 모델로 전달하고 view로 변경?
-    public String getUserInfo(@CurrentUser User user,
-            @PathVariable("id") Long id) {
-        if (user.getId() == id) {
-            return "user/detail";
-        } else {
-            return "user/list";
-        }
+    // 내 정보 조회
+    @GetMapping("/info")
+    public String getMyInfo(@CurrentUser User user, Model model) {
+        model.addAttribute("userInfo", userInfoService.getUserInfoByAccount(user.getId(), user.getId()));
+        return "user/detail";
+    }
+
+    //상대방의 정보 조회
+    @GetMapping("/{id}/info")
+    public String getUserInfo(@CurrentUser User user, @PathVariable("id") Long id, Model model) {
+        model.addAttribute("userInfo", userInfoService.getUserInfoByAccount(user.getId(), id));
+        return "user/info";
     }
 
     // 폼로그인 실패 창 띄우기
-    @GetMapping("/login-fail")
+    @GetMapping("/alert/login-fail")
     public String loginFail(Model model) {
         model.addAttribute("msg", "로그인에 실패했습니다");
         model.addAttribute("url", "/view/users/login");
+        return "common/alertMsg";
+    }
+
+    // 로그아웃 성공 안내 창
+    @GetMapping("/alert/logout")
+    public String logout(Model model) {
+        model.addAttribute("msg", "로그아웃 되었습니다.");
+        model.addAttribute("url", "/view/users/home");
         return "common/alertMsg";
     }
 }

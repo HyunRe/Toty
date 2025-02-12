@@ -1,11 +1,9 @@
 package com.toty.user.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.toty.user.domain.model.Role;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.toty.common.domain.Tag;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -34,7 +32,7 @@ public class UserInfoResponse {
 
     private String profileImgUrl;
 
-    private List<UserLinkInfo> links; // List<LinkDto>
+    private List<LinkDto> links;
 
     private Long followerCount;
 
@@ -51,7 +49,7 @@ public class UserInfoResponse {
                             boolean emailSubscribed, boolean smsSubscribed,
                             boolean notificationAllowed,
                             String status_message, String phoneNumber, List<String> tags,
-                            String profileImgUrl, List<UserLinkInfo> links,
+                            String profileImgUrl, List<LinkDto> links,
                             Long followerCount, Long followingCount, String username, boolean isFollowing,
                             Role role, LocalDateTime createdAt) {
         this.id = id;

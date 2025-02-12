@@ -1,17 +1,24 @@
 package com.toty.user.application;
 
 import com.toty.common.domain.Tag;
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
 import com.toty.following.domain.FollowingRepository;
+import com.toty.user.domain.model.Site;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.model.UserLink;
 import com.toty.user.domain.model.UserTag;
 import com.toty.user.domain.repository.UserLinkRepository;
-import com.toty.user.domain.repository.UserRepository;
 import com.toty.user.domain.repository.UserTagRepository;
+import com.toty.user.dto.request.BasicInfoUpdateRequest;
+import com.toty.user.dto.request.LinkUpdateRequest;
+import com.toty.user.dto.request.PhoneNumberUpdateRequest;
+import com.toty.user.dto.request.TagUpdateRequest;
 import com.toty.user.dto.request.UserInfoUpdateRequest;
+import com.toty.user.dto.response.LinkDto;
 import com.toty.user.dto.response.UserInfoResponse;
-import com.toty.user.dto.response.UserLinkInfo;
 import jakarta.transaction.Transactional;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,34 +32,36 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserInfoService {
 
-    private final UserRepository userRepository;
     private final UserTagRepository userTagRepository;
     private final UserLinkRepository userLinkRepository;
     private final FollowingRepository followingRepository;
+    private final UserService userService;
 
     @Value("${user.img-path}")
     private String basePath;
 
     // 본인 확인
-    private boolean isSelfAccount(User user, Long id){
+    private boolean isNotOwner(User user, Long id){
         // id의 Null 여부는 presentation에서 검증 필요
-        return user.getId().equals(id);
+        return !user.getId().equals(id);
     }
 
-    private UserInfoResponse getUserInfoByAccount(Long myId, Long userId, boolean isOwner) {
-        User foundUser = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-        
-        List<String> userTags = userTagRepository.findByUserId(userId)
+    // 사용자 정보 전체 조회
+    public UserInfoResponse getUserInfoByAccount(Long myId, Long targetId) {
+        User foundUser = userService.findById(targetId);
+
+        List<String> userTags = userTagRepository.findByUserId(targetId)
                 .stream()
                 .map(userTag -> userTag.getTag().getTag())
                 .toList();
-        List<UserLinkInfo> userLinks = userLinkRepository.findByUserId(userId)
+        List<LinkDto> userLinks = userLinkRepository.findByUserId(targetId)
                 .stream()
-                .map(userLink -> new UserLinkInfo(userLink.getSite(), userLink.getUrl()))
+                .map(userLink -> new LinkDto(userLink.getSite().getValue(), userLink.getUrl()))
                 .toList();
-        Long followingCount = followingRepository.countFollowingsByUserId(userId);
-        Long followerCount = followingRepository.countFollowersByUserId(userId);
+        Long followingCount = followingRepository.countFollowingsByUserId(targetId);
+        Long followerCount = followingRepository.countFollowersByUserId(targetId);
+
+        boolean isOwner = myId.equals(targetId);
 
         return UserInfoResponse.builder()
                 .id(foundUser.getId())
@@ -69,23 +78,93 @@ public class UserInfoService {
                 .followingCount(followingCount)
                 .followerCount(followerCount)
                 .role(foundUser.getRole())
-                .isFollowing(!isOwner ? followingRepository.existsByFromUserIdAndToUserId(myId, userId) : null)
+                .isFollowing(!isOwner ? followingRepository.existsByFromUserIdAndToUserId(myId, targetId) : null)
                 .createdAt(isOwner ? foundUser.getCreatedAt() : null)
                 .build();
     }
 
-    public UserInfoResponse getUserInfo(User user, Long id) {
-        if (isSelfAccount(user, id)) {
-            return getUserInfoByAccount(user.getId(), id, true);
-        } else {
-            return getUserInfoByAccount(user.getId(), id, false);
+
+    // 기본 정보 수정(닉네임, 사진, 구독)
+    @Transactional
+    public void updateUserBasicInfo(User user, Long userId, BasicInfoUpdateRequest newInfo, MultipartFile imgFile) {
+        if (isNotOwner(user, userId)) {
+            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
         }
+        User foundUser = userService.findById(userId);
+
+        if (!newInfo.getNickname().isBlank()) {
+            foundUser.updateNickname(newInfo.getNickname());
+        }
+
+        if (imgFile != null && !imgFile.isEmpty()) {
+            try {
+                String savePath = basePath + userId;
+                String contentType = imgFile.getContentType().split("/")[1];
+                String imgPath = savePath + "." + contentType;
+                imgFile.transferTo(new File(imgPath)); // ex) --.jpg, --hi.png
+                foundUser.updateprofileImg(imgPath);
+            } catch (IOException e) {
+                 throw new ExpectedException(ErrorCode.PROFILE_IMAGE_SAVE_ERROR);
+            }
+        }
+
+        newInfo.getSubscriptionAllowed().forEach(alert -> {
+            switch (alert) {
+                case "email":
+                    foundUser.updateEmailSubscription(true);
+                    break;
+                case "sms":
+                    foundUser.updateSmsSubscription(true);
+                    break;
+                case "notification":
+                    foundUser.updateNotificationAllowed(true);
+                    break;
+            }
+        });
+
     }
 
+    // link 변경
     @Transactional
-    public void updateUserInfo(Long userId, UserInfoUpdateRequest newInfo, MultipartFile imgFile) {
-        User foundUser = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+    public void updateUserLinks(User user, Long userId, LinkUpdateRequest request) {
+        if (isNotOwner(user, userId)) {
+            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
+        }
+        userLinkRepository.deleteByUserId(userId);
+        request.getLinks().forEach(link -> {
+            userLinkRepository.save(new UserLink(userService.findById(userId), siteStringToEnum(link.getSite()), link.getUrl()));
+        });
+    }
+
+    //태그 수정
+    @Transactional
+    public void updateUserTags(User user, Long userId, TagUpdateRequest tags) {
+        if (isNotOwner(user, userId)) {
+            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
+        }
+        User foundUser = userService.findById(userId);
+        userTagRepository.deleteByUserId(userId);
+        tags.getTags().forEach(tag -> {
+            userTagRepository.save(new UserTag(foundUser, tagStringToEnum(tag)));
+        });
+    }
+
+    // 휴대폰 번호 변경
+    public void updatePhoneNumber(User user, Long userId, PhoneNumberUpdateRequest phoneNumberDto) {
+        if (isNotOwner(user, userId)) {
+            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
+        }
+        User foundUser = userService.findById(userId);
+        foundUser.updatePhoneNumber(phoneNumberDto.getPhoneNumber());
+    }
+
+    // 전체 정보 수정
+    @Transactional
+    public void updateUserInfo(User user, Long userId, UserInfoUpdateRequest newInfo, MultipartFile imgFile) {
+        if (isNotOwner(user, userId)) {
+            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
+        }
+        User foundUser = userService.findById(userId);
 
         if (imgFile != null && !imgFile.isEmpty()) {
             try {
@@ -94,28 +173,32 @@ public class UserInfoService {
                 imgFile.transferTo(new File(savePath+"."+contentType)); // ex) --.jpg, --hi.png
                 foundUser.updateInfo(newInfo, savePath);
             } catch (IOException e) {
-                throw new RuntimeException();
-                // todo 예외 시
-                // throw new ExpectedException(ErrorCode.FileIOException);
+                throw new ExpectedException(ErrorCode.PROFILE_IMAGE_SAVE_ERROR);
             }
         }
 
         userTagRepository.deleteByUserId(userId);
-        newInfo.getTags().forEach(tags -> {
-            userTagRepository.save(new UserTag(foundUser, tags));
+        newInfo.getTags().forEach(tag -> {
+            Tag tagEnum = tagStringToEnum(tag);
+            userTagRepository.save(new UserTag(foundUser, tagEnum));
         });
 
         userLinkRepository.deleteByUserId(userId);
-        newInfo.getLinks().forEach(links -> {
-            userLinkRepository.save(new UserLink(foundUser, links.getSite(), links.getUrl()));
+        newInfo.getLinks().forEach(link -> {
+            userLinkRepository.save(new UserLink(foundUser, siteStringToEnum(link.getSite()), link.getUrl()));
         });
     }
 
-    public UserInfoResponse getMyInfoForUpdate(User user, Long id) {
-        if (isSelfAccount(user, id)) {
-            return getUserInfoByAccount(id, id,true);
-        } else {
-            throw new IllegalArgumentException("수정 권한이 없습니다.");
-        }
+
+    // 문자열-> Tag enum을 리턴
+    private static Tag tagStringToEnum(String tagValue) {
+        return Arrays.stream(Tag.values())
+                .filter(t -> t.getTag().equalsIgnoreCase(tagValue))
+                .findFirst().get();
     }
+
+    private static Site siteStringToEnum(String siteValue) {
+        return siteValue.toLowerCase().equals("github") ? Site.GITHUB : Site.BLOG;
+    }
+
 }
