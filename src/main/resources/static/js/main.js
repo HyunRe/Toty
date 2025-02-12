@@ -229,18 +229,18 @@ function isEmailAvailable() {
         return;
       }
 
-      if (response.status === 'error') {
-        Swal.fire({
-          icon: 'warning',
-          text: response.errorMessage,
-          ...swalConfig,
-        });
-      }
+      // if (response.status === 'error') {
+      //   Swal.fire({
+      //     icon: 'warning',
+      //     text: response.errorMessage,
+      //     ...swalConfig,
+      //   });
+      // }
 
-      if (response.status === 'success') {
+      if (response.status === 200) {
         Swal.fire({
           icon: 'success',
-          text: response.data.message,
+          text: response.message,
           showCancelButton: true,
           cancelButtonColor: '#d33',
           confirmButtonText: '사용',
@@ -310,17 +310,17 @@ function isNicknameAvailable() {
         });
         return;
       }
-      if (response.status === 'error') {
-        Swal.fire({
-          icon: 'warning',
-          text: response.errorMessage,
-          ...swalConfig,
-        });
-      }
-      if (response.status === 'success') {
+      // if (response.status === 'error') {
+      //   Swal.fire({
+      //     icon: 'warning',
+      //     text: response.errorMessage,
+      //     ...swalConfig,
+      //   });
+      // }
+      if (response.status === 200) {
         Swal.fire({
           icon: 'success',
-          text: response.data.message,
+          text: response.message,
           showCancelButton: true,
           cancelButtonColor: '#d33',
           confirmButtonText: '사용',
