@@ -51,21 +51,21 @@ public class UserViewController {
     // 리프레시 토큰 만료 이후 재로그인(액세스 토큰 유효성 검사x)
     @GetMapping("/login")
     public String loginPage() {
-        return "common/login"; // todo
+        return "common/login";
     }
 
-    // 내 정보 보기
+    // 내 정보 조회
     @GetMapping("/info") // -> 모델로 전달하고 view로 변경?
     public String getMyInfo(@CurrentUser User user, Model model) {
         model.addAttribute("userInfo", userInfoService.getUserInfo(user, user.getId()));
         return "user/detail";
     }
 
-    // 나의/상대방의 정보 보기
-    // 본인인지 아닌지 확인 -> 아니면 약식 정보만 전달
+    //상대방의 정보 조회
     @GetMapping("/{id}/info") // -> 모델로 전달하고 view로 변경?
     public String getUserInfo(@CurrentUser User user, @PathVariable("id") Long id, Model model) {
         model.addAttribute("userInfo", userInfoService.getUserInfo(user, id));
         return "user/info";
     }
+
 }
