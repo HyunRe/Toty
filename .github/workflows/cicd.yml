@@ -8,6 +8,9 @@ on:
     branches: ['main', 'develop']
     paths-ignore: ['src/resources/**']
 
+env:
+  S3_BUCKET_NAME: genti-deploy
+
 jobs:
 
   build:
@@ -47,8 +50,10 @@ jobs:
           name: "./src/main/resources/toty-6d4b4-firebase-adminsdk-fbsvc-f5eb24e27a.json"
           json: ${ secrets.FIREBASE_ACCOUNT_KEY }
 
-      - name: Check Firebase Credentials File
-        run: cat ./src/main/resources/toty-6d4b4-firebase-adminsdk-fbsvc-f5eb24e27a.json
+      - name: Upload key.json to S3
+        if: contains(github.ref, 'staging')
+        run: |
+          aws s3 cp ./src/main/resources/toty-6d4b4-firebase-adminsdk-fbsvc-f5eb24e27a.json s3://$S3_BUCKET_NAME/jsonkey/key.json
 
       # API E2E 테스트에서 데이터베이스 연결(SSH)을 위한 key 파일
       - name: Create SSH Key File
