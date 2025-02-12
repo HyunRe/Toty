@@ -7,7 +7,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
-    <link href="../../static/css/myList.css" rel="stylesheet">
+    <link href="/css/myList.css" rel="stylesheet" type="text/css">
 </head>
 <body>
     <div class="container mt-5">
@@ -30,28 +30,27 @@
                 
                     <!-- 카테고리 선택 메뉴 -->
                     <div class="category-menu">
-                        <select name="category" class="form-control form-control-sm" onchange="changeCategory(this.value)">
-                            <option value="free">자유</option>
-                            <option value="knowledge">지식</option>
-                            <option value="qna">Q/A</option>
+                        <select id="postCategory" name="postCategory" class="form-control form-control-sm" onchange="changeCategory(this.value)">
+                            <option value="General" selected>일반</option>
+                            <option value="Knowledge">지식</option>
+                            <option value="Qnn">Q/A</option>
                         </select>
                     </div>
                 </div>
                 
                 <!-- 게시글 목록 -->
-                <div id="post-list" class="list-group">
-                    <!-- 게시글이 JavaScript를 통해 동적으로 추가될 예정 -->
-                </div>
+                <div id="post-list" class="list-group"></div>
 
                 <!-- 페이지네이션 -->
                 <div class="row mt-4">
-                    <div class="col-md-12 text-center">
-                        <p>현재 페이지: <strong id="currentPage">1</strong> / <strong id="totalPages">1</strong></p>
-                        <p>전체 게시글 수: <strong id="totalElements">0</strong></p>
+                    <div class="col-12 text-center">
+                        <span>현재 페이지: <span id="currentPage"></span></span>
+                        <span>전체 페이지: <span id="totalPages"></span></span>
+                        <span>전체 게시글 수: <span id="totalElements"></span></span>
+                    </div>
+                    <div class="col-12 text-center">
                         <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-center" id="pagination">
-                                <!-- 페이지네이션 항목은 JavaScript로 추가됩니다 -->
-                            </ul>
+                            <ul class="pagination justify-content-center" id="pagination"></ul>
                         </nav>
                     </div>
                 </div>
@@ -67,6 +66,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Custom JS -->
-    <script src="../../static/js/myList.js"></script>
+    <script src="/js/myList.js" type="text/javascript"></script>
 </body>
 </html>

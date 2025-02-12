@@ -15,7 +15,6 @@ public class KnowledgePostDetailResponseStrategy implements PostDetailResponseSt
                 post.getPostCategory(),
                 post.getTitle(),
                 post.getContent(),
-                post.getPostImages(),
                 post.getViewCount(),
                 post.getLikeCount(),
                 post.getUpdatedAt(),

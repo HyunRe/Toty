@@ -17,18 +17,16 @@ public enum ErrorCode {
 
     // 게시글
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
-    CATEGORY_CREATION_STRATEGY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 카테고리에 대한 게시글 생성 전략이 존재하지 않습니다."),
-    CATEGORY_UPDATE_STRATEGY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 카테고리에 대한 게시글 수정 전략이 존재하지 않습니다."),
     INSUFFICIENT_PERMISSION(HttpStatus.FORBIDDEN, "권한이 없습니다."),
 
     // 게시글 태그 선택
     MISSING_REQUIRED_TAG(HttpStatus.BAD_REQUEST, "선택된 태그가 반드시 하나 필요 합니다."),
     TAG_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "태그 선택은 최대 5개만 가능 합니다."),
 
-    // 이미지
-    IMAGE_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 저장 중 오류 발생"),
-    IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,"이미지 업로드 실패를 했습니다."),
-    INVALID_IMAGE_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 이미지 형식 입니다."),
+    // 게시글 카테고리
+    CATEGORY_CREATION_STRATEGY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 카테고리에 대한 게시글 생성 전략이 존재하지 않습니다."),
+    CATEGORY_UPDATE_STRATEGY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 카테고리에 대한 게시글 수정 전략이 존재하지 않습니다."),
+    INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "잘못된 카테고리 값입니다."),
 
     // 댓글
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 댓글입니다."),
