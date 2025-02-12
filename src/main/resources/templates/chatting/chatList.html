@@ -180,8 +180,9 @@
         </div>
         <div class="col-4">
           <div sec:authorize="hasRole('ROLE_MENTOR')">
-            <button onclick="createRoom()">단톡방 생성하기</button>
+            sec:authorize="hasRole('ROLE_MENTOR')" 걸어논 div
           </div>
+          <button onclick="createRoom()">단톡방 생성하기</button>
         </div>
       </div>
       <div style="height: 50px;"></div>

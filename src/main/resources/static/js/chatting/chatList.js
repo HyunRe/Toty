@@ -37,11 +37,19 @@ function createRoom() {
         cancelButtonText: "생성 취소",
         confirmButtonText: "채팅방 개설",
         confirmButtonColor: "#1f9bcf",
+        preConfirm: () => {
+            return {
+                roomName: document.querySelector(".roomName").value,
+                userLimit: document.querySelector(".userLimit").value
+            };
+        }
       }).then((result) => {
         /* 예, 아니오 선택에 따라 조건문 로직 실행 */
         if (result.isConfirmed) {
-            var rr = $(".roomName").val();
-            var ul = $(".userLimit").val();
+            
+            var rr = result.value.roomName;
+            var ul = result.value.userLimit;
+            
             var params = {
                             "roomName": rr, "userLimit": ul
                         }
@@ -51,7 +59,6 @@ function createRoom() {
                 data: params,
                 success:function(response) {
                     Swal.fire({
-                        title: "탈퇴 완료",
                         text: "새 채팅방이 개설되었습니다.",
                         icon: "success",
                         confirmButtonColor: "#1f9bcf",
