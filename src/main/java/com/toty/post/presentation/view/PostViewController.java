@@ -6,15 +6,11 @@ import com.toty.post.application.PostLikeService;
 import com.toty.post.application.PostPaginationService;
 import com.toty.post.application.PostService;
 import com.toty.post.domain.model.Post;
-import com.toty.post.dto.request.PostCreateRequest;
-import com.toty.post.dto.request.PostUpdateRequest;
 import com.toty.post.dto.response.postdetail.PostDetailResponse;
 import com.toty.user.domain.model.User;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -30,18 +26,6 @@ public class PostViewController {
         return "post/create";
     }
 
-    @PostMapping("/create")
-    public String createPost(@CurrentUser User user,
-                             @ModelAttribute @Valid PostCreateRequest postCreateRequest,
-                             BindingResult bindingResult, Model model) {
-        if (bindingResult.hasErrors()) {
-            return "post/create"; // 유효성 검사 실패 시, 다시 폼을 반환
-        }
-        postService.createPost(user.getId(), postCreateRequest);
-        model.addAttribute("tags", postCreateRequest.getPostTags());
-        return "redirect:/view/posts/myList";
-    }
-
     @GetMapping("/update/{id}")
     public String updatePost(@PathVariable Long id, Model model) {
         Post post = postService.findPostById(id);
@@ -49,26 +33,13 @@ public class PostViewController {
         return "post/update";
     }
 
-    @PatchMapping("/{id}")
-    public String updatePost(@CurrentUser User user,
-                             @PathVariable Long id,
-                             @ModelAttribute @Valid PostUpdateRequest postUpdateRequest,
-                             BindingResult bindingResult, Model model) {
-        if (bindingResult.hasErrors()) {
-            return "post/update"; // 유효성 검사 실패 시, 다시 폼을 반환
-        }
-        postService.updatePost(user, id, postUpdateRequest);
-        model.addAttribute("tags", postUpdateRequest.getPostTags());
-        return "redirect:/view/posts/myList";
-    }
-
     // 전체 게시글 목록 조회
     @GetMapping("/list")
     public String postList(@RequestParam(name = "page", defaultValue = "1") int page,
                            @RequestParam(name = "filter", required = false) String filter,
                            Model model) {
-        PaginationResult result = postPaginationService.getPagedPosts(page, filter);
-        model.addAttribute("result", result);
+        PaginationResult post = postPaginationService.getPagedPosts(page, filter);
+        model.addAttribute("post", post);
         model.addAttribute("filter", filter);
 
         return "post/list";

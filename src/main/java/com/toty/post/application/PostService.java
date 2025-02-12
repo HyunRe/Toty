@@ -11,21 +11,20 @@ import com.toty.post.domain.repository.PostRepository;
 import com.toty.post.dto.request.PostCreateRequest;
 import com.toty.post.dto.request.PostUpdateRequest;
 import com.toty.user.domain.model.User;
-import com.toty.user.domain.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
     private final PostCreationStrategyFactory postCreationStrategyFactory;
     private final PostUpdateStrategyFactory postUpdateStrategyFactory;
-
-    private static final int PAGE_SIZE = 10;  // 기본 페이지 수
 
     // 게시글 가져 오기
     public Post findPostById(Long id) {
@@ -34,9 +33,7 @@ public class PostService {
 
     // 게시글 작성
     @Transactional
-    public Post createPost(Long userId, PostCreateRequest postCreateRequest) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ExpectedException((ErrorCode.USER_NOT_FOUND)));
-
+    public Post createPost(User user, PostCreateRequest postCreateRequest) {
         PostCreationStrategy strategy = postCreationStrategyFactory.getStrategy(postCreateRequest.getPostCategory());
         if (strategy == null) {
             throw new ExpectedException(ErrorCode.CATEGORY_CREATION_STRATEGY_NOT_FOUND);
@@ -55,9 +52,9 @@ public class PostService {
     public Post updatePost(User user, Long id, PostUpdateRequest postUpdateRequest) {
         Post post = findPostById(id);
         // 내 게시글 인지 확인 필요
-        if (isOwner(user, post.getUser().getId())) {
-            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
-        }
+//        if (isOwner(user, post.getUser().getId())) {
+//            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
+//        }
 
         PostUpdateStrategy strategy = postUpdateStrategyFactory.getStrategy(post.getPostCategory());
         if (strategy == null) {

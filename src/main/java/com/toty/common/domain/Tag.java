@@ -1,7 +1,12 @@
 package com.toty.common.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.toty.common.baseException.UnknownTagException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.Arrays;
 
 @Getter
 @NoArgsConstructor
@@ -57,5 +62,13 @@ public enum Tag {
 
     Tag(String tag) {
         this.tag = tag;
+    }
+
+    @JsonCreator
+    public static Tag fromString(String tag) {
+        return Arrays.stream(Tag.values())
+                .filter(t -> t.tag.equalsIgnoreCase(tag))
+                .findFirst()
+                .orElseThrow(() -> new UnknownTagException(tag));
     }
 }

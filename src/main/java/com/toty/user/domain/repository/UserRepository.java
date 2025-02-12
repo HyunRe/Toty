@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends Repository<User, Long> {
@@ -21,6 +20,7 @@ public interface UserRepository extends Repository<User, Long> {
     boolean existsByNickname(String nickname);
 
     User save(User user);
-  
+
+    @Query("SELECT new com.toty.roleRefreshScheduler.dto.UserIdAndRoleDto(u.id, u.role) FROM User u WHERE u.isDeleted = false")
     List<UserIdAndRoleDto> findAllByIsDeletedFalse();
 }

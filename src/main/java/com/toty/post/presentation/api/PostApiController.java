@@ -3,6 +3,7 @@ package com.toty.post.presentation.api;
 import com.toty.common.pagination.PaginationResult;
 import com.toty.base.response.SuccessResponse;
 import com.toty.common.annotation.CurrentUser;
+import com.toty.post.application.PostImageService;
 import com.toty.post.application.PostLikeService;
 import com.toty.post.application.PostPaginationService;
 import com.toty.post.application.PostService;
@@ -16,6 +17,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -24,6 +28,7 @@ public class PostApiController {
     private final PostService postService;
     private final PostPaginationService postPaginationService;
     private final PostLikeService postLikeService;
+    private final PostImageService postImageService;
 
     // 게시글 삭제
     @DeleteMapping("/{id}")
@@ -42,36 +47,31 @@ public class PostApiController {
         return ResponseEntity.ok(isLiked);
     }
 
-    // 이 밑은 테스트 용도
+    // 이미지 업로드
+    @PostMapping("/upload-image")
+    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+        String fileUrl = postImageService.saveImage(file, "uploads/posts/images");
+        return ResponseEntity.ok(fileUrl);
+    }
 
-    // 게시글 작성 (test)
+    // 게시글 작성
     @PostMapping("/create")
-    public ResponseEntity<SuccessResponse> createPost(@CurrentUser User user,
-                                                      @Valid @RequestBody PostCreateRequest postCreateRequest) {
-        Post post = postService.createPost(user.getId(), postCreateRequest);
-        SuccessResponse successResponse = new SuccessResponse(
-                HttpStatus.OK.value(),
-                "게시글 생성 성공",
-                post
-        );
-
-        return ResponseEntity.ok(successResponse);
+    public ResponseEntity<Post> createPost(@CurrentUser User user,
+                                           @RequestBody @Valid PostCreateRequest postCreateRequest) {
+        Post post = postService.createPost(user, postCreateRequest);
+        return ResponseEntity.ok(post);
     }
 
-    // 게시글 수정 (test)
+    // 게시글 수정
     @PatchMapping("/{id}")
-    public ResponseEntity<SuccessResponse> updatePost(@CurrentUser User user,
-                                                      @PathVariable Long id,
-                                                      @Valid @RequestBody PostUpdateRequest postUpdateRequest) {
+    public ResponseEntity<Post> updatePost(@CurrentUser User user,
+                                           @PathVariable Long id,
+                                           @RequestBody @Valid PostUpdateRequest postUpdateRequest) {
         Post post = postService.updatePost(user, id, postUpdateRequest);
-        SuccessResponse successResponse = new SuccessResponse(
-                HttpStatus.OK.value(),
-                "게시글 수정 성공",
-                post
-        );
-
-        return ResponseEntity.ok(successResponse);
+        return ResponseEntity.ok(post);
     }
+
+    // 이 밑은 테스트 용도
 
     // 전체 게시글 목록 조회 (test)
     @GetMapping("/list")

@@ -6,7 +6,6 @@ import com.toty.following.domain.Following;
 import com.toty.following.domain.FollowingRepository;
 import com.toty.notification.application.service.NotificationSendService;
 import com.toty.notification.dto.request.NotificationSendRequest;
-import com.toty.post.application.PostImageService;
 import com.toty.post.domain.model.Post;
 import com.toty.post.domain.model.PostCategory;
 import com.toty.post.domain.repository.PostRepository;
@@ -21,7 +20,6 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class KnowledgePostCreationStrategy implements PostCreationStrategy {
-    private final PostImageService postImageService;
     private final NotificationSendService notificationSendService;
     private final FollowingRepository followingRepository;
     private final PostRepository postRepository;
@@ -29,15 +27,14 @@ public class KnowledgePostCreationStrategy implements PostCreationStrategy {
     @Override
     public Post createPostRequest(PostCreateRequest postCreateRequest, User user) {
         // 사용자 권한 확인
-        if (postCreateRequest.getPostCategory().equals(PostCategory.KNOWLEDGE) && user.getRole().equals(Role.USER)) {
+        if (user.getRole().equals(Role.USER)) {
             throw new ExpectedException(ErrorCode.USER_NOT_MENTOR);
         }
 
         Post post = new Post(user, postCreateRequest.getPostCategory(), postCreateRequest.getTitle(),
-                postCreateRequest.getContent(), 0, 0, null, null, null);
+                postCreateRequest.getContent(), 0, 0, null, null);
 
-        // 이미지
-        processImages(post, postCreateRequest.getPostImages(), postImageService);
+        postRepository.save(post);
 
         List<Following> followings = followingRepository.findByToUserId(user.getId());
         for (Following following: followings) {
@@ -51,7 +48,6 @@ public class KnowledgePostCreationStrategy implements PostCreationStrategy {
             notificationSendService.sendNotification(notificationSendRequest);
         }
 
-        postRepository.save(post);
         return post;
     }
 
