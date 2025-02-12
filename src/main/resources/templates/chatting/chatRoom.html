@@ -175,11 +175,10 @@
         </div>
         <div class="col-3">
           <button sec:authorize="isAuthenticated()" onclick="exitRoom()">채팅방 나가기</button>
-          <div sec:authorize="hasRole('ROLE_MENTOR')">
-            sec:authorize="hasRole('ROLE_MENTOR')" 된거, 해당방 만든 사람만 보이게 해야함
-          </div>
-          <button 
+          <div sec:authorize="hasAuthority('MENTOR')">
+            <button th:if="${userId == room.mentor.id}" 
               onclick="endRoom()">채팅방 종료하기</button>
+          </div>
         </div>
       </div>
       <div class="row">
