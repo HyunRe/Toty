@@ -42,13 +42,19 @@ jobs:
           echo "${{ secrets.APPLICATION_DEPLOY }}" > ./src/main/resources/application-deploy.yaml
         shell: bash
 
-      - name: Create firebase key.json file
+      - name: Make firebase key.json
         if: contains(github.ref, 'main')
-        id: create-json
-        uses: jsdaniell/create-json@1.1.2
-        with:
-          name: "./src/main/resources/toty-6d4b4-firebase-adminsdk-fbsvc-f5eb24e27a.json"
-          json: ${ secrets.FIREBASE_ACCOUNT_KEY }
+        run: |
+          echo "${{ secrets.FIREBASE_ACCOUNT_KEY }}" > ./src/main/resources/toty-6d4b4-firebase-adminsdk-fbsvc-f5eb24e27a.json
+        shell: bash
+
+#      - name: Create firebase key.json file
+#        if: contains(github.ref, 'main')
+#        id: create-json
+#        uses: jsdaniell/create-json@1.1.2
+#        with:
+#          name: "./src/main/resources/toty-6d4b4-firebase-adminsdk-fbsvc-f5eb24e27a.json"
+#          json: ${ secrets.FIREBASE_ACCOUNT_KEY }
 
       - name: Print the contents of the firebase key.json file
         run: cat ./src/main/resources/toty-6d4b4-firebase-adminsdk-fbsvc-f5eb24e27a.json
