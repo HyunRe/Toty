@@ -30,5 +30,12 @@ public class UserService {
         foundUser.updateRole(dto.getRole());
     }
 
+    public void registerUser(User user) {
+        userRepository.save(user);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
 
 }
