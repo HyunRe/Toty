@@ -83,7 +83,7 @@ public class SecurityConfig {
     @Bean
     public SimpleUrlAuthenticationFailureHandler loginFailureHandler() {
         SimpleUrlAuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
-        failureHandler.setDefaultFailureUrl("/api/users/sign-out"); // 인증 실패 시
+        failureHandler.setDefaultFailureUrl("/view/users/login-fail"); // 인증 실패 시 response.sendRedirect(url);
         return failureHandler;
     }
 
