@@ -48,7 +48,7 @@ public class UserViewController {
         return "home";
     }
 
-    // 리프레시 토큰 만료 이후 재로그인(액세스 토큰 유효성 검사x)
+    // 로그인 페이지(액세스 토큰 유효성 검사x)
     @GetMapping("/login")
     public String loginPage() {
         return "common/login";
@@ -82,5 +82,11 @@ public class UserViewController {
         model.addAttribute("msg", "로그아웃 되었습니다.");
         model.addAttribute("url", "/view/users/home");
         return "common/alertMsg";
+    }
+
+    // 알림 모달 창(이후 window.close)
+    @RequestMapping("/alert")
+    public String test(Model model) {
+        return "common/alertMsgNoRedirection";
     }
 }
