@@ -17,6 +17,7 @@ public class QnaPostDetailResponseStrategy implements PostDetailResponseStrategy
                 post.getViewCount(),
                 post.getLikeCount(),
                 post.getIsLiked(),
+                post.getIsScraped(),
                 post.getPostTags(), // 기술 태그
                 post.getUpdatedAt(),
                 pagedComments

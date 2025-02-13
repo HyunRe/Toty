@@ -10,7 +10,9 @@ import com.toty.post.domain.model.Post;
 import com.toty.post.dto.request.LikeActionRequest;
 import com.toty.post.dto.request.PostCreateRequest;
 import com.toty.post.dto.request.PostUpdateRequest;
+import com.toty.post.dto.request.ScrapeRequest;
 import com.toty.post.dto.response.postdetail.PostDetailResponse;
+import com.toty.user.application.UserScrapeService;
 import com.toty.user.domain.model.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class PostApiController {
     private final PostPaginationService postPaginationService;
     private final PostLikeService postLikeService;
     private final PostImageService postImageService;
+    private final UserScrapeService userScrapeService;
 
     // 게시글 삭제
     @DeleteMapping("/{id}")
@@ -44,6 +47,29 @@ public class PostApiController {
                                               @RequestBody LikeActionRequest likeActionRequest) {
         int likeCount = postLikeService.toggleLikeAction(id, user.getId(), likeActionRequest.getLikeAction());
         return ResponseEntity.ok(likeCount);
+    }
+
+    @GetMapping("/{id}/like-status")
+    public ResponseEntity<Boolean> getLikeStatus(@PathVariable Long id,
+                                                 @CurrentUser User user) {
+        boolean isLiked = postLikeService.isPostLikedByUser(id, user.getId());
+        return ResponseEntity.ok(isLiked);
+    }
+
+    // 게시글 스크랩 토글
+    @PatchMapping("/{id}/scrape")
+    public ResponseEntity<String> toggleScrape(@PathVariable Long id,
+                                                @CurrentUser User user,
+                                                @RequestBody ScrapeRequest scrapeRequest) {
+        String scrape = userScrapeService.toggleScrape(id, user.getId(), scrapeRequest.getScrape());
+        return ResponseEntity.ok(scrape);
+    }
+
+    @GetMapping("/{id}/scrape-status")
+    public ResponseEntity<Boolean> getScrapeStatus(@PathVariable Long id,
+                                                   @CurrentUser User user) {
+        boolean isScraped = userScrapeService.isPostScrapedByUser(id, user.getId());
+        return ResponseEntity.ok(isScraped);
     }
 
     // 이미지 업로드

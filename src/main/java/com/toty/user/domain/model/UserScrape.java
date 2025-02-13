@@ -29,4 +29,9 @@ public class UserScrape {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    public UserScrape(User user, Post post) {
+        this.user = user;
+        this.post = post;
+    }
 }

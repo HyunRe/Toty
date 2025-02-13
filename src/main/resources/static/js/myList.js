@@ -33,7 +33,7 @@ function changeCategory(postCategory, page = 1) {
                 posts.forEach(post => {
                     const postItem = document.createElement('div');
                     postItem.classList.add('post-list-item');
-                    postItem.setAttribute('onclick', `location.href='/api/posts/${post.id}/detail'`);
+                    postItem.setAttribute('onclick', `location.href='/view/posts/${post.id}/detail'`);
                     postItem.style.cursor = 'pointer';
 
                     // 프로필 이미지
@@ -47,7 +47,6 @@ function changeCategory(postCategory, page = 1) {
                     details.classList.add('details');
 
                     const titleLink = document.createElement('a');
-                    titleLink.setAttribute('href', `/api/post/${post.id}/detail/`);
                     titleLink.textContent = post.title;
                     details.appendChild(titleLink);
 
