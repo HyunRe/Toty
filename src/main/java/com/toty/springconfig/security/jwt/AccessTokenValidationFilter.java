@@ -24,13 +24,12 @@ public class AccessTokenValidationFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
     private final RedisService refreshTokenService;
-    private final MyUserDetailsService myUserDetailsService; // todo oauth2user
-//    private final CookieRequestCache requestCache;
+    private final MyUserDetailsService myUserDetailsService;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return path.endsWith("/login") || path.endsWith("/login-fail");
+        return path.endsWith("/login") || path.contains("/alert/");
     }
 
     @Override

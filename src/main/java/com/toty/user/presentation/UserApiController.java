@@ -1,5 +1,7 @@
 package com.toty.user.presentation;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toty.base.response.SuccessResponse;
 import com.toty.common.annotation.CurrentUser;
 import com.toty.springconfig.security.jwt.JwtTokenUtil;
@@ -7,16 +9,19 @@ import com.toty.user.application.UserInfoService;
 import com.toty.user.application.UserService;
 import com.toty.user.application.UserSignUpService;
 import com.toty.user.domain.model.User;
-import com.toty.user.dto.request.UserInfoUpdateRequest;
-import com.toty.user.dto.response.UserInfoResponse;
+import com.toty.user.dto.request.BasicInfoUpdateRequest;
+import com.toty.user.dto.request.LinkUpdateRequest;
+import com.toty.user.dto.request.PhoneNumberUpdateRequest;
+import com.toty.user.dto.request.TagUpdateRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-//
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -29,8 +34,7 @@ public class UserApiController {
 
     // 회원가입 - 이메일 중복 확인
     @GetMapping("/test")
-    public ResponseEntity test(@CurrentUser User user) {
-        System.out.println("ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+    public ResponseEntity testEndpoint(@CurrentUser User user) {
         return ResponseEntity.ok(user);
     }
 
@@ -73,7 +77,8 @@ public class UserApiController {
 
     // 회원가입 - 휴대폰 인증번호 확인
     @PostMapping("/check-authCode")
-    public ResponseEntity checkAuthCode(@RequestParam(name = "authCode") String authCode, @RequestParam(name = "phoneNumber") String phoneNumber) {
+    public ResponseEntity checkAuthCode(@RequestParam(name = "authCode") String authCode,
+            @RequestParam(name = "phoneNumber") String phoneNumber) {
         Boolean response = userSignUpService.checkAuthCode(phoneNumber, authCode);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
@@ -82,6 +87,7 @@ public class UserApiController {
         );
         return ResponseEntity.ok(successResponse);
     }
+
 
     // 회원 탈퇴
     @DeleteMapping("/")
@@ -96,12 +102,12 @@ public class UserApiController {
         return ResponseEntity.ok(successResponse);
     }
 
-    // 내 정보 수정
-    @PatchMapping("/info")
-    public ResponseEntity updateUserInfo(@CurrentUser User user,
-                                                 @RequestPart UserInfoUpdateRequest newInfo,
-                                                 @RequestPart(required = false) MultipartFile imgFile) {
-        userInfoService.updateUserInfo(user.getId(), newInfo, imgFile);
+    // 내 기본 정보 수정(닉네임, 프로필 사진)
+    @PostMapping("/update")
+    public ResponseEntity updateUserBasicInfo(@CurrentUser User user,
+            @RequestBody BasicInfoUpdateRequest newInfo,
+            @RequestPart(required = false) MultipartFile imgFile) {
+        userInfoService.updateUserBasicInfo(user, user.getId(), newInfo, imgFile);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 "정보가 수정되었습니다.",
@@ -110,16 +116,53 @@ public class UserApiController {
         return ResponseEntity.ok(successResponse);
     }
 
-    // 상대방의 정보 보기
-    // 본인인지 아닌지 확인 -> 아니면 약식 정보만 전달
-    @GetMapping("/{id}/info") //
-    public ResponseEntity getUserInfo(@CurrentUser User user,
-            @PathVariable("id") Long id) {
-        UserInfoResponse userInfo = userInfoService.getUserInfo(user, id);
+    // 내 링크 수정
+    @PostMapping("/links")
+    public ResponseEntity updateUserLinks(@CurrentUser User user,
+            @RequestBody LinkUpdateRequest request) {
+        userInfoService.updateUserLinks(user, user.getId(), request);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
-                "정보 조회에 성공했습니다.",
-                userInfo
+                "링크가 수정되었습니다.",
+                null
+        );
+        return ResponseEntity.ok(successResponse);
+    }
+
+    // 내 태그 수정
+    @PostMapping("/tags")
+    public ResponseEntity updateUserTags(@CurrentUser User user,
+            @RequestBody TagUpdateRequest request) {
+        userInfoService.updateUserTags(user, user.getId(), request);
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "태그가 수정되었습니다.",
+                null
+        );
+        return ResponseEntity.ok(successResponse);
+    }
+
+    @PostMapping("/phone-number")
+    public ResponseEntity updateUserPhoneNumber(@CurrentUser User user,
+            @RequestBody PhoneNumberUpdateRequest request) {
+        userInfoService.updatePhoneNumber(user, user.getId(), request);
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "태그가 수정되었습니다.",
+                null
+        );
+        return ResponseEntity.ok(successResponse);
+    }
+
+    @PostMapping("/status-message")
+    public ResponseEntity updateUserStatusMessage(@CurrentUser User user,
+            @RequestBody Map<String, String> request) {
+        String statusMessage = request.get("statusMessage");
+        userInfoService.updateUserStatusMessage(user, user.getId(), statusMessage);
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "상태메시지가 수정되었습니다.",
+                null
         );
         return ResponseEntity.ok(successResponse);
     }

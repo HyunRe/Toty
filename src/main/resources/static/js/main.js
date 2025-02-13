@@ -151,7 +151,7 @@ function sendNumber() {
       data: {phoneNumber: cleanedPhoneNum},
       success: function (data) {
         console.log(data);
-        if (data.state === 'success') {
+        if (data.status === 200) {
           Swal.fire({
             icon: 'success',
             html: '입력하신 휴대폰 번호로 <br> 인증번호 6자리가 전송되었습니다.',
@@ -163,7 +163,7 @@ function sendNumber() {
         } else {
           Swal.fire({
             icon: 'warning',
-            text: response.message || '인증번호 전송에 실패했습니다.',
+            text: data.message || '인증번호 전송에 실패했습니다.',
             ...swalConfig,
           });
         }
@@ -229,18 +229,18 @@ function isEmailAvailable() {
         return;
       }
 
-      if (response.status === 'error') {
-        Swal.fire({
-          icon: 'warning',
-          text: response.errorMessage,
-          ...swalConfig,
-        });
-      }
+      // if (response.status === 'error') {
+      //   Swal.fire({
+      //     icon: 'warning',
+      //     text: response.errorMessage,
+      //     ...swalConfig,
+      //   });
+      // }
 
-      if (response.status === 'success') {
+      if (response.status === 200) {
         Swal.fire({
           icon: 'success',
-          text: response.data.message,
+          text: response.message,
           showCancelButton: true,
           cancelButtonColor: '#d33',
           confirmButtonText: '사용',
@@ -310,17 +310,17 @@ function isNicknameAvailable() {
         });
         return;
       }
-      if (response.status === 'error') {
-        Swal.fire({
-          icon: 'warning',
-          text: response.errorMessage,
-          ...swalConfig,
-        });
-      }
-      if (response.status === 'success') {
+      // if (response.status === 'error') {
+      //   Swal.fire({
+      //     icon: 'warning',
+      //     text: response.errorMessage,
+      //     ...swalConfig,
+      //   });
+      // }
+      if (response.status === 200) {
         Swal.fire({
           icon: 'success',
-          text: response.data.message,
+          text: response.message,
           showCancelButton: true,
           cancelButtonColor: '#d33',
           confirmButtonText: '사용',
@@ -362,9 +362,8 @@ document.getElementById('nickname').addEventListener('input', function () {
 document.getElementById('formSubmit').addEventListener('click', checkForm);
 
 function checkForm() {
-
-  if (document.getElementById('checkEmailBtn').getAttribute('data-available')
-      === 'false') {
+  // 이메일 중복 확인
+  if (document.getElementById('checkEmailBtn').getAttribute('data-available') === 'false') {
     Swal.fire({
       icon: 'warning',
       text: '이메일 중복 확인을 해주세요.',
@@ -373,8 +372,8 @@ function checkForm() {
     return false;
   }
 
-  if (document.getElementById('checkNicknameBtn').getAttribute('data-available')
-      === 'false') {
+  // 닉네임 중복 확인
+  if (document.getElementById('checkNicknameBtn').getAttribute('data-available') === 'false') {
     Swal.fire({
       icon: 'warning',
       text: '닉네임 중복 확인을 해주세요.',
@@ -383,8 +382,8 @@ function checkForm() {
     return false;
   }
 
-  if (document.getElementById('pwd').value !== document.getElementById(
-      'pwd2').value) {
+  // 비밀번호 일치 확인
+  if (document.getElementById('pwd').value !== document.getElementById('pwd2').value) {
     Swal.fire({
       icon: 'warning',
       text: '비밀번호가 일치하지 않습니다.',
@@ -392,5 +391,28 @@ function checkForm() {
     });
     return false;
   }
-  document.getElementById('registerForm').submit();
+
+  // FormData -> JSON 변환
+  const formData = new FormData(document.getElementById('registerForm'));
+  const jsonData = {};
+  formData.forEach((value, key) => jsonData[key] = value);
+
+  // JSON 형식으로 POST 요청
+  fetch('/view/users/signup', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(jsonData)
+  })
+  .then(response => response.json())  // 응답을 JSON으로 변환
+  .then(data => {
+    if (data.redirectUrl) {
+      // 서버에서 전달한 리다이렉트 URL로 이동
+      window.location.href = data.redirectUrl;
+    }
+  })
+  .catch(error => console.error('Error:', error));
 }
+
+

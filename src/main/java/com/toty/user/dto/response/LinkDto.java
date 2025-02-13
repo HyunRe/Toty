@@ -6,12 +6,13 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SmsAuthCodeResponse {
+public class LinkDto {
+    private String site;
+    private String url;
 
-    private String authCode; // 인증
-
-    public SmsAuthCodeResponse(String authCode) {
-        this.authCode = authCode;
+    public LinkDto(String site, String url) {
+        this.site = site;
+        this.url = url;
     }
-
 }
+

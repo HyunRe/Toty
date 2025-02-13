@@ -88,7 +88,7 @@ public class JwtTokenUtil {
     public Cookie createCookie(String key, String value, boolean isRefreshToken) {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge((int) REFRESH_TOKEN_TTL);
-        cookie.setSecure(true);
+        cookie.setSecure(false);
         if (isRefreshToken) {
             cookie.setPath("/api/auth");
         } else {

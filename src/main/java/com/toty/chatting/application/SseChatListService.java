@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toty.chatting.dto.response.ChatRoomListResponse;
 import com.toty.common.baseException.JsonProcessingCustomException;
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
 import com.toty.notification.dto.request.NotificationSendRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -13,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
+@Slf4j
 public class SseChatListService {
 
     private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
@@ -20,7 +24,11 @@ public class SseChatListService {
     public void addEmitter(SseEmitter emitter) {
         emitters.add(emitter);
         emitter.onCompletion(() -> emitters.remove(emitter));
-        emitter.onTimeout(() -> emitters.remove(emitter));
+        emitter.onTimeout(() -> emitter.complete());
+        emitter.onError((e) -> {
+            emitter.complete();
+            log.error("sse 채팅목록 에러 : {}", e.getMessage());
+        });
     }
 
     public void sendEventCountUp(String roomId) {

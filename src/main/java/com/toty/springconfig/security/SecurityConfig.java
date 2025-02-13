@@ -24,22 +24,20 @@ import org.springframework.security.web.firewall.HttpFirewall;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // 추가 예정
-//    @Autowired
-//    private AuthenticationFailureHandler failureHandler;
-//    @Autowired
     private final MyOAuth2UserService myOAuth2UserService;
 
     private final SavedRequestAwareAuthenticationSuccessHandler formloginsuccess;
     private final JwtRequestFilter jwtRequestFilter;
     private final AccessTokenValidationFilter accessTokenValidationFilter;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(auth -> auth.disable())       // CSRF 방어 기능 비활성화
                 .headers(x -> x.frameOptions(y -> y.disable()))
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/posts/images/**", "/css/**", "/js/**", "/img/**").permitAll()
+                        .requestMatchers("/posts/images/**", "/css/**", "/js/**", "/img/**", "/static/**").permitAll()
                         .requestMatchers("/view/posts/**", "/api/posts/**").permitAll()
                         // 테스트 엔드포인트
                         .requestMatchers("/api/users/test").hasAuthority("USER")
@@ -62,22 +60,23 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .deleteCookies("accessToken")
                         .deleteCookies("refreshToken")
-                        .logoutSuccessUrl("/view/users/home")
+                        .logoutSuccessUrl("/view/users/alert/logout")
                 )
-                // 추가 예정
                 .oauth2Login(auth -> auth
                         .userInfoEndpoint(user -> user.userService(myOAuth2UserService))
                         .successHandler(formloginsuccess)
                         .failureHandler(loginFailureHandler())
                 )
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
+                        .authenticationEntryPoint(customAuthenticationEntryPoint))
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler(customAccessDeniedHandler))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         // 토큰 관련 Filter 추가
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // /api/users/sign-in, /api/auth/refresh 제외 모든 경로
-        http.addFilterAfter(accessTokenValidationFilter, ExceptionTranslationFilter.class); // /api/auth/refresh 경로만 -> ok면
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // 인증 경로 제외 모든 경로
+        http.addFilterAfter(accessTokenValidationFilter, ExceptionTranslationFilter.class);
 
         return http.build();
     }
@@ -85,8 +84,12 @@ public class SecurityConfig {
     @Bean
     public SimpleUrlAuthenticationFailureHandler loginFailureHandler() {
         SimpleUrlAuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
-        failureHandler.setDefaultFailureUrl("/view/users/login-fail"); // 인증 실패 시 response.sendRedirect(url);
+        failureHandler.setDefaultFailureUrl("/view/users/alert/login-fail");
         return failureHandler;
     }
 
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/css/", "/js/", "/images/", "/static/");
+    }
 }
