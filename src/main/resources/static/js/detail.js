@@ -223,37 +223,33 @@ function loadComments(page = 1) {
     commentList.innerHTML = ''; // 새로운 게시글을 추가하기 전에 기존 목록을 초기화
     pagination.innerHTML = ''; // 페이지네이션을 업데이트하기 전에 초기화
 
-    // 예시 API 엔드포인트 - 실제 API나 데이터 가져오는 방법으로 변경해야 함
     const apiEndpoint = `/api/comments/list`;
 
-    // 댓글 가져오기
     fetch(apiEndpoint)
         .then(response => response.json())
         .then(data => {
-            const comments = data.content;  // API 응답에서 "content" 필드에 게시글이 담겨 있다고 가정
+            const comments = data.content;
             const totalElements = data.totalElements;
             const totalPages = data.totalPages;
             const currentPage = data.currentPage;
 
-            // 페이지 정보 업데이트
             currentPageElement.textContent = currentPage;
             totalPagesElement.textContent = totalPages;
             totalElementsElement.textContent = totalElements;
 
             if (comments.length === 0) {
-                commentList.innerHTML = '<p>게시글이 없습니다.</p>';
+                commentList.innerHTML = '<p>댓글이 없습니다.</p>';
             } else {
                 comments.forEach(comment => {
                     const commentItem = document.createElement('div');
                     commentItem.classList.add('comment-item');
 
-                   // 프로필 이미지
-                   const img = document.createElement('img');
-                   img.setAttribute('src', comment.profileImageUrl || 'profile.jpg'); // 기본 프로필 이미지로 대체
-                   img.setAttribute('alt', '프로필 이미지');
-                   postItem.appendChild(img);
+                    // 프로필 이미지
+                    const img = document.createElement('img');
+                    img.setAttribute('src', comment.profileImageUrl || 'profile.jpg');
+                    img.setAttribute('alt', '프로필 이미지');
+                    commentItem.appendChild(img);
 
-                    // 댓글 내용
                     const commentDetails = document.createElement('div');
                     commentDetails.classList.add('comment-details');
 
@@ -263,6 +259,7 @@ function loadComments(page = 1) {
 
                     const content = document.createElement('p');
                     content.textContent = comment.content;
+                    content.classList.add('content-text');
                     commentDetails.appendChild(content);
 
                     const commentMeta = document.createElement('div');
@@ -272,53 +269,157 @@ function loadComments(page = 1) {
                     commentMeta.appendChild(time);
                     commentDetails.appendChild(commentMeta);
 
-                    // 댓글 수정 및 삭제 버튼 (자신의 댓글일 경우에만)
-                    const actions = document.createElement('div');
-                    actions.classList.add('comment-actions');
+                    // 설정 메뉴 추가 (수정, 삭제 버튼)
+                    const settingsMenu = document.createElement('div');
+                    settingsMenu.classList.add('settings-menu');
+
+                    // 수정 버튼
                     const editBtn = document.createElement('button');
                     editBtn.textContent = "수정";
                     editBtn.onclick = () => {
-                        // 댓글 수정 처리
-                        const commentForm = document.createElement('div');
-                        commentForm.classList.add('comment-form');
+                        const originalContent = content.textContent;
+                        const editForm = document.createElement('div');
+                        editForm.classList.add('edit-form');
 
+                        // 수정할 텍스트 영역
                         const textarea = document.createElement('textarea');
-                        textarea.textContent = content.textContent;  // 기존 댓글 내용으로 초기화
-                        commentForm.appendChild(textarea);
+                        textarea.textContent = originalContent;
+                        editForm.appendChild(textarea);
 
                         const submitBtn = document.createElement('button');
-                        submitBtn.textContent = "완료";
+                        submitBtn.textContent = "확인";
                         submitBtn.onclick = () => {
-                            content.textContent = textarea.value;  // 댓글 내용 업데이트
-                            commentForm.style.display = 'none';  // 수정 영역 숨김
+                            const updatedContent = textarea.value;
+                            fetch(`/api/comments/${comment.id}`, {
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ content: updatedContent })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                content.textContent = data.content;  // 수정된 댓글 업데이트
+                                editForm.remove();  // 수정 폼 제거
+                            })
+                            .catch(error => {
+                                console.error('댓글 수정 실패:', error);
+                                alert('댓글 수정 중 오류가 발생했습니다.');
+                            });
                         };
 
-                        commentForm.appendChild(submitBtn);
-                        commentItem.appendChild(commentForm);
+                        const cancelBtn = document.createElement('button');
+                        cancelBtn.textContent = "취소";
+                        cancelBtn.onclick = () => {
+                            editForm.remove();  // 수정 폼 취소
+                        };
+
+                        editForm.appendChild(submitBtn);
+                        editForm.appendChild(cancelBtn);
+                        commentItem.appendChild(editForm);
                     };
 
+                    // 삭제 버튼
                     const deleteBtn = document.createElement('button');
                     deleteBtn.textContent = "삭제";
                     deleteBtn.onclick = () => {
-                        if (confirm("정말 삭제하시겠습니까?")) {
-                            commentItem.remove();  // 댓글 삭제
-                            window.location.reload();  // 페이지 새로고침
+                        if (confirm('정말로 삭제하시겠습니까?')) {
+                            fetch(`/api/comments/${comment.id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    commentItem.remove();  // 댓글 삭제
+                                    alert('댓글이 삭제되었습니다.');
+                                } else {
+                                    alert('댓글 삭제 실패');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('삭제 요청 실패:', error);
+                                alert('댓글 삭제 중 오류가 발생했습니다.');
+                            });
                         }
                     };
 
-                    actions.appendChild(editBtn);
-                    actions.appendChild(deleteBtn);
-                    commentDetails.appendChild(actions);
+                    settingsMenu.appendChild(editBtn);
+                    settingsMenu.appendChild(deleteBtn);
+                    commentDetails.appendChild(settingsMenu);
 
                     commentItem.appendChild(commentDetails);
                     commentList.appendChild(commentItem);
-                }
-            )
-        }
-    });
-}
+                });
+            }
+        });
 
-// myScrape로 이동
-function goToMyScrapePage() {
-    window.location.href = "/view/posts/myScrape";
+    // 댓글 작성 버튼 클릭 이벤트
+    const commentSubmitBtn = document.getElementById("comment-submit-btn");
+    commentSubmitBtn.addEventListener('click', function () {
+        const content = commentContent.value.trim();
+
+        if (!content) {
+            alert("댓글 내용을 입력해주세요.");
+            return;
+        }
+
+        // 댓글 작성 요청
+        const commentData = {
+            content: content
+        };
+
+        fetch(`/api/comments/create?postId=${postId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(commentData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data) {
+                // 댓글 리스트에 새로운 댓글 추가
+                const newCommentItem = document.createElement('div');
+                newCommentItem.classList.add('comment-item');
+
+                // 프로필 이미지
+                const img = document.createElement('img');
+                img.setAttribute('src', data.profileImageUrl || 'profile.jpg');
+                img.setAttribute('alt', '프로필 이미지');
+                newCommentItem.appendChild(img);
+
+                // 댓글 내용
+                const commentDetails = document.createElement('div');
+                commentDetails.classList.add('comment-details');
+
+                const nickname = document.createElement('p');
+                nickname.textContent = data.nickname;
+                commentDetails.appendChild(nickname);
+
+                const contentElement = document.createElement('p');
+                contentElement.textContent = data.content;
+                commentDetails.appendChild(contentElement);
+
+                const commentMeta = document.createElement('div');
+                commentMeta.classList.add('comment-meta');
+                const time = document.createElement('p');
+                time.textContent = new Date(data.earliestTime).toLocaleString();
+                commentMeta.appendChild(time);
+                commentDetails.appendChild(commentMeta);
+
+                // 새 댓글을 리스트에 추가
+                commentList.prepend(newCommentItem);
+
+                // 댓글 입력창 초기화
+                commentContent.value = '';
+            } else {
+                alert("댓글 작성에 실패했습니다.");
+            }
+        })
+        .catch(error => {
+            console.error('댓글 작성 중 오류가 발생했습니다:', error);
+        });
+    });
 }

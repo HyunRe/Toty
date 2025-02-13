@@ -69,9 +69,9 @@ public class PostService {
     public void deletePost(User user, Long id) {
         Post post = findPostById(id);
         // 내 게시글 인지 확인 필요
-        if (isOwner(user, post.getUser().getId())) {
-            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
-        }
+//        if (isOwner(user, post.getUser().getId())) {
+//            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
+//        }
 
         // 정말로 삭제 할 것인지 확인 필요 - 프론트에서 처리
         postRepository.delete(post);
