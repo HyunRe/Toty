@@ -405,6 +405,14 @@ function checkForm() {
     },
     body: JSON.stringify(jsonData)
   })
+  .then(response => response.json())  // 응답을 JSON으로 변환
+  .then(data => {
+    if (data.redirectUrl) {
+      // 서버에서 전달한 리다이렉트 URL로 이동
+      window.location.href = data.redirectUrl;
+    }
+  })
+  .catch(error => console.error('Error:', error));
 }
 
 

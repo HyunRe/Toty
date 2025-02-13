@@ -37,7 +37,7 @@ public class SecurityConfig {
         http.csrf(auth -> auth.disable())       // CSRF 방어 기능 비활성화
                 .headers(x -> x.frameOptions(y -> y.disable()))
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/posts/images/**", "/css/**", "/js/**", "/img/**").permitAll()
+                        .requestMatchers("/posts/images/**", "/css/**", "/js/**", "/img/**", "/static/**").permitAll()
                         .requestMatchers("/view/posts/**", "/api/posts/**").permitAll()
                         // 테스트 엔드포인트
                         .requestMatchers("/api/users/test").hasAuthority("USER")
@@ -69,7 +69,8 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint))
-                .exceptionHandling(exception -> exception.accessDeniedHandler(customAccessDeniedHandler))
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler(customAccessDeniedHandler))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -87,4 +88,8 @@ public class SecurityConfig {
         return failureHandler;
     }
 
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/css/", "/js/", "/images/", "/static/");
+    }
 }

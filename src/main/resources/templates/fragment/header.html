@@ -103,9 +103,9 @@
           >
             <div class="navbar-nav mr-auto py-0">
               <a href="/view/users/home" class="nav-item nav-link active">홈</a>
-              <a th:href="@{/categoryList(page=1, postCategory='QnA')}" class="nav-item nav-link">Q/A게시판</a>
-              <a th:href="@{/categoryList(page=1, postCategory='KNOWLEDGE')}" class="nav-item nav-link">정보게시판</a>
-              <a th:href="@{/categoryList(page=1, postCategory='GENERAL')}" class="nav-item nav-link">자유게시판</a>
+              <a th:href="@{/view/posts/categoryList(postCategory='QnA')}" class="nav-item nav-link">Q/A게시판</a>
+              <a th:href="@{/view/posts/categoryList(postCategory='KNOWLEDGE')}" class="nav-item nav-link">정보게시판</a>
+              <a th:href="@{/view/posts/categoryList(postCategory='GENERAL')}" class="nav-item nav-link">자유게시판</a>
             </div>
             <a href="/view/users/login" sec:authorize="isAnonymous()">
               <span style="float: right;">로그인</span>

@@ -87,7 +87,7 @@
             <div class="col-md-7 form-group">
               <label>프로필 이미지</label>
               <div class="col-md-4">
-                <a href="img/elements/g2.jpg" class="img-gal">
+                <a class="img-gal">
                 </div>
                   <div class="single-gallery-image" style="background: url(img/elements/g2.jpg)"></div>
                 </a>
@@ -100,18 +100,18 @@
                 <label>이메일</label>
                 <div class="check-group">
                   <input class="form-control" type="text" id="uname" name="uname"
-                         th:value="${user.username}"  style="width: 100%;" readonly>
+                         th:value="${userInfo.username}"  style="width: 100%;" readonly>
                 </div>
-                <input type="hidden" th:value="${user.id}" name="uid" id="uid">
+                <input type="hidden" th:value="${userInfo.id}" name="uid" id="uid">
             </div>
 
             <div class="col-md-7 form-group">
               <label>이름</label>
               <div class="check-group">
                 <input class="form-control" type="text" id="uname" name="uname"
-                       th:value="${user.username}"  style="width: 100%;" readonly>
+                       th:value="${userInfo.id}"  style="width: 100%;" readonly>
               </div>
-              <input type="hidden" th:value="${user.id}" name="uid" id="uid">
+              <input type="hidden" th:value="${userInfo.id}" name="uid" id="uid">
             </div>
             
 
@@ -119,7 +119,7 @@
                 <label>닉네임</label>
                 <div class="check-group">
                   <input class="form-control" name="nickname" id="nickname" type="text"
-                         placeholder="사용하실 닉네임을 입력해 주세요." style=" width: 80%;" th:value="${user.nickname}">
+                         placeholder="사용하실 닉네임을 입력해 주세요." style=" width: 80%;" th:value="${userInfo.nickname}">
                   <button class="btn btn-info" id="checkNicknameBtn" type="button"
                           style="padding: 0;" data-available="true">중복확인
                   </button>
