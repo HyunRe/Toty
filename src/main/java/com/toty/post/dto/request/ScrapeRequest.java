@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ScrapeRequest {
-    private String Scrape;
+    private String scrape;
 
     public ScrapeRequest(String Scrape) {
-        this.Scrape = Scrape;
+        this.scrape = Scrape;
     }
 }

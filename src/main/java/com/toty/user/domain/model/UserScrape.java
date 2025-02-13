@@ -33,5 +33,6 @@ public class UserScrape {
     public UserScrape(User user, Post post) {
         this.user = user;
         this.post = post;
+        this.createdAt = LocalDateTime.now();
     }
 }
