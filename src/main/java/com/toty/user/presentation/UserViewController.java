@@ -54,7 +54,7 @@ public class UserViewController {
         return "home";
     }
 
-    // 리프레시 토큰 만료 이후 재로그인(액세스 토큰 유효성 검사x)
+    // 로그인 페이지(액세스 토큰 유효성 검사x)
     @GetMapping("/login")
     public String loginPage() {
         return "common/login";
@@ -90,7 +90,6 @@ public class UserViewController {
         return "common/alertMsg";
     }
 
-
     // 업데이트 창 (내 정보 수정)
     @GetMapping("/updateInfo")
     public String getUpdateInfo(@CurrentUser User user, Model model) {
@@ -118,4 +117,9 @@ public class UserViewController {
         return "user/updateTag";
     }
 
+    // 알림 모달 창(이후 window.close)
+    @RequestMapping("/alert")
+    public String test(Model model) {
+        return "common/alertMsgNoRedirection";
+    }
 }
