@@ -1,5 +1,7 @@
 package com.toty.user.presentation;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toty.base.response.SuccessResponse;
 import com.toty.common.annotation.CurrentUser;
 import com.toty.springconfig.security.jwt.JwtTokenUtil;
@@ -12,6 +14,7 @@ import com.toty.user.dto.request.LinkUpdateRequest;
 import com.toty.user.dto.request.PhoneNumberUpdateRequest;
 import com.toty.user.dto.request.TagUpdateRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +31,7 @@ public class UserApiController {
     private final UserSignUpService userSignUpService;
     private final UserInfoService userInfoService;
     private final JwtTokenUtil jwtTokenUtil;
+
     // 회원가입 - 이메일 중복 확인
     @GetMapping("/test")
     public ResponseEntity testEndpoint(@CurrentUser User user) {
@@ -73,7 +77,8 @@ public class UserApiController {
 
     // 회원가입 - 휴대폰 인증번호 확인
     @PostMapping("/check-authCode")
-    public ResponseEntity checkAuthCode(@RequestParam(name = "authCode") String authCode, @RequestParam(name = "phoneNumber") String phoneNumber) {
+    public ResponseEntity checkAuthCode(@RequestParam(name = "authCode") String authCode,
+            @RequestParam(name = "phoneNumber") String phoneNumber) {
         Boolean response = userSignUpService.checkAuthCode(phoneNumber, authCode);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
@@ -100,7 +105,8 @@ public class UserApiController {
     // 내 기본 정보 수정(닉네임, 프로필 사진)
     @PostMapping("/update")
     public ResponseEntity updateUserBasicInfo(@CurrentUser User user,
-            @RequestBody BasicInfoUpdateRequest newInfo, @RequestPart(required = false) MultipartFile imgFile) {
+            @RequestBody BasicInfoUpdateRequest newInfo,
+            @RequestPart(required = false) MultipartFile imgFile) {
         userInfoService.updateUserBasicInfo(user, user.getId(), newInfo, imgFile);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
@@ -143,6 +149,19 @@ public class UserApiController {
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 "태그가 수정되었습니다.",
+                null
+        );
+        return ResponseEntity.ok(successResponse);
+    }
+
+    @PostMapping("/status-message")
+    public ResponseEntity updateUserStatusMessage(@CurrentUser User user,
+            @RequestBody Map<String, String> request) {
+        String statusMessage = request.get("statusMessage");
+        userInfoService.updateUserStatusMessage(user, user.getId(), statusMessage);
+        SuccessResponse successResponse = new SuccessResponse(
+                HttpStatus.OK.value(),
+                "상태메시지가 수정되었습니다.",
                 null
         );
         return ResponseEntity.ok(successResponse);

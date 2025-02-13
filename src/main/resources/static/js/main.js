@@ -151,7 +151,7 @@ function sendNumber() {
       data: {phoneNumber: cleanedPhoneNum},
       success: function (data) {
         console.log(data);
-        if (data.state === 'success') {
+        if (data.status === 200) {
           Swal.fire({
             icon: 'success',
             html: '입력하신 휴대폰 번호로 <br> 인증번호 6자리가 전송되었습니다.',
@@ -163,7 +163,7 @@ function sendNumber() {
         } else {
           Swal.fire({
             icon: 'warning',
-            text: response.message || '인증번호 전송에 실패했습니다.',
+            text: data.message || '인증번호 전송에 실패했습니다.',
             ...swalConfig,
           });
         }

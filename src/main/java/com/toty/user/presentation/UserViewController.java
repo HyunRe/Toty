@@ -48,7 +48,7 @@ public class UserViewController {
         return "home";
     }
 
-    // 리프레시 토큰 만료 이후 재로그인(액세스 토큰 유효성 검사x)
+    // 로그인 페이지(액세스 토큰 유효성 검사x)
     @GetMapping("/login")
     public String loginPage() {
         return "common/login";
@@ -82,5 +82,38 @@ public class UserViewController {
         model.addAttribute("msg", "로그아웃 되었습니다.");
         model.addAttribute("url", "/view/users/home");
         return "common/alertMsg";
+    }
+
+    // 업데이트 창 (내 정보 수정)
+    @GetMapping("/updateInfo")
+    public String getUpdateInfo(@CurrentUser User user, Model model) {
+        model.addAttribute("userInfo", user);
+        return "user/updateInfo";
+    }
+
+    /// 업데이트 창 (링크)
+    @GetMapping("/updateLink")
+    public String getUpdateLink(@CurrentUser User user, Model model) {
+        model.addAttribute("userInfo", user); // 링크로 수정 필요
+        return "user/updateLink";
+    }
+
+    /// 업데이트 창 (휴대폰)
+    @GetMapping("/updatePhone")
+    public String getUpdatePhone(@CurrentUser User user, Model model) {
+        return "user/updatePhone";
+    }
+
+    /// 업데이트 창 (태그)
+    @GetMapping("/updateTag")
+    public String getUpdateTag(@CurrentUser User user, Model model) {
+        model.addAttribute("userInfo", user); // 태그로 수정 필요
+        return "user/updateTag";
+    }
+
+    // 알림 모달 창(이후 window.close)
+    @RequestMapping("/alert")
+    public String test(Model model) {
+        return "common/alertMsgNoRedirection";
     }
 }

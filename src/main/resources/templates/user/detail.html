@@ -1,0 +1,438 @@
+<!-- 내 정보 확인 -->
+<!-- 닉네임, 프사, 태그, 링크, 팔로워/팔로잉 수 -->
+<!-- 이름, 이메일, 휴대폰 번호, sms, 이메일, 알림 수신 여부 -->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOTY_내정보</title>
+  <!-- Bootstrap CSS -->
+  <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+  />
+  <!-- Bootstrap Icons CDN을 head 섹션에 추가 -->
+  <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+  />
+  <!-- Font Awesome -->
+  <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+      rel="stylesheet"
+  />
+  <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+  />
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" />
+
+  <!-- main css -->
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/user.css" />
+
+</head>
+<body>
+<div th:replace="fragment/header :: header"></div>
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-lg-3 mt-3">
+      <div class="blog_right_sidebar">
+        <aside class="single_sidebar_widget post_category_widget">
+          <h4 class="widget_title">내 계정</h4>
+          <ul class="list cat-list">
+            <li class="page-item active">
+              <a href="#" class="d-flex" id="profileMenu">
+                <p class="active">프로필</p>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="d-flex" id="myPostsMenu">
+                <p>내가 작성한 게시글</p>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="d-flex" id="savedPostsMenu">
+                <p>내가 저장한 게시글</p>
+              </a>
+            </li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+
+    <!-- 오른쪽 게시글 목록 -->
+    <div class="col-md-9">
+      <!-- 첫 번째 섹션 - 프로필 정보 -->
+      <div class="section-border profile-section pt-3">
+        <h5>
+          <i
+              class="bi bi-check-circle-fill me-2 text-success mr-1"
+              id="mentor-badge"
+          >
+          </i
+          >회원 정보
+        </h5>
+        <div class="col-12 pt-3" style="display: flex">
+          <div class="col-4 ml-2">
+            <img
+                id="profileImage"
+                th:src="${userInfo.profileImgUrl}"
+                alt="프로필 이미지"
+                style="border-radius: 50%; height: 80%"
+            />
+          </div>
+          <div class="col-6">
+            <p>이메일 <span id="email">[[${userInfo.email}]]</span></p>
+            <p>이름 <span id="username" th:text="${userInfo.username}">ooo@gmail.com</span></p>
+            <p>닉네임 <span id="nickname" th:text="${userInfo.nickname}">ooo</span></p>
+            <p>핸드폰 <span id="phone" th:text="${userInfo.phoneNumber}">000-0000-0000</span></p>
+            <p>가입일자 <span id="joinDate" th:text="${userInfo.createdAt}">0000-00-00</span></p>
+          </div>
+        </div>
+      </div>
+    </div>l
+  </div>
+  <!-- 두 번째 섹션 - 내 소개 -->
+  <div class="row">
+    <div class="col-12">
+      <div class="section-top-border skill-section">
+        <h5 class="ml-3">내 소개</h5>
+        <div
+            class="generic-blockquote col-12"
+            style="padding: 1rem; display: flex"
+        >
+          <div class="col-4">
+            <p>상태 메세지
+              <i class="fa-solid fa-gear" style="cursor: pointer;" id="update-message"></i>
+            </p>
+            <div id="status-message" th:text="${userInfo.status_message}"></div>
+          </div>
+
+          <div class="col-4" id="follow-group">
+            <button
+                type="button"
+                class="genric-btn primary"
+                style="margin: 0.5rem"
+            >
+              팔로워: <span id="followerCount" th:text="${userInfo.followerCount}">0명</span>
+            </button>
+            <button
+                type="button"
+                class="genric-btn primary"
+                style="margin: 0.5rem"
+            >
+              팔로잉: <span id="followingCount" th:text="${userInfo.followingCount}">0명</span>
+            </button>
+          </div>
+
+          <div class="col-4 ml-5">
+            <p>기술 태그
+              <i class="fa-solid fa-gear" style="cursor: pointer;" id="updateTag"></i>
+            </p>
+            <div id="tag-container" class="tag-list"></div>
+            <!-- 태그가 동적으로 들어가는 곳 -->
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 section-top-border" style="display: flex; align-items: center">
+
+        <div class="col-4">
+          <p>링크
+            <i class="fa-solid fa-gear" style="cursor: pointer;" id="updateLink"></i>
+          </p>
+          <div id="links-container" class="links"></div>
+          <!-- 깃허브 및 블로그 링크 추가 -->
+        </div>
+
+        <div class="col-4">
+          <p>동의 현황</p>
+          <div class="custom-control custom-checkbox">
+            <input
+                type="checkbox"
+                id="email-subscribed"
+                class="custom-control-input"
+                disabled
+                th:checked="${userInfo.emailSubscribed}"
+            />
+            <label for="email-subscribed" class="custom-control-label"
+            >이메일 알림 동의</label
+            >
+            <!-- <span class="ml-1">이메일 알림 동의</span> -->
+          </div>
+
+          <div class="custom-control custom-checkbox">
+            <input
+                type="checkbox"
+                id="sms-subscribed"
+                class="custom-control-input"
+                disabled
+                th:checked="${userInfo.smsSubscribed}"
+            />
+            <label for="sms-subscribed" class="custom-control-label"
+            >sms 알림 동의</label
+            >
+            <!-- <span class="ml-1">sms 알림 동의</span> -->
+          </div>
+
+          <div class="custom-control custom-checkbox">
+            <input
+                type="checkbox"
+                id="notification-allowed"
+                class="custom-control-input"
+                disabled
+                th:checked="${userInfo.notificationAllowed}"
+            />
+            <label for="notification-allowed" class="custom-control-label"
+            >앱 알림 동의</label
+            >
+            <!-- <span class="ml-1">앱 알림 동의</span> -->
+          </div>
+        </div>
+
+
+
+        <div class="col-4">
+          <div class="update-group">
+            <button type="button" class="genric-btn info mt-2" id="updateInfo">
+              회원정보 수정
+            </button>
+            <!-- <button type="button" class="genric-btn info mt-2" id="updateLink">
+              링크 수정
+            </button> -->
+            <button type="button" class="genric-btn info mt-2" id="updatePhone">
+              연락처 수정
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- 세 번째 섹션 - 계정 삭제 -->
+      <div class="row pt-5">
+        <div class="col-12">
+          <div class="section-top-border footer-section">
+            <h5>계정 삭제</h5>
+            <div class="d-flex justify-content-between ml-2">
+              <div>
+                <input type="checkbox" id="delete-agree" />
+                <label for="delete-agree"></label>
+                <span class="ml-2">계정 삭제를 원하시면 동의를 눌러주세요</span>
+              </div>
+              <div>
+                <button
+                    type="button"
+                    class="genric-btn danger btn-sm"
+                    id="delete-account"
+                    style="color: #fff"
+                >
+                  회원탈퇴
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 수직선 (border-left 클래스 적용) -->
+      <div class="border-left"></div>
+
+      <!-- Bootstrap JS 및 의존성 -->
+      <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+      <!--Sweet Alert2-->
+      <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css"
+      />
+      <script
+          src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"
+          type="application/javascript"
+      ></script>
+</body>
+<script src="/js/detail.js"></script>
+<script>
+
+
+
+  let currentStatusMessage = document.getElementById("status-message").textContent;
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // 예제 JSON 데이터 (실제 사용 시 백엔드에서 가져와야 함)
+    const userData = {
+
+      tags: ["JAVA", "JAVASCRIPT"], // 프로그래밍 언어 태그
+      links: [
+        { site: "GITHUB", url: "https://github.com/user" },
+        { site: "BLOG", url: "https://userblog.com" },
+        { site: "LINKEDIN", url: "https://linkedin.com/in/user" },
+      ],
+      role: "MENTOR", // 역할 (USER, ADMIN, MENTOR)
+      createdAt: "2024-02-06T12:00:00", // 가입 일시
+    };
+
+    // 태그 추가
+    const tagContainer = document.getElementById("tag-container");
+    userData.tags.forEach((tag) => {
+      const tagElement = document.createElement("span");
+      tagElement.classList.add("bg", "bg-primary", "mr-2", "badge");
+      tagElement.textContent = tag;
+      tagContainer.appendChild(tagElement);
+    });
+
+    // 링크 추가
+    const linksContainer = document.getElementById("links-container");
+    userData.links.forEach((link) => {
+      const linkElement = document.createElement("a");
+      linkElement.href = link.url;
+      linkElement.textContent = link.site;
+      linkElement.classList.add("d-block");
+      linkElement.target = "_blank";
+      linksContainer.appendChild(linkElement);
+    });
+
+    const mentorBadge = document.getElementById("mentor-badge");
+    if (userData.role === "MENTOR") {
+      mentorBadge.style.display = "inline-block"; // 또는 기본값 "inline" 등
+    } else {
+      mentorBadge.style.display = "none";
+    }
+
+    const updateInfoBtn = document.getElementById("updateInfo");
+    if (updateInfoBtn) {
+      updateInfoBtn.addEventListener("click", function () {
+        const options =
+            "width=700, height=600, top=50, left=50, scrollbars=yes";
+
+        const url = '/view/users/updateInfo'
+        window.open(url, "_blank", options);
+      });
+    }
+    // });
+
+    const updateLinkBtn = document.getElementById("updateLink");
+    if (updateLinkBtn) {
+      updateLinkBtn.addEventListener("click", function () {
+        const options =
+            "width=500, height=500, top=50, left=50, scrollbars=yes";
+
+        const url = '/view/users/updateLink'
+        window.open(url, "_blank", options);
+      });
+    }
+
+
+    const updateTagBtn = document.getElementById("updateTag");
+    if (updateTagBtn) {
+      updateTagBtn.addEventListener("click", function () {
+        const options =
+            "width=400, height=600, top=50, left=50, scrollbars=yes";
+
+        const url = '/view/users/updateTag'
+        window.open(url, "_blank", options);
+      });
+    }
+    // });
+
+    const updatePhoneBtn = document.getElementById("updatePhone");
+    if (updatePhoneBtn) {
+      updatePhoneBtn.addEventListener("click", function () {
+        const options =
+            "width=400, height=500, top=50, left=50, scrollbars=yes";
+
+        const url = '/view/users/updatePhone'
+        window.open(url, "_blank", options);
+      });
+    }
+  });
+
+  // 회원 탈퇴 버튼 클릭 시 로직
+  document
+  .getElementById("delete-account")
+  .addEventListener("click", alertTest);
+
+  function alertTest() {
+    Swal.fire({
+      title: "회원탈퇴",
+      text: "회원 탈퇴일로부터 계정과 닉네임을 포함한 계정 정보(아이디/이메일/닉네임)는 개인정보 보호정책에 따라 60일간 보관(잠김)되며, 60일 경과 이후 모든 개인 정보는 완전히 삭제되어 더 이상 복구할 수 없게 됩니다. 작성된 게시물은 삭제되지 않으며, 보관 후 저희 회사 소유권에 귀속됩니다. 게시물 삭제가 필요한 경우에는 관리자 메일로 문의해 주시기 바랍니다.",
+      icon: "warning",
+      showCancelButton: true,
+      cancelButtonText: "다시 생각할게요",
+      confirmButtonText: "네",
+      confirmButtonColor: "#1f9bcf",
+    }).then((result) => {
+      // /* 예, 아니오 선택에 따라 조건문 로직 실행 */
+      if (result.isConfirmed) {
+        // 여기에 탈퇴 로직 요청하는 ajax
+        Swal.fire({
+          title: "탈퇴 완료",
+          text: "탈퇴 처리되었습니다.",
+          icon: "success",
+          confirmButtonColor: "#1f9bcf",
+        });
+      } else {
+        // 그냥 닫힘
+      }
+    });
+  }
+
+  document.getElementById('update-message').addEventListener('click', updateMessage);
+
+
+  function updateMessage() {
+    Swal.fire({
+      text: "상태메시지를 입력해 주세요.",
+      input: "text",
+      inputAttributes: {
+        autocapitalize: "off"
+      },
+      inputValue: currentStatusMessage,
+      showCancelButton: true,
+      cancelButtonText: '닫기',
+      confirmButtonText: "수정",
+      confirmButtonColor: "#1f9bcf",
+      showLoaderOnConfirm: true,
+      preConfirm: async (newMessage) => {
+        if (!newMessage) {
+          return Swal.showValidationMessage("상태 메시지를 입력해주세요.");
+        }
+
+        try {
+          const response = await fetch("/api/users/status-message", {  // 요청 URL 임의 지정
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ statusMessage: newMessage }),
+          });
+
+          if (!response.ok) {
+            throw new Error("업데이트 실패");
+          }
+
+          return newMessage; // 성공 시 새로운 메시지 반환
+        } catch (error) {
+          Swal.showValidationMessage(`에러 발생: ${error.message}`);
+        }
+      },
+      allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+      if (result.isConfirmed) {
+        document.getElementById("status-message").innerText = result.value; // 상태 메시지 업데이트
+        Swal.fire({
+          icon: "success",
+          title: "업데이트 완료",
+          text: "상태 메시지가 변경되었습니다!"
+        });
+      }
+    });
+  }
+</script>
+</html>
