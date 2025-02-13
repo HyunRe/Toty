@@ -59,7 +59,8 @@ public class User extends BaseTime {
     private LocalDateTime deletedAt;
 
     @Builder
-    public User(String email, String password, String nickname, String phoneNumber, LoginProvider loginProvider, boolean isDeleted, String username) {
+    public User(String email, String password, String nickname, String phoneNumber, LoginProvider loginProvider, boolean isDeleted, String username,
+           boolean smsSubscribed, boolean emailSubscribed, boolean notificationAllowed) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
@@ -67,6 +68,7 @@ public class User extends BaseTime {
         this.loginProvider = loginProvider;
         this.username = username;
         this.isDeleted = isDeleted;
+        this.subscribeInfo = new SubscribeInfo(smsSubscribed, emailSubscribed, notificationAllowed);
     }
 
     public void updateInfo(UserInfoUpdateRequest newInfo, String imgPath) {
