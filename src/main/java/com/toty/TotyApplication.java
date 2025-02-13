@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling // 매월 1일 멘토 선발 로직 수행 스케줄러
 public class TotyApplication {
 
-	public static void main(String[] args) {
+		public static void main(String[] args) {
 		SpringApplication.run(TotyApplication.class, args);
 	}
 

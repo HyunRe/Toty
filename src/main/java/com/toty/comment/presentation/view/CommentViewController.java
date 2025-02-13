@@ -1,13 +1,16 @@
 package com.toty.comment.presentation.view;
 
+import com.toty.comment.application.CommentPaginationService;
 import com.toty.comment.application.CommentService;
 import com.toty.comment.domain.model.Comment;
 import com.toty.comment.dto.request.CommentCreateUpdateRequest;
 import com.toty.common.annotation.CurrentUser;
+import com.toty.common.pagination.PaginationResult;
 import com.toty.post.application.PostService;
 import com.toty.user.domain.model.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,22 +21,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CommentViewController {
     private final CommentService commentService;
-    private final PostService postService;
+    private final CommentPaginationService commentPaginationService;
 
     @GetMapping("/create")
     public String createComment() {
-        return "post/detail";
-    }
-
-    @PostMapping("/create")
-    public String createComment(@CurrentUser User user,
-                                @RequestParam("postId") Long postId,
-                                @ModelAttribute @Valid CommentCreateUpdateRequest commentCreateUpdateRequest,
-                                BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "post/detail"; // 유효성 검사 실패 시, 다시 폼을 반환
-        }
-        commentService.createComment(user.getId(), postId, commentCreateUpdateRequest);
         return "post/detail";
     }
 
@@ -44,20 +35,12 @@ public class CommentViewController {
         return "post/detail";
     }
 
-    @PatchMapping("/{id}")
-    public String updateComment(@CurrentUser User user,
-                                @PathVariable Long id,
-                                @ModelAttribute @Valid CommentCreateUpdateRequest commentCreateUpdateRequest,
-                                BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "post/detail"; // 유효성 검사 실패 시, 다시 폼을 반환
-        }
-        commentService.updateComment(user, id, commentCreateUpdateRequest);
-        return "post/detail";
-    }
-
     @GetMapping("/list")
-    public String commentList() {
+    public String commentList(@RequestParam(name = "page", defaultValue = "1") int page,
+                              @RequestParam("postId") Long postId, Model model) {
+        PaginationResult result = commentPaginationService.getPagedCommentsByPostId(page, postId);
+        model.addAttribute("result", result);
+        model.addAttribute("page", page);
         return "post/detail";
     }
 

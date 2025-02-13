@@ -5,24 +5,24 @@ document.addEventListener("DOMContentLoaded", function () {
 function loadPosts(page = 1) {
     const postList = document.getElementById('post-list');
     const pagination = document.getElementById('pagination');
-    const sort = document.getElementById('sortSelect').value;
+    //const sort = document.getElementById('sortSelect').value;
     const postCategory = new URLSearchParams(window.location.search).get('postCategory');
 
     console.log("postCategory" + postCategory);
 
-    // 카테고리에 따른 페이지 제목 업데이트
+     // 카테고리에 따른 페이지 제목 업데이트
      const pageTitle = document.querySelector('#page-title');
-        if (pageTitle) {
-            if (postCategory === 'GENERAL') {
-                pageTitle.textContent = '자유 게시판입니다. 자유롭게 게시글을 작성해주세요.';
-            } else if (postCategory === 'KNOWLEDGE') {
-                pageTitle.textContent = '정보 게시판입니다. 멘토들의 유익한 글이 있는 곳입니다.';
-            } else if (postCategory === 'QnA') {
-                pageTitle.textContent = 'Q/A 게시판입니다. 자유롭게 질의 응답을 해주세요.';
-            }
-        } else {
-            console.error("페이지 제목 요소를 찾을 수 없습니다.");
+     if (pageTitle) {
+        if (postCategory === 'GENERAL') {
+            pageTitle.textContent = '자유 게시판입니다. 자유롭게 게시글을 작성해주세요.';
+        } else if (postCategory === 'KNOWLEDGE') {
+            pageTitle.textContent = '정보 게시판입니다. 멘토들의 유익한 글이 있는 곳입니다.';
+        } else if (postCategory === 'QnA') {
+            pageTitle.textContent = 'Q/A 게시판입니다. 자유롭게 질의 응답을 해주세요.';
         }
+    } else {
+        console.error("페이지 제목 요소를 찾을 수 없습니다.");
+    }
 
     // 페이지 정보 업데이트
     const currentPageElement = document.getElementById('currentPage');

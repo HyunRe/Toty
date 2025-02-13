@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,16 +31,25 @@
                         <p><strong>작성일:</strong> <span id="post-time"></span></p>
                     </div>
 
+                    <!-- 좋아요 토글 버튼 -->
+                    <div class="like-toggle">
+                        <button id="like-btn" class="btn btn-outline-primary">
+                            <img id="like-icon" src="/img/free-icon-heart-11781392.png" alt="좋아요 아이콘" style="width: 20px; height: 20px;">
+                        </button>
+                    </div>
+
                     <!-- 저장 버튼 (맨 오른쪽) -->
                     <button id="save-btn" class="btn btn-success" onclick="goToMyScrapePage()">
                         <img src="/img/free-icon-save-instagram-5662990.png" alt="저장" style="width: 24px; height: 24px;">
                     </button>
                 </div>
 
+                <!-- 게시글 태그 -->
+                <div id="post-tags" class="post-tags d-flex flex-wrap mt-3"></div>
+                <input type="hidden" id="postTags" th:value="${postTags}">
+
                 <!-- 게시글 내용 -->
-                <div id="post-content" class="post-content mt-4">
-                    <p></p>
-                </div>
+                <div id="post-content" class="post-content mt-4" th:utext="${response.content}"></div>
 
                 <!-- 수평선 -->
                 <hr>
@@ -48,13 +57,13 @@
                 <!-- 댓글 섹션 -->
                 <div id="comments-section" class="comments-section mt-4">
                     <h3>댓글</h3>
-                    <div id="comment-list" class="comment-list"></div>
-                    
                     <!-- 댓글 작성 공간 -->
                     <div class="comment-form d-flex justify-content-between mt-3">
                         <textarea id="comment-content" class="form-control" rows="3" placeholder="댓글을 작성하세요"></textarea>
                         <button id="comment-submit-btn" class="btn btn-primary">작성</button>
                     </div>
+                    <!-- 댓글 목록 -->
+                    <div id="comment-list" class="comment-list"></div>
                 </div>
 
                 <!-- 댓글 페이지네이션 -->

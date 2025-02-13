@@ -15,8 +15,8 @@ public class KnowledgePostDetailResponse extends PostDetailResponse {
     private Role role;
 
     public KnowledgePostDetailResponse(String nickname, String profileImageUrl, Role role, PostCategory postCategory, String title, String content,
-                                       int viewCount, int likeCount, LocalDateTime earliestTime, PaginationResult comments) {
-        super(nickname, profileImageUrl, postCategory, title, content, viewCount, likeCount, earliestTime, comments);
+                                       int viewCount, int likeCount, Boolean isLiked, LocalDateTime earliestTime, PaginationResult comments) {
+        super(nickname, profileImageUrl, postCategory, title, content, viewCount, likeCount, isLiked, earliestTime, comments);
         this.role = role;
     }
 }
