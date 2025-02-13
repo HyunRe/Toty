@@ -1,17 +1,5 @@
 function changeCategory(postCategory, page = 1) {
     console.log("category" + postCategory);
-//    // 왼쪽 메뉴 항목 초기화
-//    document.getElementById('profileMenu').classList.remove('active-menu');
-//    document.getElementById('myPostsMenu').classList.remove('active-menu');
-//    document.getElementById('savedPostsMenu').classList.remove('active-menu');
-//
-//    if (postCategory === 'General') {
-//        document.getElementById('myPostsMenu').classList.add('active-menu');
-//    } else if (postCategory === 'Knowledge') {
-//        document.getElementById('myPostsMenu').classList.add('active-menu');
-//    } else if (postCategory === 'qna') {
-//        document.getElementById('General').classList.add('active-menu');
-//    }
 
     const postList = document.getElementById('post-list');
     const currentPageElement = document.getElementById('currentPage');
@@ -100,7 +88,7 @@ function changeCategory(postCategory, page = 1) {
                     editButton.textContent = '수정';
                     editButton.onclick = (e) => {
                         e.stopPropagation();
-                        location.href = `/update.html?id=${post.id}`;
+                        location.href = `/view/posts/update/${post.id}`;
                     };
 
                     const deleteButton = document.createElement('button');
@@ -109,7 +97,24 @@ function changeCategory(postCategory, page = 1) {
                     deleteButton.onclick = (e) => {
                         e.stopPropagation();
                         if (confirm('정말로 삭제하시겠습니까?')) {
-                            alert('게시글이 삭제되었습니다.');
+                            fetch(`/api/posts/${post.id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    alert('게시글이 삭제되었습니다.');
+                                    window.location.href = `/view/posts/myList?postCategory=${postCategory}`;
+                                } else {
+                                    alert('게시글 삭제 실패');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('삭제 요청 실패:', error);
+                                alert('게시글 삭제 중 오류가 발생했습니다.');
+                            });
                         }
                     };
 

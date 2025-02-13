@@ -59,7 +59,8 @@ public class PostSpecifications {
             }
 
             List<PostCategory> validCategories = List.of(PostCategory.KNOWLEDGE, PostCategory.GENERAL, PostCategory.QnA);
-            PostCategory categoryEnum = PostCategory.valueOf(postCategory.toUpperCase()); // 입력된 값을 enum으로 변환
+            PostCategory categoryEnum = PostCategory.fromString(postCategory);
+            // PostCategory categoryEnum = PostCategory.valueOf(postCategory.toUpperCase()); // 입력된 값을 enum으로 변환
             if (!validCategories.contains(categoryEnum)) {
                 throw new InvalidCategoryException(postCategory);
             }
