@@ -8,6 +8,8 @@ import com.toty.chatting.domain.repository.ChatParticipantRepository;
 import com.toty.chatting.domain.repository.ChatRoomRepository;
 import com.toty.chatting.dto.response.ChatRoomListResponse;
 import com.toty.common.baseException.JsonProcessingCustomException;
+import com.toty.common.exception.ErrorCode;
+import com.toty.common.exception.ExpectedException;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -130,7 +132,7 @@ public class ChatRoomService {
             String message = convertToJson(chatRoomListResponse);
             strTemplate.convertAndSend("room/creation", message);
         } else {
-            // throw new Exception();
+            throw new ExpectedException(ErrorCode.FAIL_ROOM_CREATE);
         }
     }
 

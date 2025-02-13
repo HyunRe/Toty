@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 public class KnowledgePostListResponse extends PostListResponse {
     private Role role;
 
-    public KnowledgePostListResponse(String nickname, String profileImageUrl, Role role, String title, int viewCount, int likeCount, LocalDateTime earliestTime) {
-        super(nickname, profileImageUrl, title, viewCount, likeCount, earliestTime);
+    public KnowledgePostListResponse(Long id, String nickname, String profileImageUrl, Role role, String title, int viewCount, int likeCount, LocalDateTime earliestTime) {
+        super(id, nickname, profileImageUrl, title, viewCount, likeCount, earliestTime);
         this.role = role;
     }
 }

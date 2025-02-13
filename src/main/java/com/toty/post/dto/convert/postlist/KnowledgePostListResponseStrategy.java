@@ -8,6 +8,7 @@ public class KnowledgePostListResponseStrategy implements PostListResponseStrate
     @Override
     public PostListResponse convert(Post post) {
         return new KnowledgePostListResponse(
+                post.getId(),
                 post.getUser().getNickname(),
                 post.getUser().getProfileImageUrl(),
                 post.getUser().getRole(), // 멘토 역할

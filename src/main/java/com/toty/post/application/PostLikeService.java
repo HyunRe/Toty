@@ -22,22 +22,15 @@ public class PostLikeService {
     private final PostLikeRepository postLikeRepository;
     private final NotificationSendService notificationSendService;
 
-
     // 좋아요 토글 (증감소)
     @Transactional
-    public Boolean toggleLikeAction(Long postId, Long userId, String likeAction) {
+    public int toggleLikeAction(Long postId, Long userId, String likeAction) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
         Post post = postRepository.findById(postId).orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
 
-        boolean isLiked = false;
-
-        if ("like".equals(likeAction)) { // 좋아요 추가
-            PostLike existingLike = postLikeRepository.findByUserAndPost(user, post).orElse(null);
-            if (existingLike == null) {
-                PostLike newLike = new PostLike(user, post);
-                postLikeRepository.save(newLike);
-                isLiked = true;
-
+        if ("Like".equals(likeAction)) { // 좋아요 추가
+            if (postLikeRepository.findByUserAndPost(user, post).isEmpty()) {
+                postLikeRepository.save(new PostLike(user, post));
                 NotificationSendRequest notificationSendRequest = new NotificationSendRequest(
                         post.getUser().getId(),     // 알림 받을 사람
                         userId,                     // 알림 보낸 사람
@@ -56,13 +49,15 @@ public class PostLikeService {
         int likeCount = postLikeRepository.countPostLikesByPost(post);
         post.updateLikeCount(likeCount);
 
-        return isLiked;
+        return likeCount;
     }
 
-    // 게시물의 좋아요 개수 가져오기
-    @Transactional(readOnly = true)
-    public int getLikeCount(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
-        return postLikeRepository.countPostLikesByPost(post);
+    public boolean isPostLikedByUser(Long postId, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
+
+        return postLikeRepository.existsByUserAndPost(user, post);
     }
 }

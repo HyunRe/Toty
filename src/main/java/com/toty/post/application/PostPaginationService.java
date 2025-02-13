@@ -105,6 +105,7 @@ public class PostPaginationService {
     // Post -> PostListResponse
     private GeneralPostListResponse toGeneralPostListResponse(Post post) {
         return new GeneralPostListResponse(
+                post.getId(),
                 post.getUser().getNickname(),                   // 사용자 닉네임
                 post.getUser().getProfileImageUrl(),            // 프로필 이미지 URL
                 post.getTitle(),                                // 제목

@@ -40,6 +40,12 @@ public class Post extends BaseTime {
     @Column(name = "like_count", columnDefinition = "int default 0")
     private int likeCount;
 
+    @Column(name = "is_liked")
+    private Boolean isLiked = false;
+
+    @Column(name = "is_scraped")
+    private Boolean isScraped = false;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 

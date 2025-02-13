@@ -1,17 +1,26 @@
 package com.toty.post.presentation.view;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toty.common.pagination.PaginationResult;
 import com.toty.common.annotation.CurrentUser;
 import com.toty.post.application.PostLikeService;
 import com.toty.post.application.PostPaginationService;
 import com.toty.post.application.PostService;
+import com.toty.post.application.PostTagService;
 import com.toty.post.domain.model.Post;
+import com.toty.post.domain.model.PostTag;
 import com.toty.post.dto.response.postdetail.PostDetailResponse;
+import com.toty.user.application.UserScrapeService;
 import com.toty.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/view/posts")
@@ -20,6 +29,8 @@ public class PostViewController {
     private final PostService postService;
     private final PostPaginationService postPaginationService;
     private final PostLikeService postLikeService;
+    private final PostTagService postTagService;
+    private final UserScrapeService userScrapeService;
 
     @GetMapping("/create")
     public String createPost() {
@@ -75,15 +86,20 @@ public class PostViewController {
                              @CurrentUser User user,
                              @RequestParam(name = "page", defaultValue = "1") int page,
                              @RequestParam(name = "likeAction", required = false) String likeAction,
+                             @RequestParam(name = "scrape", required = false) String Scrape,
                              @RequestParam(name = "postCategory", required = false) String postCategory,
-                             Model model) {
+                             Model model) throws JsonProcessingException {
         postService.incrementViewCount(id);
         PostDetailResponse response = postPaginationService.getPostDetailByCategory(page, id, postCategory);
-        Boolean isLiked = postLikeService.toggleLikeAction(id, user.getId(), likeAction);
-        int likeCount = postLikeService.getLikeCount(id);
-        model.addAttribute("result", response);
-        model.addAttribute("isLiked", isLiked);
-        model.addAttribute("likeAction", likeAction);
+        int likeCount = postLikeService.toggleLikeAction(id, user.getId(), likeAction);
+        userScrapeService.toggleScrape(id, user.getId(), Scrape);
+        Post post = postService.findPostById(id);
+        List<PostTag> postTags = postTagService.getTagsByPost(post);
+        List<Map<String, String>> tagList = postTags.stream()
+                .map(tag -> Map.of("name", tag.getTagName().toString()))
+                .collect(Collectors.toList());
+        model.addAttribute("response", response);
+        model.addAttribute("postTags", new ObjectMapper().writeValueAsString(tagList)); // JSON 변환
         model.addAttribute("likeCount", likeCount);
         model.addAttribute("postCategory", postCategory);
         return "post/detail";

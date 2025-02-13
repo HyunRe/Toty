@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GeneralPostDetailResponse extends PostDetailResponse {
     public GeneralPostDetailResponse(String nickname, String profileImageUrl, PostCategory postCategory, String title, String content,
-                                     int viewCount, int likeCount, LocalDateTime earliestTime, PaginationResult comments) {
-        super(nickname, profileImageUrl, postCategory, title, content, viewCount, likeCount, earliestTime, comments);
+                                     int viewCount, int likeCount, Boolean isLiked, Boolean isScraped, LocalDateTime earliestTime, PaginationResult comments) {
+        super(nickname, profileImageUrl, postCategory, title, content, viewCount, likeCount, isLiked, isScraped, earliestTime, comments);
     }
 }

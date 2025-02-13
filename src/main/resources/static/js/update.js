@@ -55,7 +55,7 @@ $(document).ready(function () {
             data: JSON.stringify(postData),
             success: function (response) {
                 alert("게시글이 수정되었습니다.");
-                window.location.href = `/view/posts/myList?postCategory=${encodeURIComponent(category)}`;
+                window.location.href = `/view/posts/myList?postCategory=${category}`;
             },
             error: function () {
                 alert('게시글 수정 실패');

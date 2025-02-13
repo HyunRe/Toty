@@ -1,7 +1,9 @@
 package com.toty.user.presentation;
 
+import com.toty.common.annotation.CurrentUser;
 import com.toty.common.pagination.PaginationResult;
 import com.toty.user.application.UserScrapeService;
+import com.toty.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,21 +12,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("/posts")
+@RequestMapping("/view/posts")
 @RequiredArgsConstructor
 public class UserScrapeViewController {
     private final UserScrapeService userScrapeService;
 
     @GetMapping("/myScrape")
-    public String myScrape(@RequestParam("userId") Long userId,
+    public String myScrape(@CurrentUser User user,
                            @RequestParam(name = "page", defaultValue = "1") int page,
                            @RequestParam(name = "postCategory", required = false) String postCategory, // free, qna, knowledge
                            Model model) {
 
-        PaginationResult result = userScrapeService.getPagedPostsByMyScrape(userId, page, postCategory);
+        PaginationResult result = userScrapeService.getPagedPostsByMyScrape(user.getId(), page, postCategory);
         model.addAttribute("result", result);
+        model.addAttribute("page", page);
         model.addAttribute("postCategory", postCategory);
         return "user/myScrape";
     }
-
 }

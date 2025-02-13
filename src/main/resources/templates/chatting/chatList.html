@@ -2,43 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
   <head>
-    <meta charset="utf-8" />
-    <title>TOTY</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <meta content="Free HTML Templates" name="keywords" />
-    <meta content="Free HTML Templates" name="description" />
-
-    <!-- Favicon -->
-    <link href="/img/favicon.ico" rel="icon" />
-
-
-    <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
-      rel="stylesheet"
-    />
-    <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-    integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
-
+    <th:block th:replace="fragment/header :: headerhead"></th:block>
     
-
-    <!--Sweet Alert2-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.20/bulma.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"></script>
-
-    <!-- Customized Bootstrap Stylesheet -->
-    <link href="/css/style.css" rel="stylesheet" />
-    <link rel="stylesheet" href="/css/globals.css" />
-
     <style>
         .alarmList {
         position: absolute;
@@ -66,102 +31,12 @@
   </head>
 
   <body>
+    <!-- header -->
+    <div th:replace="fragment/header :: header"></div>
   
-    <!-- Topbar Start -->
-    <div class="container-fluid">
-      <div class="row bg-secondary py-2 px-xl-5">
-        <div class="col-lg-6 d-none d-lg-block">
-        </div>
-      </div>
-    </div>
-    <div class="row align-items-center py-3 px-xl-1">
-      <div class="col-lg-3 d-none d-lg-block">
-        <a href="index.html">
-          <img src="/img/logo.png" style="margin-left: 25%; width: 40%;">
-        </a>
-      </div>
-      <div class="col-lg-5 text-left">
-        <form action="/api/search/posts" method="get">
-          <div class="control-group" style="float: left;">
-            <select class="form-control" name="field">
-              <option value="TITLE">제목</option>
-              <option value="CONTENT">내용</option>
-              <option value="TITLE_CONTENT">제목+내용</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <input
-              type="text"
-              class="form-control"
-              placeholder="검색창"
-            />
-            <div class="input-group-append">
-              <span class="input-group-text bg-transparent text-primary" style="cursor: pointer;" onclick="document.forms[0].submit()">
-                <i class="fa fa-search"></i>
-              </span>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="col-lg-2 col-3 text-center">
-
-        <span class="bg-transparent text-primary" style="cursor: pointer;" >
-          <i class="fa-regular fa-bell" id="header-noti"></i>
-        </span>
-
-        <span class="bg-transparent text-primary" style="cursor: pointer;" >
-          <i class="fa-regular fa-message" id="header-chat"></i>
-        </span>
-
-        <span class="bg-transparent text-primary" style="cursor: pointer;" >
-          <i class="fa-regular fa-user" id="header-profile"></i>
-        </span>
-
-      </div>
-      </div>
-    </div>
-
-      <div class="alarmList">
-        <table>
-          <thead>
-            <tr>
-              <!-- <td><button id="alarmChkAll" class="btn btn-primary" type="button">전체 읽음</button></td> -->
-            </tr>
-          </thead>
-          <tbody id="list"></tbody>
-        </table>
-      </div>
-      
-
-    <!-- Topbar End -->
-
-    <!-- Navbar Start -->
-    <div class="container-fluid mb-2">
-      <div class="row border-top px-xl-5">
-        <div class="col-lg-9">
-          <nav
-            class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0"
-          >
-            <div
-              class="collapse navbar-collapse justify-content-between"
-              id="navbarCollapse"
-            >
-              <div class="navbar-nav mr-auto py-0">
-                <a href="index.html" class="nav-item nav-link active">홈</a>
-                <a href="shop.html" class="nav-item nav-link">Q/A게시판</a>
-                <a href="detail.html" class="nav-item nav-link">정보게시판</a>
-                <a href="contact.html" class="nav-item nav-link">자유게시판</a>
-              </div>
-            </div>
-          </nav>
-        </div>
-      </div>
-    </div>
-    <!-- Navbar End -->
-     
     <!-- Fragment declaration -->
     <div style="height: 50px;">
-      <input type="text" class="userId" th:value="${userId}">
+      <input type="hidden" class="userId" th:value="${userId}">
     </div>
     <div class="container">
       <div class="row">
@@ -179,7 +54,7 @@
           </div>
         </div>
         <div class="col-4">
-          <div sec:authorize="hasRole('ROLE_MENTOR')">
+          <div sec:authorize="hasAuthority('MENTOR')">
             <button onclick="createRoom()">단톡방 생성하기</button>
           </div>
         </div>
@@ -219,21 +94,6 @@
         </div>
       </div>
     </div>
-    
-
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-    
-
-
-  <script>
-  
-    document.getElementById('header-noti').addEventListener("click", function() {
-    document.querySelector('.alarmList').classList.toggle('show');
-  });
-
-  </script>
 
 <link href="/css/chatting/chatList.css" rel="stylesheet">
 <script src="/js/chatting/chatList.js"></script>

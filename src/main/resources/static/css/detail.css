@@ -6,7 +6,7 @@
 }
 
 .post-info {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -44,20 +44,69 @@
     font-size: 0.9rem;
 }
 
-#save-btn {
-    font-size: 0.9rem;
-    padding: 10px;
-    background: none;
-    border: none;
-}
-
-#save-btn img {
+.like-toggle button {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    padding: 5px 10px;
     cursor: pointer;
 }
 
+.like-toggle button.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.like-toggle button.active .bi-heart {
+    color: red;
+}
+
+#save-btn {
+   display: flex;
+   align-items: center;
+   font-size: 1rem;
+   padding: 5px 10px;
+   cursor: pointer;
+}
+
+.save-toggle button.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.save-toggle button.active .bi-bookmark {
+    color: blue;
+}
+
+.post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag-item {
+    background-color: #f1f1f1;
+    color: #333;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#post-content {
+    font-size: 1.0rem;
+    line-height: 2.0;
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
 .post-content p {
-    font-size: 1.1rem;
-    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    word-wrap: break-word;
 }
 
 hr {
@@ -103,6 +152,8 @@ hr {
 
 .comment-form {
     width: 100%;
+    display: flex;
+    align-items: center;
 }
 
 .comment-form textarea {
@@ -116,7 +167,8 @@ hr {
     width: 15%;
     font-size: 1rem;
     padding: 10px;
-    margin-left: 10px;
+    margin-left: 20px;
+    height: 100%;
 }
 
 .pagination {

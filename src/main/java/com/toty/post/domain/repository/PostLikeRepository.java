@@ -15,6 +15,8 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
     // 좋아요 찾기
     Optional<PostLike> findByUserAndPost(User user, Post post);
 
+    boolean existsByUserAndPost(User user, Post post);
+
     // 게시글에 대한 좋아요 개수만 조회
     @Query("SELECT COUNT(l) FROM PostLike l WHERE l.post = :post")
     int countPostLikesByPost(@Param("post") Post post);

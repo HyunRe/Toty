@@ -7,9 +7,12 @@ import com.toty.post.application.PostLikeService;
 import com.toty.post.application.PostPaginationService;
 import com.toty.post.application.PostService;
 import com.toty.post.domain.model.Post;
+import com.toty.post.dto.request.LikeActionRequest;
 import com.toty.post.dto.request.PostCreateRequest;
 import com.toty.post.dto.request.PostUpdateRequest;
+import com.toty.post.dto.request.ScrapeRequest;
 import com.toty.post.dto.response.postdetail.PostDetailResponse;
+import com.toty.user.application.UserScrapeService;
 import com.toty.user.domain.model.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ public class PostApiController {
     private final PostPaginationService postPaginationService;
     private final PostLikeService postLikeService;
     private final PostImageService postImageService;
+    private final UserScrapeService userScrapeService;
 
     // 게시글 삭제
     @DeleteMapping("/{id}")
@@ -38,11 +42,34 @@ public class PostApiController {
 
     // 게시글 좋아요 토글 (증감소)
     @PatchMapping("/{id}/like")
-    public ResponseEntity<Boolean> toggleLike(@PathVariable Long id,
+    public ResponseEntity<Integer> toggleLike(@PathVariable Long id,
                                               @CurrentUser User user,
-                                              @RequestParam(name = "likeAction", required = false) String likeAction) {
-        Boolean isLiked = postLikeService.toggleLikeAction(id, user.getId(), likeAction);
+                                              @RequestBody LikeActionRequest likeActionRequest) {
+        int likeCount = postLikeService.toggleLikeAction(id, user.getId(), likeActionRequest.getLikeAction());
+        return ResponseEntity.ok(likeCount);
+    }
+
+    @GetMapping("/{id}/like-status")
+    public ResponseEntity<Boolean> getLikeStatus(@PathVariable Long id,
+                                                 @CurrentUser User user) {
+        boolean isLiked = postLikeService.isPostLikedByUser(id, user.getId());
         return ResponseEntity.ok(isLiked);
+    }
+
+    // 게시글 스크랩 토글
+    @PatchMapping("/{id}/scrape")
+    public ResponseEntity<String> toggleScrape(@PathVariable Long id,
+                                                @CurrentUser User user,
+                                                @RequestBody ScrapeRequest scrapeRequest) {
+        String scrape = userScrapeService.toggleScrape(id, user.getId(), scrapeRequest.getScrape());
+        return ResponseEntity.ok(scrape);
+    }
+
+    @GetMapping("/{id}/scrape-status")
+    public ResponseEntity<Boolean> getScrapeStatus(@PathVariable Long id,
+                                                   @CurrentUser User user) {
+        boolean isScraped = userScrapeService.isPostScrapedByUser(id, user.getId());
+        return ResponseEntity.ok(isScraped);
     }
 
     // 이미지 업로드
@@ -100,7 +127,6 @@ public class PostApiController {
                                                          @RequestParam(name = "page", defaultValue = "1") int page,
                                                          @RequestParam(name = "postCategory", required = false) String postCategory) {
         postService.incrementViewCount(id);
-
         PostDetailResponse response = postPaginationService.getPostDetailByCategory(page, id, postCategory);
         return ResponseEntity.ok(response);
     }
