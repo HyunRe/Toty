@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -9,10 +6,6 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <meta content="Free HTML Templates" name="keywords"/>
   <meta content="Free HTML Templates" name="description"/>
-
-  <!-- Favicon -->
-  <!--  <link href="/static/img/favicon.ico" rel="icon" />-->
-
 
   <!-- Google Web Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,8 +26,7 @@
       referrerpolicy="no-referrer"
   />
 
-  <!-- Libraries Stylesheet -->
-  <link href="/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet"/>
+  
 
   <!--Sweet Alert2-->
   <link rel="stylesheet"
@@ -45,6 +37,17 @@
   <link href="/css/style.css" rel="stylesheet"/>
   <link rel="stylesheet" href="/css/globals.css"/>
   <link rel="stylesheet" href="/css/register.css" type="text/css"/>
+  <style>
+    #links-container {
+    display: flex;
+    margin: auto;
+    text-align: start;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row-reverse;
+    }
+
+  </style>
 </head>
 
 <body>
@@ -58,7 +61,7 @@
 <div class="row align-items-center py-3 px-xl-5">
   <div class="col-lg-3 d-none d-lg-block">
     <a href="/home">
-      <img src="/img/logo.png" style="margin-left: 5%; width: 40%;">
+      <img src="/img/logo.png" style="margin-left: 25%; width: 55%;">
     </a>
   </div>
 </div>
@@ -66,19 +69,14 @@
 
 <!-- Navbar Start -->
 <div class="container-fluid mb-2">
-  <div class="row border-top px-xl-5">
+  <div class="row px-xl-5">
   </div>
 </div>
 <!-- Navbar End -->
 
- <!-- 
-이메일, 이름, -- readonly 
-  휴대폰 번호, 
-  닉네임, 프사, 태그, 링크,
-  sms, 이메일, 알림 수신 여부 -->
-<div class="container-fluid pt-5">
+<div class="container-fluid">
   <div class="row"
-       style="justify-content: space-between; flex-wrap: nowrap; margin: auto; width: 70%;">
+       style="justify-content: space-between; flex-wrap: nowrap; margin: auto;">
     <div class="col-12 mb-0">
       <div class="mb-8">
         <h4 class="font-weight-semi-bold mb-5"
@@ -116,126 +114,50 @@
               <input type="hidden" th:value="${user.id}" name="uid" id="uid">
             </div>
             
-            <div class="col-md-7 form-group">
-              <label>닉네임</label>
-              <div class="check-group">
-                <input class="form-control" name="nickname" id="nickname" type="text"
-                       placeholder="사용하실 닉네임을 입력해 주세요." style=" width: 100%;" th:value="${user.nickname}">
-              </div>
-            </div>
 
             <div class="col-md-7 form-group">
-              <label>휴대폰 번호</label>
-              <div class="check-group">
-                <input class="form-control" id="phone" name="phoneNumber" type="tel"
-                       placeholder="예시: 010-1234-5678"
-                       pattern="(01[016789]{1})-?[0-9]{3,4}-?[0-9]{4}" style="width: 80%;">
-                <button class="btn btn-info" id="authNumReq" type="button">인증</button>
-              </div>
-            </div>
-
-
-            <div class="col-md-7 form-group">
-                <label>기술 스택</label>
-                <div class="dropdown-container" id="tag-options">
-                    <select>
-                      <option value="1">Java</option>
-                      <option value="1">JavaScript</option>
-                      <option value="1">C</option>
-                      <option value="1">C#</option>
-                      <option value="1">C++</option>
-                      <option value="1">Ruby</option>
-                      <option value="1">Go</option>
-                      <option value="1">PHP</option>
-                      <option value="1">Swift</option>
-                      <option value="1">Kotlin</option>
-                      <option value="1">Rust</option>
-                      <option value="1">Spring Boot</option>
-                      <option value="1">Spring Security</option>
-                      <option value="1">Spring Data JPA</option>
-                      <option value="1">Spring Cloud</option>
-                      <option value="1">Spring Batch</option>
-                      <option value="1">Spring REST</option>
-                      <option value="1">Spring Web</option>
-                      <option value="1">Thymeleaf</option>
-                      <option value="1">JPA</option>
-                      <option value="1">Hibernate</option>
-                      <option value="1">MySQL</option>
-                      <option value="1">PostgreSQL</option>
-                      <option value="1">MongoDB</option>
-                      <option value="1">Redis</option>
-                      <option value="1">Kafka</option>
-                      <option value="1">RabbitMQ</option>
-                      <option value="1">AWS</option>
-                      <option value="1">Azure</option>
-                      <option value="1">Google Cloud</option>
-                      <option value="1">Docker</option>
-                      <option value="1">Kubernetes</option>
-                      <option value="1">Jenkins</option>
-                      <option value="1">Maven</option>
-                      <option value="1">Gradle</option>
-                      <option value="1">REST API</option>
-                      <option value="1">SOAP</option>
-                      <option value="1">JWT</option>
-                      <option value="1">OAuth2</option>
-                      <option value="1">Swagger</option>
-                      <option value="1">Logging</option>
-                      <option value="1">Unit Testing</option>
-                      <option value="1">Integration Testing</option>                      
-                    </select>
+                <label>닉네임</label>
+                <div class="check-group">
+                  <input class="form-control" name="nickname" id="nickname" type="text"
+                         placeholder="사용하실 닉네임을 입력해 주세요." style=" width: 80%;" th:value="${user.nickname}">
+                  <button class="btn btn-info" id="checkNicknameBtn" type="button"
+                          style="padding: 0;" data-available="true">중복확인
+                  </button>
                 </div>
-                
-                <!--기술 스택 옵션에서 클릭하면 버튼 생성, 다시 클릭 시 사라짐 -->
-                <div class="tags-container col-md-7 form-group" id="tags-container" style="display:flex; flex-wrap : wrap; width: 80%; justify-content: center; margin: auto;">
-
-            </div>
-
-            <div class="col-md-7 form-group">
-                <label>링크</label>
-                <button type="button" id="link-add">+</button>
-                <div class="links-container row" id="links-container" style="display: flex; margin: auto; text-align: start;">
-                  <!-- 동적으로 설정 -->
-                  <button type="button" id="link-del">-</button>
-                  <a class="link-itemz" href="https://github.com/username" target="_blank">
-                    <img src="https://via.placeholder.com/20?text=GH" alt="Github 로고">
-                    <!-- url 주소 그대로 -->
-                    Github
-                  </a>
-                  
-                </div>
-                <!-- <div class="links-container"></div> -->
-            </div>
-
-            <div class="col-md-7 form-group">
+              </div>
+            <div class="col-md-7 form-group custom-control">
               <label>수신 동의</label>
               <div class="switch-wrap d-flex justify-content-between">
                 <label>SMS 수신 동의</label>
-                <div class="primary-checkbox">
-                  <input type="checkbox" id="sms-subscribe">
-                  <label for="sms-subscribe"></label>
+                <!-- <div class="primary-checkbox"> -->
+                    <div class="custom-control custom-checkbox">
+                  <input type="checkbox" id="sms-subscribe" class="custom-control-input">
+                  <label for="sms-subscribe" class="custom-control-label"></label>
                 </div>
               </div>
               <div class="switch-wrap d-flex justify-content-between">
                 <label>메일 수신 동의</label>
-                <div class="primary-checkbox">
-                  <input type="checkbox" id="email-subscribe" checked="">
-                  <label for="email-subscribe"></label>
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" id="email-subscribe" checked="" class="custom-control-input">
+                  <label for="email-subscribe" class="custom-control-label"></label>
                 </div>
               </div>
               <div class="switch-wrap d-flex justify-content-between">
                 <label>앱 알림 수신 동의</label>
-                <div class="primary-checkbox">
-                  <input type="checkbox" id="noti-subscribe">
-                  <label for="noti-subscribe"></label>
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" id="noti-subscribe" class="custom-control-input">
+                  <label for="noti-subscribe" class="custom-control-label"></label>
                 </div>
               </div>
             </div>
 
         </form>
-            <div class="col-md-7 form-group pt-3">
+        
+            <div class="col-7 pt-3">
               <button type="button" id="formSubmit" class="btn btn-info" style="width: 100%;">저장</button>
             </div>
       </div>
+      
 
   </div>
 </div>
@@ -254,6 +176,152 @@
 
 <!-- Template Javascript -->
 <!--<script src="/js/main.js"></script>-->
+<script>
+
+// sweetalert 버튼 스타일 설정
+const swalConfig = {confirmButtonColor: '#1f9bcf'};
+
+  document
+  .getElementById('checkNicknameBtn')
+  .addEventListener('click', isNicknameAvailable);
+
+
+  // 닉네임 중복 검사 로직
+  // 1. 중복검사 후 사용 가능한 닉네임일 경우 사용 또는 취소를 선택할 수 있음 
+  // 2. 사용 버튼 클릭 시 중복확인 버튼이 비활성화 상태로 변경되며, 닉네임 중복확인 여부를 확인하는 속성 값이 true로 변경 됨(태그에 속성 값은 false로 미리 부여해 둠)
+  // 3. 취소 버튼 클릭 시 중복확인 버튼 활성화 유지, 중복여부를 확인 하는 속성 값도 false로 유지 됨
+  // 4. 사용 버튼 클릭 후 중복확인 버튼이 비활성화 되었으나, 사용자가 새로운 닉네임을 input에 입력할 경우 입력을 감지해 중복확인 버튼 활성화, 속성값 false로 변경 됨
+  // 5. 항목별 중복검사 실행 여부를 판단하는 속성 값이 각각 설정된 상태로 모든 값이 true가 아니라면 Form 제출이 불가능 하도록 설정 함.
+  // ** 속성 명: data-available ** 
+
+  function isNicknameAvailable() {
+    let nickname = document.getElementById('nickname').value.trim();
+
+    if (!nickname) {
+      Swal.fire({
+        icon: 'warning',
+        text: '닉네임을 입력해 주세요.',
+        ...swalConfig,
+      });
+      return;
+    }
+
+    $.ajax({
+      url: '/api/users/check-nickname',
+      type: 'GET',
+      data: {nickname: nickname},
+      dataType: 'json',
+      success: function (response) {
+        if (!response) {
+          Swal.fire({
+            icon: 'error',
+            text: '서버 응답이 올바르지 않습니다.',
+            ...swalConfig,
+          });
+          return;
+        }
+        if (response.status === 'error') {
+          Swal.fire({
+            icon: 'warning',
+            text: response.errorMessage,
+            ...swalConfig,
+          });
+        }
+        if (response.status === 'success') {
+          Swal.fire({
+            icon: 'success',
+            text: response.data.message,
+            showCancelButton: true,
+            cancelButtonColor: '#d33',
+            confirmButtonText: '사용',
+            cancelButtonText: '취소',
+            ...swalConfig,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // 중복검사 실행 여부를 확인하는 속성 값!
+              document
+              .getElementById('checkNicknameBtn')
+              .setAttribute('data-available', 'true');
+              document
+              .getElementById('checkNicknameBtn')
+              .setAttribute('disabled', true);
+            }
+          });
+        }
+      },
+      error: function () {
+        Swal.fire({
+          icon: 'error',
+          text: '서버 응답이 올바르지 않습니다.',
+          ...swalConfig,
+        });
+      },
+    });
+  }
+
+  // 닉네임 재입력 시 중복 검사 버튼 활성화
+  document.getElementById('nickname').addEventListener('input', function () {
+    if (document.getElementById('checkNicknameBtn').getAttribute('data-available')
+        === 'true') {
+      document.getElementById('checkNicknameBtn').removeAttribute('disabled');
+      document
+      .getElementById('checkNicknameBtn')
+      .setAttribute('data-available', 'false');
+    }
+  });
+
+
+  document.getElementById('formSubmit').addEventListener('click', checkForm);
+
+  function checkForm() {
+
+    console.log('checkForm');
+    const updateForm = document.getElementById('updateForm');
+    const formData = new FormData(updateForm);
+    // let file = document.getElementById('formFile').files[0];
+    // if (file) {
+    //   formData.append('profileImage', file);
+    // }
+
+    if (document.getElementById('checkNicknameBtn').getAttribute('data-available')
+        === 'false') {
+      Swal.fire({
+        icon: 'warning',
+        text: '닉네임 중복 확인을 해주세요.',
+        ...swalConfig,
+      });
+      return false;
+    }
+ 
+
+
+
+
+    fetch(updateForm.action, {
+      method: 'POST',
+      body: formData,
+    })
+    .then((response) => {
+      if (response.ok) {
+        return response.json(); // 응답 데이터 확인
+      }
+      throw new Error('업데이트 실패!');
+    })
+    .then((data) => {
+      alert(data.data.message);
+      console.log(data);
+      if (window.opener && !window.opener.closed) {
+        window.opener.location.reload(); // 부모 창 새로고침
+      }
+      window.close(); // 팝업창 닫기
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+      alert('업데이트 실패! 다시 시도해 주세요.');
+    });
+  
+  }
+</script>
 </body>
 
 </html>

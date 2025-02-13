@@ -114,4 +114,9 @@ public class User extends BaseTime {
         this.nickname = nickname;
     }
 
+    public void saveStatusMessage(String request) { this.statusMessage = request; }
+
+
+
 }
+
