@@ -23,11 +23,18 @@ function loadPosts() {
                 earliestTime: new Date(data.earliestTime),
                 content: data.content,
                 tags: data.tags || [],
-                isLiked: data.isLiked
+                isLiked: data.isLiked,
+                isScraped: data.isScraped
             };
 
             // 게시글 내용 업데이트
-            document.getElementById("page-title").textContent = post.postCategory + " 게시판";
+            if (post.postCategory == "Qna") {
+                document.getElementById("page-title").textContent = "질문 게시판";
+            } else if (post.postCategory == "Knowledge") {
+                document.getElementById("page-title").textContent = "지식 게시판";
+            } else if (post.postCategory == "General") {
+                document.getElementById("page-title").textContent = "자유 게시판";
+            }
             document.getElementById("post-title").textContent = post.title;
             document.getElementById("nickname").textContent = post.nickname;
             document.getElementById("profile-image").src = post.profileImageUrl;
@@ -45,7 +52,7 @@ function loadPosts() {
             const likeCountElement = document.getElementById("like-count");
 
            // 좋아요 토글 버튼 처리
-           likeButton.addEventListener('click', function () {
+            likeButton.addEventListener('click', function () {
                 const likeAction = post.isLiked ? 'unlike' : 'Like';
                 post.isLiked = !post.isLiked; // 상태 토글
                 likeButton.classList.toggle('active');
@@ -57,9 +64,8 @@ function loadPosts() {
                     likeIcon.classList.add('bi-heart');
                 }
 
-                const ApiEndpoint = `/api/posts/${postId}/like`;
                 // 서버와의 연동: 좋아요 상태 업데이트
-                fetch(ApiEndpoint, {
+                fetch(`/api/posts/${postId}/like`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -68,28 +74,109 @@ function loadPosts() {
                         likeAction: likeAction,
                     })
                 })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) { // 서버에서 성공적으로 처리했는지 확인
+                        post.isLiked = !post.isLiked; // 서버 응답을 받고 상태 변경
+                        likeButton.classList.toggle('active');
+
+                        if (post.isLiked) {
+                            likeIcon.classList.remove('bi-heart');
+                            likeIcon.classList.add('bi-heart-fill');
+                        } else {
+                            likeIcon.classList.remove('bi-heart-fill');
+                            likeIcon.classList.add('bi-heart');
+                        }
+
+                        // 서버에서 받은 likeCount로 UI 업데이트
+                        likeCountElement.textContent = data.likeCount;
+                    }
+                })
+                .catch(error => {
+                    console.error('서버와의 연동 중 오류가 발생했습니다:', error);
+                });
+            });
+
+            fetch(`/api/posts/${postId}/like-status`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.isLiked) {  // 서버에서 받은 스크랩 상태
+                        post.isLiked = true;
+                        likeIcon.classList.remove('bi-heart-fill');
+                        likeIcon.classList.add('bi-heart');
+                        likeButton.classList.add('active'); // 강조 효과 유지
+                    } else {
+                        post.isLiked = false;
+                        likeIcon.classList.add('bi-heart');
+                        likeIcon.classList.remove('bi-heart-fill');
+                        likeButton.classList.remove('active');
+                    }
+                })
+                .catch(error => console.error('스크랩 상태 가져오기 실패:', error));
+
+            const saveButton = document.getElementById('save-btn');
+            const saveIcon = document.getElementById('save-icon');
+
+                // 스크랩 토글 버튼 처리
+                saveButton.addEventListener('click', function () {
+                    const scrape = post.isScraped ? 'cancel' : 'scrape';
+                    post.isScraped = !post.isScraped; // 상태 토글
+                    saveButton.classList.toggle('active');
+                    if (post.isScraped) {
+                        saveIcon.classList.remove('bi-bookmark');
+                        saveIcon.classList.add('bi-bookmark-fill');
+                    } else {
+                        saveIcon.classList.remove('bi-bookmark-fill');
+                        saveIcon.classList.add('bi-bookmark');
+                    }
+
+                    // 서버와의 연동: 좋아요 상태 업데이트
+                    fetch(`/api/posts/${postId}/scrape`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            scrape: scrape,
+                        })
+                    })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) { // 서버에서 성공적으로 처리했는지 확인
-                            post.isLiked = !post.isLiked; // 서버 응답을 받고 상태 변경
-                            likeButton.classList.toggle('active');
+                            post.isScraped = !post.isScraped; // 서버 응답을 받고 상태 변경
+                            saveButton.classList.toggle('active');
 
-                            if (post.isLiked) {
-                                likeIcon.classList.remove('bi-heart');
-                                likeIcon.classList.add('bi-heart-fill');
+                            if (post.isScraped) {
+                                saveIcon.classList.remove('bi-bookmark');
+                                saveIcon.classList.add('bi-bookmark-fill');
                             } else {
-                                likeIcon.classList.remove('bi-heart-fill');
-                                likeIcon.classList.add('bi-heart');
+                                saveIcon.classList.remove('bi-bookmark-fill');
+                                saveIcon.classList.add('bi-bookmark');
                             }
-
-                            // 서버에서 받은 likeCount로 UI 업데이트
-                            likeCountElement.textContent = data.likeCount;
                         }
                     })
                     .catch(error => {
                         console.error('서버와의 연동 중 오류가 발생했습니다:', error);
                     });
-            });
+                });
+
+            // 스크랩 상태를 서버에서 받아오기
+            fetch(`/api/posts/${postId}/scrape-status`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.isScraped) {  // 서버에서 받은 스크랩 상태
+                        post.isScraped = true;
+                        saveIcon.classList.add('bi-bookmark-fill');
+                        saveIcon.classList.remove('bi-bookmark');
+                        saveButton.classList.add('active'); // 강조 효과 유지
+                    } else {
+                        post.isScraped = false;
+                        saveIcon.classList.add('bi-bookmark');
+                        saveIcon.classList.remove('bi-bookmark-fill');
+                        saveButton.classList.remove('active');
+                    }
+                })
+                .catch(error => console.error('스크랩 상태 가져오기 실패:', error));
         })
         .catch(error => {
             console.error('게시글을 가져오는 중 오류가 발생했습니다:', error);

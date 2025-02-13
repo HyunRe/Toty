@@ -11,6 +11,7 @@ import com.toty.post.application.PostTagService;
 import com.toty.post.domain.model.Post;
 import com.toty.post.domain.model.PostTag;
 import com.toty.post.dto.response.postdetail.PostDetailResponse;
+import com.toty.user.application.UserScrapeService;
 import com.toty.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -29,6 +30,7 @@ public class PostViewController {
     private final PostPaginationService postPaginationService;
     private final PostLikeService postLikeService;
     private final PostTagService postTagService;
+    private final UserScrapeService userScrapeService;
 
     @GetMapping("/create")
     public String createPost() {
@@ -84,11 +86,13 @@ public class PostViewController {
                              @CurrentUser User user,
                              @RequestParam(name = "page", defaultValue = "1") int page,
                              @RequestParam(name = "likeAction", required = false) String likeAction,
+                             @RequestParam(name = "scrape", required = false) String Scrape,
                              @RequestParam(name = "postCategory", required = false) String postCategory,
                              Model model) throws JsonProcessingException {
         postService.incrementViewCount(id);
         PostDetailResponse response = postPaginationService.getPostDetailByCategory(page, id, postCategory);
         int likeCount = postLikeService.toggleLikeAction(id, user.getId(), likeAction);
+        userScrapeService.toggleScrape(id, user.getId(), Scrape);
         Post post = postService.findPostById(id);
         List<PostTag> postTags = postTagService.getTagsByPost(post);
         List<Map<String, String>> tagList = postTags.stream()

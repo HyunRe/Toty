@@ -18,6 +18,7 @@ public class KnowledgePostDetailResponseStrategy implements PostDetailResponseSt
                 post.getViewCount(),
                 post.getLikeCount(),
                 post.getIsLiked(),
+                post.getIsScraped(),
                 post.getUpdatedAt(),
                 pagedComments
         );
