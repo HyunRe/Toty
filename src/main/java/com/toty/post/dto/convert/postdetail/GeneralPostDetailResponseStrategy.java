@@ -17,6 +17,7 @@ public class GeneralPostDetailResponseStrategy implements PostDetailResponseStra
                 post.getViewCount(),
                 post.getLikeCount(),
                 post.getIsLiked(),
+                post.getIsScraped(),
                 post.getUpdatedAt(),
                 pagedComments
         );

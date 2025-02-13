@@ -22,7 +22,6 @@ public class PostLikeService {
     private final PostLikeRepository postLikeRepository;
     private final NotificationSendService notificationSendService;
 
-
     // 좋아요 토글 (증감소)
     @Transactional
     public int toggleLikeAction(Long postId, Long userId, String likeAction) {
@@ -30,7 +29,7 @@ public class PostLikeService {
         Post post = postRepository.findById(postId).orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
 
         if ("Like".equals(likeAction)) { // 좋아요 추가
-            if (!postLikeRepository.findByUserAndPost(user, post).isPresent()) {
+            if (postLikeRepository.findByUserAndPost(user, post).isEmpty()) {
                 postLikeRepository.save(new PostLike(user, post));
                 NotificationSendRequest notificationSendRequest = new NotificationSendRequest(
                         post.getUser().getId(),     // 알림 받을 사람
@@ -51,5 +50,14 @@ public class PostLikeService {
         post.updateLikeCount(likeCount);
 
         return likeCount;
+    }
+
+    public boolean isPostLikedByUser(Long postId, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
+
+        return postLikeRepository.existsByUserAndPost(user, post);
     }
 }

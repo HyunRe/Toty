@@ -23,12 +23,13 @@ public abstract class PostDetailResponse extends BaseTime {
     private int viewCount;
     private int likeCount;
     private Boolean isLiked;
+    private Boolean isScraped;
     private LocalDateTime earliestTime;
 
     // 댓글 정보
     private PaginationResult comments;
 
-    public PostDetailResponse(String nickname, String profileImageUrl, PostCategory postCategory, String title, String content, int viewCount, int likeCount, Boolean isLiked, LocalDateTime earliestTime, PaginationResult comments) {
+    public PostDetailResponse(String nickname, String profileImageUrl, PostCategory postCategory, String title, String content, int viewCount, int likeCount, Boolean isLiked, Boolean isScraped, LocalDateTime earliestTime, PaginationResult comments) {
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
         this.postCategory = postCategory;
@@ -37,6 +38,7 @@ public abstract class PostDetailResponse extends BaseTime {
         this.viewCount = viewCount;
         this.likeCount = likeCount;
         this.isLiked = isLiked;
+        this.isScraped = isScraped;
         this.earliestTime = earliestTime;
         this.comments = comments;
     }

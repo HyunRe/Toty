@@ -68,9 +68,9 @@ public class CommentService {
     public Comment updateComment(User user, Long id, CommentCreateUpdateRequest commentCreateUpdateRequest) {
         Comment comment = findByCommentId(id);
         // 내 댓글 인지 확인 필요
-        if (isOwner(user, comment.getUser().getId())) {
-            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
-        }
+//        if (isOwner(user, comment.getUser().getId())) {
+//            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
+//        }
 
         Comment updatedComment = new Comment(comment.getUser(), comment.getPost(), commentCreateUpdateRequest.getContent());
         comment.getPost().addComment(updatedComment);
@@ -83,9 +83,9 @@ public class CommentService {
     public void deleteComment(User user, Long id) {
         Comment comment = findByCommentId(id);
         // 내 댓글 인지 확인 필요
-        if (isOwner(user, comment.getUser().getId())) {
-            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
-        }
+//        if (isOwner(user, comment.getUser().getId())) {
+//            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
+//        }
 
         // 정말로 삭제 할 것인지 확인 필요 - 프론트에서 처리
         commentRepository.delete(comment);

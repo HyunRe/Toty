@@ -49,8 +49,6 @@
     align-items: center;
     font-size: 1rem;
     padding: 5px 10px;
-    border: 2px solid #007bff;
-    background-color: #fff;
     cursor: pointer;
 }
 
@@ -64,14 +62,20 @@
 }
 
 #save-btn {
-    font-size: 0.9rem;
-    padding: 10px;
-    background: none;
-    border: none;
+   display: flex;
+   align-items: center;
+   font-size: 1rem;
+   padding: 5px 10px;
+   cursor: pointer;
 }
 
-#save-btn img {
-    cursor: pointer;
+.save-toggle button.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.save-toggle button.active .bi-bookmark {
+    color: blue;
 }
 
 .post-tags {
