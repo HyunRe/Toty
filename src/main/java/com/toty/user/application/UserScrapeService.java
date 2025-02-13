@@ -30,8 +30,8 @@ public class UserScrapeService {
         Pageable pageable = PageRequest.of(page - 1, PAGE_SIZE, Sort.by(Sort.Order.desc("updatedAt")));
         // postCategory null이면 free(일반 게시판)로 처리
         Map<String, PostCategory> categoryMap = Map.of(
-                "free", PostCategory.GENERAL,
-                "qna", PostCategory.QnA,
+                "General", PostCategory.GENERAL,
+                "Qna", PostCategory.QnA,
                 "knowledge", PostCategory.KNOWLEDGE
         );
 

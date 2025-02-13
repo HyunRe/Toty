@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class PostListResponse extends BaseTime {
+    private Long id;
     // 사용자 정보
     private String nickname;
     private String profileImageUrl;
@@ -20,7 +21,8 @@ public abstract class PostListResponse extends BaseTime {
     private int likeCount;
     private LocalDateTime earliestTime;
 
-    public PostListResponse(String nickname, String profileImageUrl, String title, int viewCount, int likeCount, LocalDateTime earliestTime) {
+    public PostListResponse(Long id, String nickname, String profileImageUrl, String title, int viewCount, int likeCount, LocalDateTime earliestTime) {
+        this.id = id;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
         this.title = title;

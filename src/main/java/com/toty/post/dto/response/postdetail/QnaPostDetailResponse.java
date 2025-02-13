@@ -16,8 +16,10 @@ public class QnaPostDetailResponse extends PostDetailResponse {
     private List<PostTag> postTags;
 
     public QnaPostDetailResponse(String nickname, String profileImageUrl, PostCategory postCategory, String title, String content,
-                                 int viewCount, int likeCount, List<PostTag> postTags, LocalDateTime earliestTime, PaginationResult comments) {
-        super(nickname, profileImageUrl, postCategory, title, content, viewCount, likeCount, earliestTime, comments);
+                                 int viewCount, int likeCount, Boolean isLiked, List<PostTag> postTags, LocalDateTime earliestTime, PaginationResult comments) {
+        super(nickname, profileImageUrl, postCategory, title, content, viewCount, likeCount, isLiked ,earliestTime, comments);
         this.postTags = postTags;
+
+        System.out.println("postTags: " + postTags);
     }
 }

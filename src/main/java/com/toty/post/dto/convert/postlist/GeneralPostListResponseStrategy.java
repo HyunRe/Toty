@@ -8,6 +8,7 @@ public class GeneralPostListResponseStrategy implements PostListResponseStrategy
     @Override
     public PostListResponse convert(Post post) {
         return new GeneralPostListResponse(
+                post.getId(),
                 post.getUser().getNickname(),
                 post.getUser().getProfileImageUrl(),
                 post.getTitle(),

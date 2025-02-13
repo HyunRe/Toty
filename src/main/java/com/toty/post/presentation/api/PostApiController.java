@@ -1,20 +1,19 @@
 package com.toty.post.presentation.api;
 
 import com.toty.common.pagination.PaginationResult;
-import com.toty.base.response.SuccessResponse;
 import com.toty.common.annotation.CurrentUser;
 import com.toty.post.application.PostImageService;
 import com.toty.post.application.PostLikeService;
 import com.toty.post.application.PostPaginationService;
 import com.toty.post.application.PostService;
 import com.toty.post.domain.model.Post;
+import com.toty.post.dto.request.LikeActionRequest;
 import com.toty.post.dto.request.PostCreateRequest;
 import com.toty.post.dto.request.PostUpdateRequest;
 import com.toty.post.dto.response.postdetail.PostDetailResponse;
 import com.toty.user.domain.model.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,11 +39,11 @@ public class PostApiController {
 
     // 게시글 좋아요 토글 (증감소)
     @PatchMapping("/{id}/like")
-    public ResponseEntity<Boolean> toggleLike(@PathVariable Long id,
+    public ResponseEntity<Integer> toggleLike(@PathVariable Long id,
                                               @CurrentUser User user,
-                                              @RequestParam(name = "likeAction", required = false) String likeAction) {
-        Boolean isLiked = postLikeService.toggleLikeAction(id, user.getId(), likeAction);
-        return ResponseEntity.ok(isLiked);
+                                              @RequestBody LikeActionRequest likeActionRequest) {
+        int likeCount = postLikeService.toggleLikeAction(id, user.getId(), likeActionRequest.getLikeAction());
+        return ResponseEntity.ok(likeCount);
     }
 
     // 이미지 업로드
@@ -102,7 +101,6 @@ public class PostApiController {
                                                          @RequestParam(name = "page", defaultValue = "1") int page,
                                                          @RequestParam(name = "postCategory", required = false) String postCategory) {
         postService.incrementViewCount(id);
-
         PostDetailResponse response = postPaginationService.getPostDetailByCategory(page, id, postCategory);
         return ResponseEntity.ok(response);
     }
