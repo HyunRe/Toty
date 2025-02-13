@@ -1,5 +1,6 @@
 package com.toty.comment.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.toty.common.domain.BaseTime;
 import com.toty.post.domain.model.Post;
 import com.toty.user.domain.model.User;
@@ -25,6 +26,7 @@ public class Comment extends BaseTime {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "post_id", nullable = false)
+    @JsonBackReference
     private Post post;
 
     @Column(name = "content", nullable = false)

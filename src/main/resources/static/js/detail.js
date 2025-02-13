@@ -130,7 +130,7 @@ function loadPosts() {
                         saveIcon.classList.add('bi-bookmark');
                     }
 
-                    // 서버와의 연동: 좋아요 상태 업데이트
+                    // 서버와의 연동: 스크랩 상태 업데이트
                     fetch(`/api/posts/${postId}/scrape`, {
                         method: 'PATCH',
                         headers: {
@@ -214,6 +214,8 @@ function updatePostTags(tags, postCategory) {
 
 // 댓글 로딩 함수
 function loadComments(page = 1) {
+    const postId = window.location.pathname.split('/')[3];
+
     const commentList = document.getElementById("comment-list");
     const currentPageElement = document.getElementById('currentPage');
     const totalPagesElement = document.getElementById('totalPages');
@@ -223,7 +225,7 @@ function loadComments(page = 1) {
     commentList.innerHTML = ''; // 새로운 게시글을 추가하기 전에 기존 목록을 초기화
     pagination.innerHTML = ''; // 페이지네이션을 업데이트하기 전에 초기화
 
-    const apiEndpoint = `/api/comments/list`;
+    const apiEndpoint = `/api/comments/list?postId=${postId}`;
 
     fetch(apiEndpoint)
         .then(response => response.json())
@@ -358,6 +360,7 @@ function loadComments(page = 1) {
     // 댓글 작성 버튼 클릭 이벤트
     const commentSubmitBtn = document.getElementById("comment-submit-btn");
     commentSubmitBtn.addEventListener('click', function () {
+        const commentContent = document.getElementById('comment-content');
         const content = commentContent.value.trim();
 
         if (!content) {
@@ -383,31 +386,6 @@ function loadComments(page = 1) {
                 // 댓글 리스트에 새로운 댓글 추가
                 const newCommentItem = document.createElement('div');
                 newCommentItem.classList.add('comment-item');
-
-                // 프로필 이미지
-                const img = document.createElement('img');
-                img.setAttribute('src', data.profileImageUrl || 'profile.jpg');
-                img.setAttribute('alt', '프로필 이미지');
-                newCommentItem.appendChild(img);
-
-                // 댓글 내용
-                const commentDetails = document.createElement('div');
-                commentDetails.classList.add('comment-details');
-
-                const nickname = document.createElement('p');
-                nickname.textContent = data.nickname;
-                commentDetails.appendChild(nickname);
-
-                const contentElement = document.createElement('p');
-                contentElement.textContent = data.content;
-                commentDetails.appendChild(contentElement);
-
-                const commentMeta = document.createElement('div');
-                commentMeta.classList.add('comment-meta');
-                const time = document.createElement('p');
-                time.textContent = new Date(data.earliestTime).toLocaleString();
-                commentMeta.appendChild(time);
-                commentDetails.appendChild(commentMeta);
 
                 // 새 댓글을 리스트에 추가
                 commentList.prepend(newCommentItem);
