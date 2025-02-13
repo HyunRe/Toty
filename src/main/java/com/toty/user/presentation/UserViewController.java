@@ -5,7 +5,10 @@ import com.toty.user.application.UserInfoService;
 import com.toty.user.application.UserSignUpService;
 import com.toty.user.domain.model.User;
 import com.toty.user.dto.request.UserSignUpRequest;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +29,12 @@ public class UserViewController {
 
     // 회원 가입
     @PostMapping("/signup")
-    public String signUp(@RequestBody UserSignUpRequest userSignUpRequest, Model model) {
+    public ResponseEntity<Map<String, String>> signUp (@RequestBody UserSignUpRequest userSignUpRequest, Model model) {
         userSignUpService.signUp(userSignUpRequest);
-        return "redirect:/view/users/home";
+        Map<String, String> response = new HashMap<>();
+        response.put("redirectUrl", "/view/users/home");
+
+        return ResponseEntity.ok(response);
     }
 
     // 정보 수정(View)
@@ -88,7 +94,7 @@ public class UserViewController {
     // 업데이트 창 (내 정보 수정)
     @GetMapping("/updateInfo")
     public String getUpdateInfo(@CurrentUser User user, Model model) {
-        model.addAttribute("userInfo", user);
+        model.addAttribute("userInfo", userInfoService.getUserInfoByAccount(user.getId(), user.getId()));
         return "user/updateInfo";
     }
 
