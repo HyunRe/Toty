@@ -1,26 +1,23 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
+    <th:block th:replace="fragment/header :: headerhead"></th:block>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>내가 저장한 게시글 목록</title>
      <!-- Bootstrap CSS -->
      <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- 외부 CSS 파일 링크 -->
-    <link href="../../static/css/myScrape.css" rel="stylesheet">
+    <link href="/css/myScrape.css" rel="stylesheet">
 </head>
 <body>
+    <!-- header -->
+    <div th:replace="fragment/header :: header"></div>
+
     <div class="container mt-5">
         <div class="row">
             <!-- 왼쪽 메뉴 -->
-            <div class="col-md-3">
-                <h5>내 계정</h5>
-                <ul class="list-unstyled">
-                    <li><a href="#" id="profileMenu">프로필</a></li>
-                    <li><a href="#" id="myPostsMenu">내가 작성한 게시글</a></li>
-                    <li><a href="#" id="savedPostsMenu">내가 저장한 게시글</a></li>
-                </ul>
-            </div>
+            <div class="col-md-3" id="left-menu-container"></div>
 
             <!-- 오른쪽 게시글 목록 -->
             <div class="col-md-9">
@@ -59,14 +56,11 @@
         </div>
     </div>
 
-    <!-- 수직선 (border-left 클래스 적용) -->
-    <div class="border-left"></div>
-
     <!-- Bootstrap JS 및 의존성 -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- 외부 JS 파일 링크 -->
-    <script src="../../static/js/myScrape.js"></script>
+    <script src="/js/myScrape.js"></script>
 </body>
 </html>
