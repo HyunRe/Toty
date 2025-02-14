@@ -55,6 +55,9 @@ public class UserSignUpService {
                 .nickname(userSignUpRequest.getNickname())
                 .phoneNumber(userSignUpRequest.getPhoneNumber())
                 .loginProvider(LoginProvider.FORM)
+                .smsSubscribed(false)
+                .emailSubscribed(false)
+                .notificationAllowed(false)
                 .build();
 
         return userRepository.save(user).getId();

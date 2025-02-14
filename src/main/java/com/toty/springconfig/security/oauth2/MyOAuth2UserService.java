@@ -52,6 +52,9 @@ public class MyOAuth2UserService extends DefaultOAuth2UserService {
                             .password(hashedPwd)
                             .username(nickname)
                             .nickname(nickname)
+                            .smsSubscribed(false)
+                            .emailSubscribed(false)
+                            .notificationAllowed(false)
                             .loginProvider(LoginProvider.KAKAO)
                             .build();
                     userService.registerUser(user);
@@ -73,6 +76,9 @@ public class MyOAuth2UserService extends DefaultOAuth2UserService {
                                 .password(hashedPwd)
                                 .username(uname)
                                 .nickname(uname)
+                                .smsSubscribed(false)
+                                .emailSubscribed(false)
+                                .notificationAllowed(false)
                                 .loginProvider(LoginProvider.GOOGLE)
                                 .build();
                         userService.registerUser(user);
@@ -94,6 +100,9 @@ public class MyOAuth2UserService extends DefaultOAuth2UserService {
                             .password(hashedPwd)
                             .username(uname)
                             .nickname(uname)
+                            .smsSubscribed(false)
+                            .emailSubscribed(false)
+                            .notificationAllowed(false)
                             .loginProvider(LoginProvider.GITHUB)
                             .build();
                     userService.registerUser(user);
