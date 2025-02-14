@@ -36,16 +36,16 @@ public class UserScrapeService {
     // 저장된 게시글 목록 조회
     @Transactional(readOnly = true)
     public PaginationResult getPagedPostsByMyScrape(Long id, int page, String postCategory) {
-        Pageable pageable = PageRequest.of(page - 1, PAGE_SIZE, Sort.by(Sort.Order.desc("updatedAt")));
+        Pageable pageable = PageRequest.of(page - 1, PAGE_SIZE, Sort.by(Sort.Order.desc("createdAt")));
         // postCategory null이면 free(일반 게시판)로 처리
         Map<String, PostCategory> categoryMap = Map.of(
-                "General", PostCategory.GENERAL,
-                "Qna", PostCategory.QnA,
+                "general", PostCategory.GENERAL,
+                "qna", PostCategory.QnA,
                 "knowledge", PostCategory.KNOWLEDGE
         );
 
         PostCategory pc = categoryMap.getOrDefault(
-                Optional.ofNullable(postCategory).map(String::toLowerCase).orElse("free"),
+                Optional.ofNullable(postCategory).map(String::toLowerCase).orElse("general"),
                 PostCategory.GENERAL
         );
 
@@ -62,9 +62,12 @@ public class UserScrapeService {
     public String toggleScrape(Long postId, Long userId, String Scrape) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
         Post post = postRepository.findById(postId).orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
-
+        System.out.println("postI = " + postId);
+        System.out.println("userId = " + userId);
+        System.out.println("Scrape = " + Scrape);
         if ("scrape".equals(Scrape)) { // 스크랩 추가
-            if (userScrapeRepository.findByUserAndPost(user, post).isEmpty()) {
+            if (!userScrapeRepository.findByUserAndPost(user, post).isPresent()) {
+                System.out.println("값 없음");
                 userScrapeRepository.save(new UserScrape(user, post));
             }
         }
