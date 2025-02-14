@@ -37,12 +37,12 @@ function changeCategory(postCategory, page = 1) {
                 posts.forEach(post => {
                     const postItem = document.createElement('div');
                     postItem.classList.add('post-list-item');
-                    postItem.setAttribute('onclick', `location.href='/api/posts/${post.id}/detail'`);
+                    postItem.setAttribute('onclick', `location.href='/view/posts/${post.id}/detail'`);
                     postItem.style.cursor = 'pointer';
 
                     // 프로필 이미지
                     const img = document.createElement('img');
-                    img.setAttribute('src', post.profileImageUrl || 'profile.jpg'); // 기본 프로필 이미지로 대체
+                    img.setAttribute('src', post.profileImageUrl || '/img/undraw_profile.svg'); // 기본 프로필 이미지로 대체
                     img.setAttribute('alt', '프로필 이미지');
                     postItem.appendChild(img);
 
@@ -51,7 +51,6 @@ function changeCategory(postCategory, page = 1) {
                     details.classList.add('details');
 
                     const titleLink = document.createElement('a');
-                    titleLink.setAttribute('href', `/api/post/${post.id}/detail/`);
                     titleLink.textContent = post.title;
                     details.appendChild(titleLink);
 

@@ -1,3 +1,7 @@
+document.addEventListener("DOMContentLoaded", () => {
+  changeCategory("General", 1);
+});
+
 function changeCategory(selectedCategory,  page = 1) {
     const postList = document.getElementById('post-list');
     const currentPageElement = document.getElementById('currentPage');
@@ -36,7 +40,7 @@ function changeCategory(selectedCategory,  page = 1) {
 
                     // 프로필 이미지
                     const img = document.createElement('img');
-                    img.setAttribute('src', post.profileImageUrl || 'profile.jpg'); // 기본 프로필 이미지로 대체
+                    img.setAttribute('src', post.profileImageUrl || '/img/undraw_profile.svg'); // 기본 프로필 이미지로 대체
                     img.setAttribute('alt', '프로필 이미지');
                     postItem.appendChild(img);
 
