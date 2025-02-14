@@ -99,7 +99,7 @@ public class PostApiController {
     // 전체 게시글 목록 조회
     @GetMapping("/list")
     public ResponseEntity<PaginationResult> postList(@RequestParam(name = "page", defaultValue = "1") int page,
-                                                    @RequestParam(name = "sort", required = false) String sort) {
+                                                     @RequestParam(name = "sort", required = false) String sort) {
         PaginationResult result = postPaginationService.getPagedPosts(page, sort);
         return ResponseEntity.ok(result);
     }

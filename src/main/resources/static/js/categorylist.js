@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", function () {
 function loadPosts(page = 1) {
     const postList = document.getElementById('post-list');
     const pagination = document.getElementById('pagination');
-    //const sort = document.getElementById('sortSelect').value;
     const postCategory = new URLSearchParams(window.location.search).get('postCategory');
 
     console.log("postCategory" + postCategory);
@@ -55,12 +54,12 @@ function loadPosts(page = 1) {
                 posts.forEach(post => {
                     const postItem = document.createElement('div');
                     postItem.classList.add('post-list-item');
-                    postItem.setAttribute('onclick', `location.href='/api/posts/${post.id}/detail'`);
+                    postItem.setAttribute('onclick', `location.href='/view/posts/${post.id}/detail'`);
                     postItem.style.cursor = 'pointer';
 
                     // 프로필 이미지
                     const img = document.createElement('img');
-                    img.setAttribute('src', post.profileImageUrl || 'profile.jpg'); // 기본 프로필 이미지로 대체
+                    img.setAttribute('src', post.profileImageUrl || '/img/undraw_profile.svg'); // 기본 프로필 이미지로 대체
                     img.setAttribute('alt', '프로필 이미지');
                     postItem.appendChild(img);
 
@@ -69,7 +68,6 @@ function loadPosts(page = 1) {
                     details.classList.add('details');
 
                     const titleLink = document.createElement('a');
-                    titleLink.setAttribute('href', `/post/detail/${post.id}`);
                     titleLink.textContent = post.title;
                     details.appendChild(titleLink);
 

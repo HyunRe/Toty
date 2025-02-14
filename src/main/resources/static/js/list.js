@@ -44,7 +44,7 @@ function loadPosts(page = 1) {
                 console.log("postId", post.id)
                 const postItem = $(`
                     <div class="post-list-item" onclick="location.href='/view/posts/${post.id}/detail'">
-                        <img src="${post.profileImageUrl || 'profile.jpg'}" alt="프로필 이미지">
+                        <img src="${post.profileImageUrl || '/img/undraw_profile.svg'}" alt="프로필 이미지">
                         <div class="details">
                             <p>${post.title}</p>
                             <p>닉네임: ${post.nickname} ${post.role === 'MENTOR' ? '<span class="badge badge-primary">MENTOR</span>' : ''}</p>

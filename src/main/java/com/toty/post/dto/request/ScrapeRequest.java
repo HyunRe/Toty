@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 public class ScrapeRequest {
     private String scrape;
 
-    public ScrapeRequest(String Scrape) {
-        this.scrape = Scrape;
+    public ScrapeRequest(String scrape) {
+        this.scrape = scrape;
     }
 }

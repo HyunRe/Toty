@@ -1,10 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
-  changeCategory("general", 1);
+  changeCategory("General", 1);
 });
 
-function changeCategory(postCategory, page = 1) {
-    console.log("category" + postCategory);
-
+function changeCategory(selectedCategory,  page = 1) {
     const postList = document.getElementById('post-list');
     const currentPageElement = document.getElementById('currentPage');
     const totalPagesElement = document.getElementById('totalPages');
@@ -15,7 +13,7 @@ function changeCategory(postCategory, page = 1) {
     pagination.innerHTML = ''; // 페이지네이션을 업데이트하기 전에 초기화
 
     // 예시 API 엔드포인트 - 실제 API나 데이터 가져오는 방법으로 변경해야 함
-    const apiEndpoint = `/api/posts/myList?postCategory=${postCategory}&page=${page}`;
+    const apiEndpoint = `/api/posts/myList?postCategory=${selectedCategory}&page=${page}`;
 
     // 선택된 카테고리와 페이지에 맞는 게시글을 가져오기
     fetch(apiEndpoint)
@@ -42,7 +40,7 @@ function changeCategory(postCategory, page = 1) {
 
                     // 프로필 이미지
                     const img = document.createElement('img');
-                    img.setAttribute('src', post.profileImageUrl || 'profile.jpg'); // 기본 프로필 이미지로 대체
+                    img.setAttribute('src', post.profileImageUrl || '/img/undraw_profile.svg'); // 기본 프로필 이미지로 대체
                     img.setAttribute('alt', '프로필 이미지');
                     postItem.appendChild(img);
 
@@ -109,7 +107,7 @@ function changeCategory(postCategory, page = 1) {
                             .then(response => {
                                 if (response.ok) {
                                     alert('게시글이 삭제되었습니다.');
-                                    window.location.href = `/view/posts/myList?postCategory=${postCategory}`;
+                                    window.location.href = `/view/posts/myList?postCategory=${selectedCategory}`;
                                 } else {
                                     alert('게시글 삭제 실패');
                                 }
@@ -142,7 +140,7 @@ function changeCategory(postCategory, page = 1) {
                     a.href = '#';
                     a.onclick = (e) => {
                         e.preventDefault();
-                        changeCategory(postCategory, pageNumber);
+                        changeCategory(selectedCategory, pageNumber);
                     };
                     li.appendChild(a);
                     return li;
