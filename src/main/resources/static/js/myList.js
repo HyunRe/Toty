@@ -1,3 +1,7 @@
+document.addEventListener("DOMContentLoaded", () => {
+  changeCategory("general", 1);
+});
+
 function changeCategory(postCategory, page = 1) {
     console.log("category" + postCategory);
 

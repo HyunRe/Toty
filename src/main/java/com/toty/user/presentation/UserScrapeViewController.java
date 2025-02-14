@@ -23,10 +23,7 @@ public class UserScrapeViewController {
                            @RequestParam(name = "postCategory", required = false) String postCategory, // free, qna, knowledge
                            Model model) {
 
-        PaginationResult result = userScrapeService.getPagedPostsByMyScrape(user.getId(), page, postCategory);
-        model.addAttribute("result", result);
-        model.addAttribute("page", page);
-        model.addAttribute("postCategory", postCategory);
+
         return "user/myScrape";
     }
 }
