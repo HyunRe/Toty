@@ -42,7 +42,7 @@ public class UserInfoResponse {
 
     private Role role;
 
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     @Builder
     public UserInfoResponse(Long id, String email, String nickname,
@@ -51,7 +51,7 @@ public class UserInfoResponse {
                             String status_message, String phoneNumber, List<String> tags,
                             String profileImgUrl, List<LinkDto> links,
                             Long followerCount, Long followingCount, String username, boolean isFollowing,
-                            Role role, LocalDateTime createdAt) {
+                            Role role, String createdAt) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;

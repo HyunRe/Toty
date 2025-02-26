@@ -76,6 +76,7 @@
           <i
               class="bi bi-check-circle-fill me-2 text-success mr-1"
               id="mentor-badge"
+              th:if="${userInfo.role == 'MENTOR'}"
           >
           </i
           >회원 정보
@@ -84,20 +85,40 @@
           <div class="col-4 ml-2">
             <img
                 id="profileImage"
-                src="/img/user2.jpg"
+                th:src="${userInfo.profileImgUrl != null ? userInfo.profileImgUrl : '/img/undraw_profile.svg'}"
+                
                 alt="프로필 이미지"
                 style="border-radius: 50%; height: 80%"
             />
           </div>
+          
           <div class="col-6">
-            <p>이메일 <span id="email">[[${userInfo.email}]]</span></p>
-            <p>이름 <span id="username" th:text="${userInfo.username}">ooo@gmail.com</span></p>
-            <p>닉네임 <span id="nickname" th:text="${userInfo.nickname}">ooo</span></p>
-            <p>핸드폰 <span id="phone" th:text="${userInfo.phoneNumber}">000-0000-0000</span></p>
-            <p>가입일자 <span id="joinDate" th:text="${userInfo.createdAt}">0000-00-00</span></p>
+            <div style="display: flex; padding: 5px 0; font-size: 16px;">
+              <span style="font-weight: bold; min-width: 120px; text-align: left;">이메일</span>
+              <span id="email" style="flex-grow: 1; text-align: left;">[[${userInfo.email}]]</span>
+            </div>
+            <div style="display: flex; padding: 5px 0; font-size: 16px;">
+              <span style="font-weight: bold; min-width: 120px; text-align: left;">이름</span>
+              <span id="username" th:text="${userInfo.username}" style="flex-grow: 1; text-align: left;">ooo@gmail.com</span>
+            </div>
+            <div style="display: flex; padding: 5px 0; font-size: 16px;">
+              <span style="font-weight: bold; min-width: 120px; text-align: left;">닉네임</span>
+              <span id="nickname" th:text="${userInfo.nickname}" style="flex-grow: 1; text-align: left;">ooo</span>
+            </div>
+            <div style="display: flex; padding: 5px 0; font-size: 16px;">
+              <span style="font-weight: bold; min-width: 120px; text-align: left;">핸드폰</span>
+              <span id="phone" th:text="${userInfo.phoneNumber}" style="flex-grow: 1; text-align: left;">000-0000-0000</span>
+            </div>
+            <div style="display: flex; padding: 5px 0; font-size: 16px;">
+              <span style="font-weight: bold; min-width: 120px; text-align: left;">가입일자</span>
+              <span id="joinDate" th:text="${userInfo.createdAt}" style="flex-grow: 1; text-align: left;">0000-00-00</span>
+            </div>
           </div>
+          
+          
         </div>
       </div>
+      
     </div>l
   </div>
   <!-- 두 번째 섹션 - 내 소개 -->
@@ -137,7 +158,7 @@
             <p>기술 태그
               <i class="fa-solid fa-gear" style="cursor: pointer;" id="updateTag"></i>
             </p>
-            <div id="tag-container" class="tag-list"></div>
+            <div id="tag-container" class="tag-list" th:data-tags="${userInfo.tags != null ? tags : '[]'}"></div>
             <!-- 태그가 동적으로 들어가는 곳 -->
           </div>
         </div>
@@ -239,6 +260,8 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
 
       <!-- 수직선 (border-left 클래스 적용) -->
       <div class="border-left"></div>
@@ -268,19 +291,18 @@
     // 예제 JSON 데이터 (실제 사용 시 백엔드에서 가져와야 함)
     const userData = {
 
-      tags: ["JAVA", "JAVASCRIPT"], // 프로그래밍 언어 태그
       links: [
         { site: "GITHUB", url: "https://github.com/user" },
         { site: "BLOG", url: "https://userblog.com" },
-        { site: "LINKEDIN", url: "https://linkedin.com/in/user" },
       ],
-      role: "MENTOR", // 역할 (USER, ADMIN, MENTOR)
       createdAt: "2024-02-06T12:00:00", // 가입 일시
     };
 
     // 태그 추가
     const tagContainer = document.getElementById("tag-container");
-    userData.tags.forEach((tag) => {
+
+    let tags = tagContainer.getAttribute("data-tags")
+    tags.forEach((tag) => {
       const tagElement = document.createElement("span");
       tagElement.classList.add("bg", "bg-primary", "mr-2", "badge");
       tagElement.textContent = tag;
@@ -297,13 +319,6 @@
       linkElement.target = "_blank";
       linksContainer.appendChild(linkElement);
     });
-
-    const mentorBadge = document.getElementById("mentor-badge");
-    if (userData.role === "MENTOR") {
-      mentorBadge.style.display = "inline-block"; // 또는 기본값 "inline" 등
-    } else {
-      mentorBadge.style.display = "none";
-    }
 
     const updateInfoBtn = document.getElementById("updateInfo");
     if (updateInfoBtn) {

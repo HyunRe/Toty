@@ -19,6 +19,7 @@ import com.toty.user.dto.request.UserInfoUpdateRequest;
 import com.toty.user.dto.response.LinkDto;
 import com.toty.user.dto.response.UserInfoResponse;
 import jakarta.transaction.Transactional;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -82,7 +83,7 @@ public class UserInfoService {
                 .role(foundUser.getRole())
                 .status_message(foundUser.getStatusMessage())
 //                .isFollowing(!isOwner ? followingRepository.existsByFromUserIdAndToUserId(myId, targetId) : null)
-                .createdAt(isOwner ? foundUser.getCreatedAt() : null)
+                .createdAt(isOwner ? foundUser.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null)
                 .build();
     }
 
