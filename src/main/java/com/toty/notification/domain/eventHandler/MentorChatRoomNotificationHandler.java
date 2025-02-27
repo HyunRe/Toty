@@ -1,7 +1,7 @@
 package com.toty.notification.domain.eventHandler;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.toty.notification.application.service.NotificationCreationService;
+import com.toty.notification.application.sender.NotificationSenderService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class MentorChatRoomNotificationHandler {
-    private final NotificationCreationService notificationCreationService;
+    private final NotificationSenderService notificationSenderService;
 
     @EventListener
     public void handleNotification(NotificationEvent event) throws MessagingException, FirebaseMessagingException {
         if ("ChatRoom".equals(event.getNotificationSendRequest().getType())) {
-            notificationCreationService.createNotification(event.getNotificationSendRequest());
+            notificationSenderService.send(event.getNotificationSendRequest());
         }
     }
 }

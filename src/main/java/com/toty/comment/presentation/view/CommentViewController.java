@@ -3,17 +3,10 @@ package com.toty.comment.presentation.view;
 import com.toty.comment.application.CommentPaginationService;
 import com.toty.comment.application.CommentService;
 import com.toty.comment.domain.model.Comment;
-import com.toty.comment.dto.request.CommentCreateUpdateRequest;
-import com.toty.common.annotation.CurrentUser;
 import com.toty.common.pagination.PaginationResult;
-import com.toty.post.application.PostService;
-import com.toty.user.domain.model.User;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller

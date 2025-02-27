@@ -74,6 +74,9 @@ dependencies {
 	//oauth2
 	implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client'
 
+	// retry
+	implementation 'org.springframework.retry:spring-retry:2.0.8'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 }
 
 sourceSets {

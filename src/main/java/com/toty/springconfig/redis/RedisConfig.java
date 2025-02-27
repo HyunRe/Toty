@@ -9,10 +9,12 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import javax.management.NotificationListener;
 
 /**
  * Redis 환경 설정
@@ -98,13 +100,20 @@ public class RedisConfig {
         }
     }
 
-    // Redis Pub/Sub 메시지를 자동으로 수신하여 NotificationService로 전달
+    // Redis 메시지를 구독
+    @Bean
+    public MessageListenerAdapter redisSubscriberAdapter(RedisSubscriber subscriber) {
+        return new MessageListenerAdapter(subscriber, "onMessage"); // RedisSubscriber의 onMessage 실행
+    }
+
+    // Redis Pub/Sub 메시지를 자동으로 수신하여 NotificationService 전달
     @Bean
     public RedisMessageListenerContainer redisContainer(RedisConnectionFactory connectionFactory,
-                                                        RedisSubscriber subscriber) {
+                                                        MessageListenerAdapter redisSubscriberAdapter) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(new MessageListenerAdapter(subscriber), new ChannelTopic("notifications"));
+        container.addMessageListener(redisSubscriberAdapter, new PatternTopic("notifications"));
+
         return container;
     }
 }
