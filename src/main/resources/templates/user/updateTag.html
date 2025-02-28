@@ -321,7 +321,15 @@ function submit() {
         body: JSON.stringify(requestData)
     })
     .then(response => response.json())
-    .then(data => console.log('Success:', data))
+    .then(data => {
+      console.log('Success:', data)
+
+      if (window.opener) {
+        window.opener.location.reload();
+      }
+
+      window.close();
+    })
     .catch(error => console.error('Error:', error));
 }
   
