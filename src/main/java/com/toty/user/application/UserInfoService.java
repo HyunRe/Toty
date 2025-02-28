@@ -157,6 +157,10 @@ public class UserInfoService {
         if (isNotOwner(user, dto.getId())) {
             throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
         }
+
+        if (dto.getTags().size() > 10) {
+            throw new ExpectedException(ErrorCode.Tag_Limit_Exceeded_Error);
+        }
         User foundUser = userService.findById(userId);
         userTagRepository.deleteByUserId(userId);
         dto.getTags().forEach(tag -> {

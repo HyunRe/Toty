@@ -287,7 +287,7 @@
 </body>
 <!-- <script src="/js/detail.js"></script> -->
 <script>
-
+  const swalConfig = {confirmButtonColor: '#1f9bcf'};
   let currentStatusMessage = document.getElementById("status-message").textContent;
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -437,7 +437,8 @@
         Swal.fire({
           icon: "success",
           title: "업데이트 완료",
-          text: "상태 메시지가 변경되었습니다!"
+          text: "상태 메시지가 변경되었습니다!",
+          ...swalConfig
         });
       }
     });

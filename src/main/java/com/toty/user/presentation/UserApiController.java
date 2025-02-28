@@ -135,7 +135,7 @@ public class UserApiController {
     }
 
     // 내 태그 수정
-    @PostMapping("/tags")
+    @PutMapping("/tags")
     public ResponseEntity updateUserTags(@CurrentUser User user,
             @RequestBody TagUpdateDto dto) {
         userInfoService.updateUserTags(user, dto);
@@ -153,7 +153,7 @@ public class UserApiController {
         userInfoService.updatePhoneNumber(user, user.getId(), request);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
-                "태그가 수정되었습니다.",
+                "번호가 수정되었습니다.",
                 null
         );
         return ResponseEntity.ok(successResponse);
