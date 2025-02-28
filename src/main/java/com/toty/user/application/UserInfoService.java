@@ -14,7 +14,7 @@ import com.toty.user.domain.repository.UserTagRepository;
 import com.toty.user.dto.request.BasicInfoUpdateRequest;
 import com.toty.user.dto.request.LinkUpdateRequest;
 import com.toty.user.dto.request.PhoneNumberUpdateRequest;
-import com.toty.user.dto.request.TagUpdateRequest;
+import com.toty.user.dto.TagUpdateDto;
 import com.toty.user.dto.request.UserInfoUpdateRequest;
 import com.toty.user.dto.response.LinkDto;
 import com.toty.user.dto.response.UserInfoResponse;
@@ -140,15 +140,26 @@ public class UserInfoService {
         });
     }
 
+    // 태그 수정 페이지 조회
+    public TagUpdateDto getUserTags(Long userId) {
+        List<String> userTags = userTagRepository.findByUserId(userId)
+                .stream()
+                .map(userTag -> userTag.getTag().name().toLowerCase().replace("_", "-"))
+                .toList();
+        TagUpdateDto tagUpdateDto = new TagUpdateDto(userId, userTags);
+        return tagUpdateDto;
+    }
+
     //태그 수정
     @Transactional
-    public void updateUserTags(User user, Long userId, TagUpdateRequest tags) {
-        if (isNotOwner(user, userId)) {
+    public void updateUserTags(User user, TagUpdateDto dto) {
+        Long userId = user.getId();
+        if (isNotOwner(user, dto.getId())) {
             throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
         }
         User foundUser = userService.findById(userId);
         userTagRepository.deleteByUserId(userId);
-        tags.getTags().forEach(tag -> {
+        dto.getTags().forEach(tag -> {
             userTagRepository.save(new UserTag(foundUser, tagStringToEnum(tag)));
         });
     }
@@ -197,7 +208,7 @@ public class UserInfoService {
     // 문자열-> Tag enum을 리턴
     private static Tag tagStringToEnum(String tagValue) {
         return Arrays.stream(Tag.values())
-                .filter(t -> t.getTag().equalsIgnoreCase(tagValue))
+                .filter(t -> t.name().equalsIgnoreCase(tagValue.replace("-","_")))
                 .findFirst().get();
     }
 

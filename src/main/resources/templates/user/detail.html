@@ -39,7 +39,7 @@
 
 </head>
 <body>
-<div th:replace="fragment/header :: header"></div>
+<div th:replace="~{fragment/header :: header}"></div>
 
 <div class="container mt-5">
   <div class="row">
@@ -158,7 +158,12 @@
             <p>기술 태그
               <i class="fa-solid fa-gear" style="cursor: pointer;" id="updateTag"></i>
             </p>
-            <div id="tag-container" class="tag-list" th:data-tags="${userInfo.tags != null ? userInfo.tags : '[]'}"></div>
+            <div id="tag-container" class="tag-list" th:if="${userInfo.tags != null}">
+              <span th:each="tag : ${userInfo.tags}" 
+                    th:text="${tag}" 
+                    class="bg bg-primary mr-2 badge">
+              </span>
+            </div>
             <!-- 태그가 동적으로 들어가는 곳 -->
           </div>
         </div>
@@ -283,8 +288,6 @@
 <!-- <script src="/js/detail.js"></script> -->
 <script>
 
-
-
   let currentStatusMessage = document.getElementById("status-message").textContent;
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -297,21 +300,6 @@
       ],
       createdAt: "2024-02-06T12:00:00", // 가입 일시
     };
-
-    // 태그 추가
-    const tagContainer = document.getElementById("tag-container");
-
-    let tagsData = tagContainer.getAttribute("data-tags")
-    let tags = JSON.parse(tagsData);
-
-    if (tags.length > 0) {
-      tags.forEach((tag) => {
-      const tagElement = document.createElement("span");
-      tagElement.classList.add("bg", "bg-primary", "mr-2", "badge");
-      tagElement.textContent = tag;
-      tagContainer.appendChild(tagElement);
-    });
-    }
     
 
     // 링크 추가

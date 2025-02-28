@@ -1,7 +1,5 @@
 package com.toty.user.presentation;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toty.base.response.SuccessResponse;
 import com.toty.common.annotation.CurrentUser;
 import com.toty.springconfig.security.jwt.JwtTokenUtil;
@@ -12,12 +10,13 @@ import com.toty.user.domain.model.User;
 import com.toty.user.dto.request.BasicInfoUpdateRequest;
 import com.toty.user.dto.request.LinkUpdateRequest;
 import com.toty.user.dto.request.PhoneNumberUpdateRequest;
-import com.toty.user.dto.request.TagUpdateRequest;
+import com.toty.user.dto.TagUpdateDto;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -129,11 +128,17 @@ public class UserApiController {
         return ResponseEntity.ok(successResponse);
     }
 
+    /// 업데이트 창 (태그)
+    @GetMapping("/updateTag")
+    public ResponseEntity getUpdateTag(@CurrentUser User user, Model model) {
+        return ResponseEntity.ok(userInfoService.getUserTags(user.getId()));
+    }
+
     // 내 태그 수정
     @PostMapping("/tags")
     public ResponseEntity updateUserTags(@CurrentUser User user,
-            @RequestBody TagUpdateRequest request) {
-        userInfoService.updateUserTags(user, user.getId(), request);
+            @RequestBody TagUpdateDto dto) {
+        userInfoService.updateUserTags(user, dto);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 "태그가 수정되었습니다.",

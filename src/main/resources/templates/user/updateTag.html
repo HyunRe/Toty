@@ -96,197 +96,157 @@
               <div class="col-12 mb-5">
                 
                   <label style="margin-left: 1.5rem;" class="mb-3">기술 스택</label>
-                  <div class="col-md-12 form-group" style="display: flex;">
-                  <div class="col-6">
-                      
-        
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="java" class="custom-control-input" />
-                    <label for="java" class="custom-control-label">Java</label>
+                  <div class="col-md-12 form-group" style="display: flex;" id="tag-container">
+                    <div class="col-6">
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="java" id="java" class="custom-control-input" />
+                        <label for="java" class="custom-control-label">Java</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="javascript" id="javascript" class="custom-control-input" />
+                        <label for="javascript" class="custom-control-label">JavaScript</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="c" id="c" class="custom-control-input" />
+                        <label for="c" class="custom-control-label">C</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="c-sharp" id="c-sharp" class="custom-control-input" />
+                        <label for="c-sharp" class="custom-control-label">C#</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="c-plus-plus" id="c-plus-plus" class="custom-control-input" />
+                        <label for="c-plus-plus" class="custom-control-label">C++</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="ruby" id="ruby" class="custom-control-input" />
+                        <label for="ruby" class="custom-control-label">Ruby</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="go" id="go" class="custom-control-input" />
+                        <label for="go" class="custom-control-label">Go</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="php" id="php" class="custom-control-input" />
+                        <label for="php" class="custom-control-label">PHP</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="swift" id="swift" class="custom-control-input" />
+                        <label for="swift" class="custom-control-label">Swift</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="kotlin" id="kotlin" class="custom-control-input" />
+                        <label for="kotlin" class="custom-control-label">Kotlin</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="rust" id="rust" class="custom-control-input" />
+                        <label for="rust" class="custom-control-label">Rust</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="spring-boot" id="spring-boot" class="custom-control-input" />
+                        <label for="spring-boot" class="custom-control-label">Spring Boot</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="spring-security" id="spring-security" class="custom-control-input" />
+                        <label for="spring-security" class="custom-control-label">Spring Security</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="spring-data-jpa" id="spring-data-jpa" class="custom-control-input" />
+                        <label for="spring-data-jpa" class="custom-control-label">Spring Data JPA</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="spring-cloud" id="spring-cloud" class="custom-control-input" />
+                        <label for="spring-cloud" class="custom-control-label">Spring Cloud</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="spring-batch" id="spring-batch" class="custom-control-input" />
+                        <label for="spring-batch" class="custom-control-label">Spring Batch</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="spring-rest" id="spring-rest" class="custom-control-input" />
+                        <label for="spring-rest" class="custom-control-label">Spring REST</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="spring-web" id="spring-web" class="custom-control-input" />
+                        <label for="spring-web" class="custom-control-label">Spring Web</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="thymeleaf" id="thymeleaf" class="custom-control-input" />
+                        <label for="thymeleaf" class="custom-control-label">Thymeleaf</label>
+                      </div>
+                    </div>
+                  
+                    <div class="col-6">
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="jpa" id="jpa" class="custom-control-input" />
+                        <label for="jpa" class="custom-control-label">JPA</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="hibernate" id="hibernate" class="custom-control-input" />
+                        <label for="hibernate" class="custom-control-label">Hibernate</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="mysql" id="mysql" class="custom-control-input" />
+                        <label for="mysql" class="custom-control-label">MySQL</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="postgresql" id="postgresql" class="custom-control-input" />
+                        <label for="postgresql" class="custom-control-label">PostgreSQL</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="mongodb" id="mongodb" class="custom-control-input" />
+                        <label for="mongodb" class="custom-control-label">MongoDB</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="redis" id="redis" class="custom-control-input" />
+                        <label for="redis" class="custom-control-label">Redis</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="kafka" id="kafka" class="custom-control-input" />
+                        <label for="kafka" class="custom-control-label">Kafka</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="rabbitmq" id="rabbitmq" class="custom-control-input" />
+                        <label for="rabbitmq" class="custom-control-label">RabbitMQ</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="rest-api" id="rest-api" class="custom-control-input" />
+                        <label for="rest-api" class="custom-control-label">REST API</label>
+                      </div>
+                  
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="tags" value="soap" id="soap" class="custom-control-input" />
+                        <label for="soap" class="custom-control-label">SOAP</label>
+                      </div>
+                    </div>
                   </div>
                   
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="javascript" class="custom-control-input" />
-                    <label for="javascript" class="custom-control-label">JavaScript</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="c" class="custom-control-input" />
-                    <label for="c" class="custom-control-label">C</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="c-sharp" class="custom-control-input" />
-                    <label for="c-sharp" class="custom-control-label">C#</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="cpp" class="custom-control-input" />
-                    <label for="cpp" class="custom-control-label">C++</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="ruby" class="custom-control-input" />
-                    <label for="ruby" class="custom-control-label">Ruby</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="go" class="custom-control-input" />
-                    <label for="go" class="custom-control-label">Go</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="php" class="custom-control-input" />
-                    <label for="php" class="custom-control-label">PHP</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="swift" class="custom-control-input" />
-                    <label for="swift" class="custom-control-label">Swift</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="kotlin" class="custom-control-input" />
-                    <label for="kotlin" class="custom-control-label">Kotlin</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="rust" class="custom-control-input" />
-                    <label for="rust" class="custom-control-label">Rust</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="spring-boot" class="custom-control-input" />
-                    <label for="spring-boot" class="custom-control-label">Spring Boot</label>
-                  </div>
-       
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="spring-security" class="custom-control-input" />
-                    <label for="spring-security" class="custom-control-label">Spring Security</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="spring-data-jpa" class="custom-control-input" />
-                    <label for="spring-data-jpa" class="custom-control-label">Spring Data JPA</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="spring-cloud" class="custom-control-input" />
-                    <label for="spring-cloud" class="custom-control-label">Spring Cloud</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="spring-batch" class="custom-control-input" />
-                    <label for="spring-batch" class="custom-control-label">Spring Batch</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="spring-rest" class="custom-control-input" />
-                    <label for="spring-rest" class="custom-control-label">Spring REST</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="spring-web" class="custom-control-input" />
-                    <label for="spring-web" class="custom-control-label">Spring Web</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="thymeleaf" class="custom-control-input" />
-                    <label for="thymeleaf" class="custom-control-label">Thymeleaf</label>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="jpa" class="custom-control-input" />
-                    <label for="jpa" class="custom-control-label">JPA</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="hibernate" class="custom-control-input" />
-                    <label for="hibernate" class="custom-control-label">Hibernate</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="mysql" class="custom-control-input" />
-                    <label for="mysql" class="custom-control-label">MySQL</label>
-                  </div>
-  
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="postgresql" class="custom-control-input" />
-                    <label for="postgresql" class="custom-control-label">PostgreSQL</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="mongodb" class="custom-control-input" />
-                    <label for="mongodb" class="custom-control-label">MongoDB</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="redis" class="custom-control-input" />
-                    <label for="redis" class="custom-control-label">Redis</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="kafka" class="custom-control-input" />
-                    <label for="kafka" class="custom-control-label">Kafka</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="rabbitmq" class="custom-control-input" />
-                    <label for="rabbitmq" class="custom-control-label">RabbitMQ</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="aws" class="custom-control-input" />
-                    <label for="aws" class="custom-control-label">AWS</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="azure" class="custom-control-input" />
-                    <label for="azure" class="custom-control-label">Azure</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="google-cloud" class="custom-control-input" />
-                    <label for="google-cloud" class="custom-control-label">Google Cloud</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="docker" class="custom-control-input" />
-                    <label for="docker" class="custom-control-label">Docker</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="kubernetes" class="custom-control-input" />
-                    <label for="kubernetes" class="custom-control-label">Kubernetes</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="jenkins" class="custom-control-input" />
-                    <label for="jenkins" class="custom-control-label">Jenkins</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="maven" class="custom-control-input" />
-                    <label for="maven" class="custom-control-label">Maven</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="gradle" class="custom-control-input" />
-                    <label for="gradle" class="custom-control-label">Gradle</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="rest-api" class="custom-control-input" />
-                    <label for="rest-api" class="custom-control-label">REST API</label>
-                  </div>
-                  
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" id="soap" class="custom-control-input" />
-                    <label for="soap" class="custom-control-label">SOAP</label>
-                  </div>
-                </div>
 </div>
         </form>
             <div class="col-md-12 form-group pt-3">
@@ -309,37 +269,63 @@
 
 // sweetalert 버튼 스타일 설정
 const swalConfig = {confirmButtonColor: '#1f9bcf'};
+let userId;
 
 document.addEventListener("DOMContentLoaded", function () {
-  // 기존 선택된 기술 태그 목록(예시 데이터 실제 사용 시 ajax로 호출 후 대입하기)
-  const selectedTechs = ["Java", "JavaScript"];
-  const submit = document.getElementById('tagSubmit');
 
-  // 모든 체크박스
-  const checkboxes = document.querySelectorAll("input[type='checkbox']");
-
-  checkboxes.forEach((checkbox) => {
-    // 라벨 텍스트 가져오기
-    const label = document.querySelector(`label[for="${checkbox.id}"]`);
-    if (label && selectedTechs.includes(label.textContent.trim())) {
-      checkbox.checked = true; 
-    }
-  });
+  fetch('/api/users/updateTag', {
+        method: 'GET'
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success:', data)
+      const tagContainer = document.getElementById("tag-container")
+      const selectedTechs = data.tags;
+      userId = data.id;
+      if (selectedTechs != null) {
+        selectedTechs.forEach(id => {
+          const checkbox = document.getElementById(id);
+          if (checkbox) {
+            checkbox.checked = true;
+          }
+        });
+      }
+    })
+    .catch(error => console.error('Error:', error));
+  
 });
 
 
-
-if(submit) {
-  submit.addEventListener('click', submit);
+const submitBtn = document.getElementById('tagSubmit');
+if(submitBtn) {
+  submitBtn.addEventListener('click', submit);
 }
 
 function submit() {
-  console.log('클릭');
-  document.getElementById('updateForm').submit;
+  const selectedTags = Array.from(document.getElementsByName("tags"))
+        .filter(checkbox => checkbox.checked)
+        .map(checkbox => checkbox.value);
+    console.log("selectedTags: ", selectedTags)
+    // JSON 데이터 생성
+    const requestData = {
+        id: userId,
+        tags: selectedTags
+    };
+
+    // JSON으로 서버에 전송
+    fetch('/api/users/tags', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => response.json())
+    .then(data => console.log('Success:', data))
+    .catch(error => console.error('Error:', error));
 }
   
 </script>
 </body>
 
 </html>
-        
