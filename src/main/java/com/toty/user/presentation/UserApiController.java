@@ -7,8 +7,8 @@ import com.toty.user.application.UserInfoService;
 import com.toty.user.application.UserService;
 import com.toty.user.application.UserSignUpService;
 import com.toty.user.domain.model.User;
+import com.toty.user.dto.LinkUpdateDto;
 import com.toty.user.dto.request.BasicInfoUpdateRequest;
-import com.toty.user.dto.request.LinkUpdateRequest;
 import com.toty.user.dto.request.PhoneNumberUpdateRequest;
 import com.toty.user.dto.TagUpdateDto;
 import jakarta.servlet.http.HttpServletResponse;
@@ -115,11 +115,17 @@ public class UserApiController {
         return ResponseEntity.ok(successResponse);
     }
 
+    // 업데이트 창 (링크)
+    @GetMapping("/updateLink")
+    public ResponseEntity getUpdateLink(@CurrentUser User user, Model model) {
+        return ResponseEntity.ok(userInfoService.getUserLinks(user.getId()));
+    }
+
     // 내 링크 수정
-    @PostMapping("/links")
+    @PutMapping("/links")
     public ResponseEntity updateUserLinks(@CurrentUser User user,
-            @RequestBody LinkUpdateRequest request) {
-        userInfoService.updateUserLinks(user, user.getId(), request);
+            @RequestBody LinkUpdateDto request) {
+        userInfoService.updateUserLinks(user, request);
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
                 "링크가 수정되었습니다.",

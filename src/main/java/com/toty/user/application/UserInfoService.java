@@ -11,8 +11,8 @@ import com.toty.user.domain.model.UserTag;
 import com.toty.user.domain.repository.UserLinkRepository;
 import com.toty.user.domain.repository.UserRepository;
 import com.toty.user.domain.repository.UserTagRepository;
+import com.toty.user.dto.LinkUpdateDto;
 import com.toty.user.dto.request.BasicInfoUpdateRequest;
-import com.toty.user.dto.request.LinkUpdateRequest;
 import com.toty.user.dto.request.PhoneNumberUpdateRequest;
 import com.toty.user.dto.TagUpdateDto;
 import com.toty.user.dto.request.UserInfoUpdateRequest;
@@ -128,14 +128,25 @@ public class UserInfoService {
 
     }
 
-    // link 변경
+    // 링크 수정 페이지 조회
+    public LinkUpdateDto getUserLinks(Long userId) {
+        List<LinkDto> userLinks = userLinkRepository.findByUserId(userId)
+                .stream()
+                .map(userLink -> new LinkDto(userLink.getSite().getValue(), userLink.getUrl()))
+                .toList();
+        LinkUpdateDto linkUpdateDto = new LinkUpdateDto(userId, userLinks);
+        return linkUpdateDto;
+    }
+
+    // 링크 수정
     @Transactional
-    public void updateUserLinks(User user, Long userId, LinkUpdateRequest request) {
-        if (isNotOwner(user, userId)) {
+    public void updateUserLinks(User user, LinkUpdateDto dto) {
+        Long userId = user.getId();
+        if (isNotOwner(user, dto.getId())) {
             throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
         }
         userLinkRepository.deleteByUserId(userId);
-        request.getLinks().forEach(link -> {
+        dto.getLinks().forEach(link -> {
             userLinkRepository.save(new UserLink(userService.findById(userId), siteStringToEnum(link.getSite()), link.getUrl()));
         });
     }
@@ -177,36 +188,36 @@ public class UserInfoService {
         foundUser.updatePhoneNumber(phoneNumberDto.getPhoneNumber());
     }
 
-    // 전체 정보 수정
-    @Transactional
-    public void updateUserInfo(User user, Long userId, UserInfoUpdateRequest newInfo, MultipartFile imgFile) {
-        if (isNotOwner(user, userId)) {
-            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
-        }
-        User foundUser = userService.findById(userId);
-
-        if (imgFile != null && !imgFile.isEmpty()) {
-            try {
-                String savePath = basePath + userId;
-                String contentType = imgFile.getContentType().split("/")[1];
-                imgFile.transferTo(new File(savePath+"."+contentType)); // ex) --.jpg, --hi.png
-                foundUser.updateInfo(newInfo, savePath);
-            } catch (IOException e) {
-                throw new ExpectedException(ErrorCode.PROFILE_IMAGE_SAVE_ERROR);
-            }
-        }
-
-        userTagRepository.deleteByUserId(userId);
-        newInfo.getTags().forEach(tag -> {
-            Tag tagEnum = tagStringToEnum(tag);
-            userTagRepository.save(new UserTag(foundUser, tagEnum));
-        });
-
-        userLinkRepository.deleteByUserId(userId);
-        newInfo.getLinks().forEach(link -> {
-            userLinkRepository.save(new UserLink(foundUser, siteStringToEnum(link.getSite()), link.getUrl()));
-        });
-    }
+//    // 전체 정보 수정
+//    @Transactional
+//    public void updateUserInfo(User user, Long userId, UserInfoUpdateRequest newInfo, MultipartFile imgFile) {
+//        if (isNotOwner(user, userId)) {
+//            throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
+//        }
+//        User foundUser = userService.findById(userId);
+//
+//        if (imgFile != null && !imgFile.isEmpty()) {
+//            try {
+//                String savePath = basePath + userId;
+//                String contentType = imgFile.getContentType().split("/")[1];
+//                imgFile.transferTo(new File(savePath+"."+contentType)); // ex) --.jpg, --hi.png
+//                foundUser.updateInfo(newInfo, savePath);
+//            } catch (IOException e) {
+//                throw new ExpectedException(ErrorCode.PROFILE_IMAGE_SAVE_ERROR);
+//            }
+//        }
+//
+//        userTagRepository.deleteByUserId(userId);
+//        newInfo.getTags().forEach(tag -> {
+//            Tag tagEnum = tagStringToEnum(tag);
+//            userTagRepository.save(new UserTag(foundUser, tagEnum));
+//        });
+//
+//        userLinkRepository.deleteByUserId(userId);
+//        newInfo.getLinks().forEach(link -> {
+//            userLinkRepository.save(new UserLink(foundUser, siteStringToEnum(link.getSite()), link.getUrl()));
+//        });
+//    }
 
 
     // 문자열-> Tag enum을 리턴
