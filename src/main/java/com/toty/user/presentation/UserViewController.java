@@ -100,7 +100,7 @@ public class UserViewController {
     /// 업데이트 창 (링크)
     @GetMapping("/updateLink")
     public String getUpdateLink(@CurrentUser User user, Model model) {
-        model.addAttribute("userInfo", user); // 링크로 수정 필요
+//        model.addAttribute("userInfo", user); // 링크로 수정 필요
         return "user/updateLink";
     }
 
@@ -113,7 +113,7 @@ public class UserViewController {
     /// 업데이트 창 (태그)
     @GetMapping("/updateTag")
     public String getUpdateTag(@CurrentUser User user, Model model) {
-        model.addAttribute("userInfo", user); // 태그로 수정 필요
+//        model.addAttribute("userInfo", userInfoService.getUserLinks(user.getId()));
         return "user/updateTag";
     }
 

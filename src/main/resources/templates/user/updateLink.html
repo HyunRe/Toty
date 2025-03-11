@@ -76,12 +76,7 @@
       <div class="row px-xl-5"></div>
     </div>
     <!-- Navbar End -->
-
-    <!-- 
-이메일, 이름, -- readonly 
-  휴대폰 번호, 
-  닉네임, 프사, 태그, 링크,
-  sms, 이메일, 알림 수신 여부 -->
+     
     <div class="container-fluid">
       <div
         class="row"
@@ -116,39 +111,27 @@
                     </button>
                   </div>
                   <form>
-                  <div
-                    class="links-container col-12 input-group"
-                    id="links-container"
-                    style="
-                      display: flex;
-                      margin: auto;
-                      text-align: start;
-                      flex-direction: row;
-                    "
-                  >
+                    <div
+                      class="links-container col-12 input-group"
+                      id="links-container"
+                      style="
+                        display: flex;
+                        margin: auto;
+                        text-align: start;
+                        flex-direction: row;
+                      "
+                    >
+                    </div>
                   </form>
-                  </div>
-                 
-                  <a
-                    class="link-itemz pt-1"
-                    href="https://github.com/username"
-                    target="_blank"
-                    style="width: 60%"
-                  >
-                  <!-- <div class="col-12 pt-3"> -->
-                    <!-- <img src="https://via.placeholder.com/20?text=GH" alt="Github 로고"> -->
-                    <!-- url 주소 그대로 -->
-                    <!-- <i class="fa-brands fa-square-github"></i>Github
-                  </a>
-                </div> -->
-                <div class="links-container"></div>
+
+                </div>
               </div>
             </form>
-            </div>
+            <!-- </div> -->
             <div class="col-md-12 form-group pt-3">
               <button
                 type="button"
-                id="formSubmit"
+                id="linkSubmit"
                 class="btn btn-info"
                 style="width: 100%"
               >
@@ -169,25 +152,12 @@
 
     <script>
 
-document.addEventListener("DOMContentLoaded", function () {
-  const addBtn = document.getElementById("link-add");
-  const container = document.getElementById("links-container");
+// sweetalert 버튼 스타일 설정
+  const swalConfig = {confirmButtonColor: '#1f9bcf'};
+  let userId;
 
-// 기존 링크 데이터(존재할 경우)
-const existingLinks = [
-  { type: "GITHUB", url: "https://github.com/myprofile" },
-  { type: "BLOG", url: "https://myblog.com" }
-];
-
-existingLinks.forEach((link) => addList(link.type, link.url));
-
-
-if (addBtn) {
-    addBtn.addEventListener("click", () => addList()); // 빈 값으로 새 입력 추가
-  }
-
-  function addList(selectedType = "GITHUB", linkValue = "") {
-    // 새로운 입력 필드 추가
+  function addList(container, selectedType = "GITHUB", linkValue = "") {
+    
     const newElement = document.createElement("div");
     newElement.classList.add("input-group", "mb-2");
     newElement.style.display = "flex";
@@ -208,8 +178,106 @@ if (addBtn) {
     newElement.querySelector(".remove-btn").addEventListener("click", () => {
       newElement.remove();
     });
+    }
+
+  document.addEventListener("DOMContentLoaded", function () {
+
+    fetch("/api/users/updateLink", {
+        method: "GET"
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success:', data)
+      userId = data.id;
+      const existingLinks = data.links;
+      const container = document.getElementById("links-container");
+      if (existingLinks != null) {
+        existingLinks.forEach((link) => addList(container, link.site, link.url));
+      }
+
+    })
+  });
+
+  const addBtn = document.getElementById("link-add");
+  if (addBtn) {
+      const container = document.getElementById("links-container");
+      addBtn.addEventListener("click", () => addList(container));
+    }
+
+  function collectLinksData() {
+    const container = document.getElementById("links-container");
+    const linkElements = Array.from(container.getElementsByClassName("input-group"));
+    let linksArray = [];
+
+    linkElements.forEach(element => {
+        const siteType = element.querySelector("select").value;
+        const urlValue = element.querySelector("input").value;
+
+        if (urlValue && urlValue.trim() !== "") {
+          linksArray.push({
+            site: siteType,
+            url: urlValue
+        });
+        }
+        
+    });
+
+    return linksArray;
   }
-});
+
+  const submitBtn = document.getElementById('linkSubmit');
+  if(submitBtn) {
+    submitBtn.addEventListener('click', submit);
+  }
+
+  // 백엔드로 데이터 전송
+  function submit() {
+    const linksData = collectLinksData();
+
+    const requestData = {
+        id: userId,
+        links: linksData
+    };
+
+    fetch("/api/users/links", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => {
+      console.log('requestData', requestData)
+      console.log('response', response)
+      if (response.ok) {
+        if (window.opener) {
+          window.opener.location.reload();
+        }
+        window.close();
+      } else {
+        return response.json().then(data => {
+          console.log('Error:', data.errorMessage);
+          Swal.fire({
+            text: data.errorMessage,
+            confirmButtonText: '확인',
+            ...swalConfig,
+          })
+        })
+        
+      }
+    })
+    .catch(error => {
+      console.error('Network or parsing error:', error);
+      Swal.fire({
+            text: "저장 중 문제가 발생했습니다.",
+            confirmButtonText: '확인',
+            ...swalConfig,
+          })
+    });
+
+  }
+
+
     </script>
   </body>
 </html>

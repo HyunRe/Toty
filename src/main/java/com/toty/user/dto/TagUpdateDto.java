@@ -1,4 +1,4 @@
-package com.toty.user.dto.request;
+package com.toty.user.dto;
 
 
 import java.util.List;
@@ -8,7 +8,12 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TagUpdateRequest {
+public class TagUpdateDto {
+    private Long id;
     private List<String> tags;
 
+    public TagUpdateDto(Long id, List<String> tags) {
+        this.id = id;
+        this.tags = tags;
+    }
 }
