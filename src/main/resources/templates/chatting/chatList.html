@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-  <head>
+<head>
     <th:block th:replace="fragment/header :: headerhead"></th:block>
 
     <style>
@@ -28,44 +28,44 @@
         margin: 3px;
       }
     </style>
-  </head>
+</head>
 
-  <body>
-    <!-- header -->
-    <div th:replace="fragment/header :: header"></div>
-  
-    <!-- Fragment declaration -->
-    <div style="height: 50px;">
-      <input type="hidden" class="userId" th:value="${userId}">
-    </div>
-    <div class="container">
-      <div class="row">
+<body>
+<!-- header -->
+<div th:replace="fragment/header :: header"></div>
+
+<!-- Fragment declaration -->
+<div style="height: 50px;">
+    <input type="hidden" class="userId" th:value="${userId}">
+</div>
+<div class="container">
+    <div class="row">
         <div class="col-4">
-          <h4>멘토 단톡방 목록</h4>
+            <h4>멘토 단톡방 목록</h4>
         </div>
         <div class="col-4">
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="채팅방 검색">
-            <div class="input-group-append">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="채팅방 검색">
+                <div class="input-group-append">
               <span class="input-group-text bg-transparent text-primary" style="cursor: pointer;" onclick="document.forms[0].submit()">
                 <i class="fa fa-search"></i>
               </span>
+                </div>
             </div>
-          </div>
         </div>
         <div class="col-4">
-          <div sec:authorize="hasAuthority('MENTOR')">
-            <button onclick="createRoom()">단톡방 생성하기</button>
-          </div>
+            <div sec:authorize="hasAuthority('MENTOR')">
+                <button onclick="createRoom()">단톡방 생성하기</button>
+            </div>
         </div>
-      </div>
-      <div style="height: 50px;"></div>
-      <div id="chatRoomListBox">
+    </div>
+    <div style="height: 50px;"></div>
+    <div id="chatRoomListBox">
         <div class="row rowDiv" style="min-width: 1110px; margin-bottom: 15px;"
-          th:each="cardRow : ${#numbers.sequence(0, chatRoomList.size() - 1, 4)}">
-            <div class="col-3 roomUI" 
-              th:classappend="'room-' + ${chatRoom.id}"
-              th:each="chatRoom : ${chatRoomList.subList(cardRow, cardRow + 4 > chatRoomList.size() ? chatRoomList.size() : cardRow + 4)}">
+             th:each="cardRow : ${#numbers.sequence(0, chatRoomList.size() - 1, 4)}">
+            <div class="col-3 roomUI"
+                 th:classappend="'room-' + ${chatRoom.id}"
+                 th:each="chatRoom : ${chatRoomList.subList(cardRow, cardRow + 4 > chatRoomList.size() ? chatRoomList.size() : cardRow + 4)}">
                 <div class="card mb-2">
                     <div class="row">
                         <div class="col-4">
@@ -78,24 +78,24 @@
                     <h4>[[${chatRoom.roomName}]]</h4>
                     <div>생성된 시간 : [[${chatRoom.createdAt}]]</div>
                     <div class="d-flex justify-content-between align-items-center">
-                        <div>인원 : 
+                        <div>인원 :
                             <span th:class="'roomUserCount-' + ${chatRoom.id}"
-                                >[[${chatRoom.userCount}]]</span>/<span>[[${chatRoom.userLimit}]] </span>
+                            >[[${chatRoom.userCount}]]</span>/<span>[[${chatRoom.userLimit}]] </span>
                         </div>
-                        
+
                         <form sec:authorize="isAuthenticated()"
-                            th:action="@{/api/chatting/participant/{roomId}(roomId=${chatRoom.id})}"
-                            method="post">
+                              th:action="@{/api/chatting/participant/{roomId}(roomId=${chatRoom.id})}"
+                              method="post">
                             <button type="submit"> 단톡 참석 </button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-      </div>
     </div>
+</div>
 
 <link href="/css/chatting/chatList.css" rel="stylesheet">
 <script src="/js/chatting/chatList.js"></script>
-    </body>
-    </html>
+</body>
+</html>

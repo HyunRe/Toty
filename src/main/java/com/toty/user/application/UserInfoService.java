@@ -123,7 +123,7 @@ public class UserInfoService {
                 imgFile.transferTo(new File(imgPath)); // ex) --.jpg, --hi.png
                 foundUser.updateprofileImg(imgPath);
             } catch (IOException e) {
-                 throw new ExpectedException(ErrorCode.PROFILE_IMAGE_SAVE_ERROR);
+                throw new ExpectedException(ErrorCode.PROFILE_IMAGE_SAVE_ERROR);
             }
         }
 

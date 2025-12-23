@@ -32,4 +32,3 @@ public class NotificationMessageFactory {
         throw new UnSupportedNotificationTypeException(eventType);
     }
 }
-

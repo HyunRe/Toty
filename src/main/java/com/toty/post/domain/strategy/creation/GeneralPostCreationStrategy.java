@@ -27,4 +27,3 @@ public class GeneralPostCreationStrategy implements PostCreationStrategy {
         return PostCategory.GENERAL;
     }
 }
-

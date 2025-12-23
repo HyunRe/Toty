@@ -1,7 +1,7 @@
 package com.toty.following.presentation.view;
 
 import com.toty.common.annotation.CurrentUser;
-import com.toty.following.application.service.FollowingService;
+import com.toty.following.application.FollowingService;
 import com.toty.following.dto.response.FollowingListResponse;
 import com.toty.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller

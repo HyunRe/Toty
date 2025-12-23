@@ -32,4 +32,3 @@ public class PostDetailResponseContext {
         return strategy.convert(post, pagedComments, isLiked, isScraped);
     }
 }
-

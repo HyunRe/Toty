@@ -48,7 +48,7 @@ public class PostSpecifications {
     // 특정 사용자 ID로 필터링
     public static Specification<Post> hasUserId(Long userId) {
         return (root, query, criteriaBuilder) ->
-            criteriaBuilder.equal(root.get("user").get("id"), userId);
+                criteriaBuilder.equal(root.get("user").get("id"), userId);
     }
 
     // 특정 카테고리로 필터링

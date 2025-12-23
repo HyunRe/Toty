@@ -61,21 +61,21 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <img th:src="'cid:logo'" alt="Toty 로고">
-        </div>
-        <div class="content">
-            <img th:src="'cid:notice-icon'" alt="알림" style="width: 30px;">
-            <h2>축하합니다! 당신은 멘토에 선정되셨습니다!</h2>
-            <p>팔로워 수 100명을 달성하여 <strong th:text="${nickname}">사용자</strong> 님은 멘토 자격이 주어졌습니다</p>
-            <p>지식 게시판을 자유롭게 이용해 보세요!</p>
-            <a href="http://localhost:8070/view/users/home" class="button">Go To Toty</a>
-        </div>
-        <div class="footer">
-            <p>이 이메일은 자동 발송된 메시지입니다. 회신하지 마세요.</p>
-            <p>&copy; 2025 Toty. 모든 권리 보유.</p>
-        </div>
+<div class="container">
+    <div class="header">
+        <img th:src="'cid:logo'" alt="Toty 로고">
     </div>
+    <div class="content">
+        <img th:src="'cid:notice-icon'" alt="알림" style="width: 30px;">
+        <h2>축하합니다! 당신은 멘토에 선정되셨습니다!</h2>
+        <p>팔로워 수 100명을 달성하여 <strong th:text="${nickname}">사용자</strong> 님은 멘토 자격이 주어졌습니다</p>
+        <p>지식 게시판을 자유롭게 이용해 보세요!</p>
+        <a href="http://localhost:8070/view/users/home" class="button">Go To Toty</a>
+    </div>
+    <div class="footer">
+        <p>이 이메일은 자동 발송된 메시지입니다. 회신하지 마세요.</p>
+        <p>&copy; 2025 Toty. 모든 권리 보유.</p>
+    </div>
+</div>
 </body>
 </html>

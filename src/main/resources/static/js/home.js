@@ -100,4 +100,3 @@ if (cancel) {
     history.back()
   });
 }
-

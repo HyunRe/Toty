@@ -58,7 +58,7 @@ public class User extends BaseTime {
 
     @Builder
     public User(String email, String password, String nickname, String phoneNumber, LoginProvider loginProvider, boolean isDeleted, String username,
-           boolean smsSubscribed, boolean emailSubscribed, boolean notificationAllowed) {
+                boolean smsSubscribed, boolean emailSubscribed, boolean notificationAllowed) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
@@ -121,4 +121,3 @@ public class User extends BaseTime {
 
     public void saveStatusMessage(String request) { this.statusMessage = request; }
 }
-

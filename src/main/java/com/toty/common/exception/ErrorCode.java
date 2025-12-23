@@ -64,7 +64,7 @@ public enum ErrorCode {
     FCM_TOKEN_DEACTIVATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FCM 토큰 비활성화에 실패했습니다."),
     FCM_TOKEN_QUERY_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FCM 토큰 조회 중 오류가 발생했습니다."),
     FCM_TOKEN_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "비활성화된 FCM 토큰 삭제에 실패했습니다."),
-    
+
     // 채팅
     FAIL_ROOM_CREATE(HttpStatus.FORBIDDEN, "단톡방을 생성할수 없습니다");
     private final HttpStatus httpStatus;

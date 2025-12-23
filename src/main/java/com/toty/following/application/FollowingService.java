@@ -1,4 +1,4 @@
-package com.toty.following.application.service;
+package com.toty.following.application;
 
 import com.toty.common.baseException.NotificationSendException;
 import com.toty.common.exception.ErrorCode;

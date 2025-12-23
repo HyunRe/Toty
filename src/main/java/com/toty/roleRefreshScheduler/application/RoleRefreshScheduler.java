@@ -1,7 +1,7 @@
 package com.toty.roleRefreshScheduler.application;
 
 import com.toty.common.baseException.NotificationSendException;
-import com.toty.following.application.service.FollowingService;
+import com.toty.following.application.FollowingService;
 
 import com.toty.notification.application.service.NotificationSendService;
 import com.toty.notification.domain.type.EventType;

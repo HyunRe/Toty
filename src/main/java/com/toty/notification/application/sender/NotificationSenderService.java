@@ -42,28 +42,28 @@ public class NotificationSenderService {
         // 채널별 이벤트 등록
         // SSE: 헤더 알림 패널에 표시 (실시간 + API 조회용)
         registerSender(senders, SseNotificationSender.class,
-            EventType.COMMENT,
-            EventType.LIKE,
-            EventType.FOLLOW
+                EventType.COMMENT,
+                EventType.LIKE,
+                EventType.FOLLOW
         );
 
         // FCM: 웹푸시 알림 (브라우저 시스템 알림)
         registerSender(senders, FcmNotificationSender.class,
-            EventType.QNA_POST,
-            EventType.MENTOR_POST,
-            EventType.MENTOR_CHAT
+                EventType.QNA_POST,
+                EventType.MENTOR_POST,
+                EventType.MENTOR_CHAT
         );
 
         // Email: 멘토 선정/해제
         registerSender(senders, EmailNotificationSender.class,
-            EventType.BECOME_MENTOR,
-            EventType.REVOKE_MENTOR
+                EventType.BECOME_MENTOR,
+                EventType.REVOKE_MENTOR
         );
 
         // SMS: 멘토 선정/해제
         registerSender(senders, SmsNotificationSender.class,
-            EventType.BECOME_MENTOR,
-            EventType.REVOKE_MENTOR
+                EventType.BECOME_MENTOR,
+                EventType.REVOKE_MENTOR
         );
     }
 
@@ -127,4 +127,3 @@ public class NotificationSenderService {
         log.info("[SENDER] ========== 알림 전송 종료 ==========");
     }
 }
-

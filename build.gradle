@@ -1,126 +1,126 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.4.1'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.springframework.boot' version '3.4.1'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-	unitTestImplementation.extendsFrom implementation
-	unitTestRuntimeOnly.extendsFrom runtimeOnly
-	apiE2ETestImplementation.extendsFrom implementation
-	apiE2ETestRuntimeOnly.extendsFrom runtimeOnly
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    unitTestImplementation.extendsFrom implementation
+    unitTestRuntimeOnly.extendsFrom runtimeOnly
+    apiE2ETestImplementation.extendsFrom implementation
+    apiE2ETestRuntimeOnly.extendsFrom runtimeOnly
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	unitTestImplementation 'org.springframework.boot:spring-boot-starter-test'
-	unitTestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    unitTestImplementation 'org.springframework.boot:spring-boot-starter-test'
+    unitTestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	apiE2ETestImplementation 'org.springframework.boot:spring-boot-starter-test'
-	apiE2ETestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	apiE2ETestImplementation 'io.rest-assured:rest-assured:5.3.1'
-	apiE2ETestImplementation 'com.github.mwiede:jsch:0.2.22'
+    apiE2ETestImplementation 'org.springframework.boot:spring-boot-starter-test'
+    apiE2ETestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    apiE2ETestImplementation 'io.rest-assured:rest-assured:5.3.1'
+    apiE2ETestImplementation 'com.github.mwiede:jsch:0.2.22'
 
     // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 
-	// 이메일
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
+    // 이메일
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-	// sms
-	implementation 'net.nurigo:sdk:4.2.7'
+    // sms
+    implementation 'net.nurigo:sdk:4.2.7'
 
-	// jwt
-	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
-	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
-	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+    // jwt
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
 
-	// redis
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-	// 웹소켓
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    // 웹소켓
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
-	// firebase
-  	implementation 'com.google.firebase:firebase-admin:9.4.3'
-	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
+    // firebase
+    implementation 'com.google.firebase:firebase-admin:9.4.3'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
 
-	// elasticsearch
-	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
-	implementation 'co.elastic.clients:elasticsearch-java:8.17.0'
+    // elasticsearch
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    implementation 'co.elastic.clients:elasticsearch-java:8.17.0'
 
-	//oauth2
-	implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client'
+    //oauth2
+    implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client'
 
-	// retry
-	implementation 'org.springframework.retry:spring-retry:2.0.8'
-	implementation 'org.springframework.boot:spring-boot-starter-aop'
+    // retry
+    implementation 'org.springframework.retry:spring-retry:2.0.8'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'io.micrometer:micrometer-core'
     implementation 'org.apache.commons:commons-lang3:3.14.0'
 }
 
 sourceSets {
-	unitTest {
-		java {
-			srcDirs = ['src/test_unit/java']
-		}
-		resources {
-			srcDirs = ['src/test/resources']
-		}
-		compileClasspath += sourceSets.main.output
-		runtimeClasspath += sourceSets.main.output
-	}
-	apiE2ETest {
-		java {
-			srcDirs = ['src/test_apiE2E/java']
-		}
-		resources {
-			srcDirs = ['src/test/resources']
-		}
-		compileClasspath += sourceSets.main.output
-		runtimeClasspath += sourceSets.main.output
-	}
+    unitTest {
+        java {
+            srcDirs = ['src/test_unit/java']
+        }
+        resources {
+            srcDirs = ['src/test/resources']
+        }
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+    apiE2ETest {
+        java {
+            srcDirs = ['src/test_apiE2E/java']
+        }
+        resources {
+            srcDirs = ['src/test/resources']
+        }
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
 }
 
 tasks.register('unitTest', Test) {
-	testClassesDirs = sourceSets.unitTest.output.classesDirs
-	classpath = sourceSets.unitTest.runtimeClasspath
+    testClassesDirs = sourceSets.unitTest.output.classesDirs
+    classpath = sourceSets.unitTest.runtimeClasspath
 
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 tasks.register('apiE2ETest', Test) {
-	testClassesDirs = sourceSets.apiE2ETest.output.classesDirs
-	classpath = sourceSets.apiE2ETest.runtimeClasspath
-	shouldRunAfter unitTest
+    testClassesDirs = sourceSets.apiE2ETest.output.classesDirs
+    classpath = sourceSets.apiE2ETest.runtimeClasspath
+    shouldRunAfter unitTest
 
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 check.dependsOn unitTest

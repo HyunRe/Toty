@@ -72,4 +72,3 @@ public class NotificationService {
         notificationRepository.deleteByReceiverIdAndIsReadTrue(receiverId);
     }
 }
-

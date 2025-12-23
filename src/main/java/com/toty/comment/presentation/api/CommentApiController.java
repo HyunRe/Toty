@@ -42,8 +42,8 @@ public class CommentApiController {
     @Operation(summary = "댓글 수정", description = "특정 댓글을 수정합니다")
     @PatchMapping("/{id}")
     public ResponseEntity<CommentDto> updateComment(@CurrentUser User user,
-                                                 @PathVariable Long id,
-                                                 @Valid @RequestBody CommentCreateUpdateRequest commentCreateUpdateRequest) {
+                                                    @PathVariable Long id,
+                                                    @Valid @RequestBody CommentCreateUpdateRequest commentCreateUpdateRequest) {
         CommentDto commentDto = commentService.updateComment(user, id, commentCreateUpdateRequest);
         return ResponseEntity.ok(commentDto);
     }

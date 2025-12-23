@@ -16,4 +16,3 @@ public interface PostDetailResponseStrategy {
      */
     PostDetailResponse convert(Post post, PaginationResult pagedComments, boolean isLiked, boolean isScraped);
 }
-
