@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>알림 이메일</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #f44336;
+            padding: 20px;
+            text-align: center;
+        }
+        .header img {
+            max-width: 150px;
+            height: auto;
+        }
+        .content {
+            padding: 30px;
+            text-align: center;
+        }
+        .content h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .content p {
+            color: #666;
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background-color: #f44336;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .footer {
+            background-color: #f9f9f9;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img th:src="'cid:logo'" alt="Toty 로고">
+        </div>
+        <div class="content">
+            <img th:src="'cid:notice-icon'" alt="알림" style="width: 30px;">
+            <h2>멘토 자격이 해제되었습니다</h2>
+            <p><strong th:text="${nickname}">사용자</strong> 님의 멘토 자격이 해제되었습니다.</p>
+            <p>팔로워 수가 100명 미만으로 감소하여 멘토 자격 요건을 충족하지 못하였습니다.</p>
+            <p>다시 팔로워 수를 늘려 멘토 자격을 회복하실 수 있습니다.</p>
+            <a href="http://localhost:8070/view/users/home" class="button">Go To Toty</a>
+        </div>
+        <div class="footer">
+            <p>이 이메일은 자동 발송된 메시지입니다. 회신하지 마세요.</p>
+            <p>&copy; 2025 Toty. 모든 권리 보유.</p>
+        </div>
+    </div>
+</body>
+</html>

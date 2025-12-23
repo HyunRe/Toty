@@ -44,6 +44,6 @@ application-deploy.yaml
 application-staging.yaml
 
 ### FCM ###
-src/main/resources/toty-6d4b4-firebase-adminsdk-fbsvc-f5eb24e27a.json
+src/main/resources/firebase/toty-6d4b4-firebase-adminsdk-fbsvc-f5eb24e27a.json
 
 README-SECRET.md

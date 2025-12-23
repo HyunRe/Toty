@@ -1,7 +1,7 @@
 package com.toty.post.domain.strategy.update;
 
-import com.toty.post.domain.model.Post;
-import com.toty.post.domain.model.PostCategory;
+import com.toty.post.domain.model.post.Post;
+import com.toty.post.domain.model.post.PostCategory;
 import com.toty.post.dto.request.PostUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

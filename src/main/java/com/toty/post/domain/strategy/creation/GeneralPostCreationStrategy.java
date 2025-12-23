@@ -1,13 +1,12 @@
 package com.toty.post.domain.strategy.creation;
 
-import com.toty.post.domain.model.Post;
-import com.toty.post.domain.model.PostCategory;
-import com.toty.post.domain.repository.PostRepository;
+import com.toty.post.domain.model.post.Post;
+import com.toty.post.domain.model.post.PostCategory;
+import com.toty.post.domain.repository.post.PostRepository;
 import com.toty.post.dto.request.PostCreateRequest;
 import com.toty.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
 
 @Component
 @RequiredArgsConstructor

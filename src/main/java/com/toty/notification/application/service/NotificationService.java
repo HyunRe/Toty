@@ -40,7 +40,13 @@ public class NotificationService {
 
     // 읽지 않은 알림 개수 조회
     public int countUnreadNotifications(Long receiverId) {
-        return notificationRepository.countByReceiverIdAndIsReadFalse(receiverId);
+        // Spring Data Redis의 count 메서드는 제대로 작동하지 않으므로
+        // 리스트를 조회한 후 size()를 사용
+        List<Notification> unreadNotifications = notificationRepository.findByReceiverIdAndIsReadFalse(
+                receiverId,
+                Sort.unsorted()
+        );
+        return unreadNotifications != null ? unreadNotifications.size() : 0;
     }
 
     // 알림 읽음 처리 (비동기 처리)

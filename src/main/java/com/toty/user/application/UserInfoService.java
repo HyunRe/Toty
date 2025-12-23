@@ -3,7 +3,7 @@ package com.toty.user.application;
 import com.toty.common.domain.Tag;
 import com.toty.common.exception.ErrorCode;
 import com.toty.common.exception.ExpectedException;
-import com.toty.following.domain.FollowingRepository;
+import com.toty.following.domain.repository.FollowingRepository;
 import com.toty.user.domain.model.Site;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.model.UserLink;
@@ -11,11 +11,10 @@ import com.toty.user.domain.model.UserTag;
 import com.toty.user.domain.repository.UserLinkRepository;
 import com.toty.user.domain.repository.UserRepository;
 import com.toty.user.domain.repository.UserTagRepository;
-import com.toty.user.dto.LinkUpdateDto;
+import com.toty.user.dto.request.LinkUpdateDto;
 import com.toty.user.dto.request.BasicInfoUpdateRequest;
 import com.toty.user.dto.request.PhoneNumberUpdateRequest;
-import com.toty.user.dto.TagUpdateDto;
-import com.toty.user.dto.request.UserInfoUpdateRequest;
+import com.toty.user.dto.request.TagUpdateDto;
 import com.toty.user.dto.response.LinkDto;
 import com.toty.user.dto.response.UserInfoResponse;
 import jakarta.transaction.Transactional;
@@ -23,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,6 +39,7 @@ public class UserInfoService {
     private final FollowingRepository followingRepository;
     private final UserService userService;
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Value("${user.img-path}")
     private String basePath;
@@ -73,22 +74,22 @@ public class UserInfoService {
                 .nickname(foundUser.getNickname())
                 .username(isOwner ? foundUser.getUsername() : null)
                 .profileImgUrl(foundUser.getProfileImageUrl())
-                .emailSubscribed(isOwner ? foundUser.getSubscribeInfo().isEmailSubscribed() : null)
-                .smsSubscribed(isOwner ? foundUser.getSubscribeInfo().isSmsSubscribed() : null)
-                .notificationAllowed(isOwner ? foundUser.getSubscribeInfo().isNotificationAllowed() : null)
+                .emailSubscribed(isOwner ? foundUser.getUserSubscribeInfo().isEmailSubscribed() : false)
+                .smsSubscribed(isOwner ? foundUser.getUserSubscribeInfo().isSmsSubscribed() : false)
+                .notificationAllowed(isOwner ? foundUser.getUserSubscribeInfo().isNotificationAllowed() : false)
                 .tags(userTags)
                 .links(userLinks)
                 .followingCount(followingCount)
                 .followerCount(followerCount)
                 .role(foundUser.getRole())
                 .status_message(foundUser.getStatusMessage())
-//                .isFollowing(!isOwner ? followingRepository.existsByFromUserIdAndToUserId(myId, targetId) : null)
+                .isFollowing(!isOwner ? followingRepository.existsByFromUserIdAndToUserId(myId, targetId) : false)
                 .createdAt(isOwner ? foundUser.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null)
                 .build();
     }
 
 
-    // 기본 정보 수정(닉네임, 사진, 구독)
+    // 기본 정보 수정(닉네임, 사진, 구독, 비밀번호)
     @Transactional
     public void updateUserBasicInfo(User user, Long userId, BasicInfoUpdateRequest newInfo, MultipartFile imgFile) {
         if (isNotOwner(user, userId)) {
@@ -98,6 +99,20 @@ public class UserInfoService {
 
         if (!newInfo.getNickname().isBlank()) {
             foundUser.updateNickname(newInfo.getNickname());
+        }
+
+        // 비밀번호 변경 로직
+        if (newInfo.getCurrentPassword() != null && !newInfo.getCurrentPassword().isBlank()
+                && newInfo.getNewPassword() != null && !newInfo.getNewPassword().isBlank()) {
+
+            // 현재 비밀번호 확인
+            if (!passwordEncoder.matches(newInfo.getCurrentPassword(), foundUser.getPassword())) {
+                throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+            }
+
+            // 새 비밀번호 암호화 및 업데이트
+            String encodedNewPassword = passwordEncoder.encode(newInfo.getNewPassword());
+            foundUser.updatePassword(encodedNewPassword);
         }
 
         if (imgFile != null && !imgFile.isEmpty()) {
@@ -112,19 +127,27 @@ public class UserInfoService {
             }
         }
 
-        newInfo.getSubscriptionAllowed().forEach(alert -> {
-            switch (alert) {
-                case "email":
-                    foundUser.updateEmailSubscription(true);
-                    break;
-                case "sms":
-                    foundUser.updateSmsSubscription(true);
-                    break;
-                case "notification":
-                    foundUser.updateNotificationAllowed(true);
-                    break;
-            }
-        });
+        // 수신 동의 초기화 (모두 false로)
+        foundUser.updateEmailSubscription(false);
+        foundUser.updateSmsSubscription(false);
+        foundUser.updateNotificationAllowed(false);
+
+        // 체크된 항목만 true로 설정
+        if (newInfo.getSubscriptionAllowed() != null) {
+            newInfo.getSubscriptionAllowed().forEach(alert -> {
+                switch (alert) {
+                    case "email":
+                        foundUser.updateEmailSubscription(true);
+                        break;
+                    case "sms":
+                        foundUser.updateSmsSubscription(true);
+                        break;
+                    case "notification":
+                        foundUser.updateNotificationAllowed(true);
+                        break;
+                }
+            });
+        }
 
     }
 

@@ -2,8 +2,8 @@ package com.toty.post.domain.strategy.update;
 
 import com.toty.common.exception.ErrorCode;
 import com.toty.common.exception.ExpectedException;
-import com.toty.post.domain.model.Post;
-import com.toty.post.domain.model.PostCategory;
+import com.toty.post.domain.model.post.Post;
+import com.toty.post.domain.model.post.PostCategory;
 import com.toty.post.dto.request.PostUpdateRequest;
 import com.toty.user.domain.model.Role;
 import lombok.RequiredArgsConstructor;

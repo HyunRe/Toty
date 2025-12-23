@@ -1,9 +1,11 @@
 package com.toty.comment.presentation.view;
 
-import com.toty.comment.application.CommentPaginationService;
-import com.toty.comment.application.CommentService;
+import com.toty.comment.application.service.CommentPaginationService;
+import com.toty.comment.application.service.CommentService;
 import com.toty.comment.domain.model.Comment;
+import com.toty.common.annotation.CurrentUser;
 import com.toty.common.pagination.PaginationResult;
+import com.toty.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,6 +37,17 @@ public class CommentViewController {
         model.addAttribute("result", result);
         model.addAttribute("page", page);
         return "post/detail";
+    }
+
+    // 내가 작성한 댓글 목록 조회
+    @GetMapping("/myList")
+    public String myCommentList(@CurrentUser User user,
+                                @RequestParam(name = "page", defaultValue = "1") int page,
+                                Model model) {
+        PaginationResult comments = commentPaginationService.getPagedCommentsByUserId(page, user.getId());
+        model.addAttribute("comments", comments);
+        model.addAttribute("page", page);
+        return "user/myCommentList";
     }
 
     // 기본 페이지

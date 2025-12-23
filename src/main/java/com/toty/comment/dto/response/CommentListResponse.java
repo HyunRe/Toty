@@ -10,18 +10,26 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommentListResponse extends BaseTime {
+    // 댓글 ID
+    private Long id;
+
     // 사용자 정보
-    private String nickname;
-    private String profileImageUrl;
+    private Long authorId;
+    private String authorNickname;
+    private String authorProfileImageUrl;
 
     // 댓글 정보
     private String content;
-    private LocalDateTime earliestTime;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    public CommentListResponse(String nickname, String profileImageUrl, String content, LocalDateTime earliestTime) {
-        this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
+    public CommentListResponse(Long id, Long authorId, String authorNickname, String authorProfileImageUrl, String content, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.authorId = authorId;
+        this.authorNickname = authorNickname;
+        this.authorProfileImageUrl = authorProfileImageUrl;
         this.content = content;
-        this.earliestTime = earliestTime;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 }

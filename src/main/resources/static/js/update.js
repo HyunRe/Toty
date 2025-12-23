@@ -57,8 +57,16 @@ $(document).ready(function () {
                 alert("게시글이 수정되었습니다.");
                 window.location.href = `/view/posts/myList?postCategory=${category}`;
             },
-            error: function () {
-                alert('게시글 수정 실패');
+            error: function (xhr, status, error) {
+                console.error('수정 실패:', xhr.responseText);
+                let errorMessage = '게시글 수정 실패';
+                try {
+                    const errorData = JSON.parse(xhr.responseText);
+                    errorMessage = errorData.errorMessage || errorMessage;
+                } catch (e) {
+                    // JSON 파싱 실패 시 기본 메시지 사용
+                }
+                alert(errorMessage);
             }
         });
     });

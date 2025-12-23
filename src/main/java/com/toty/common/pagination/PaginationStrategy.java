@@ -1,6 +1,5 @@
 package com.toty.common.pagination;
 
-
 import org.springframework.data.domain.Page;
 
 import java.util.List;

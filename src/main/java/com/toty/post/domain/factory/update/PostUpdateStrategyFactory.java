@@ -1,7 +1,7 @@
 package com.toty.post.domain.factory.update;
 
 import com.toty.post.domain.strategy.update.PostUpdateStrategy;
-import com.toty.post.domain.model.PostCategory;
+import com.toty.post.domain.model.post.PostCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

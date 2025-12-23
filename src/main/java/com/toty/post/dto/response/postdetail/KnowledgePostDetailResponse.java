@@ -1,7 +1,7 @@
 package com.toty.post.dto.response.postdetail;
 
 import com.toty.common.pagination.PaginationResult;
-import com.toty.post.domain.model.PostCategory;
+import com.toty.post.domain.model.post.PostCategory;
 import com.toty.user.domain.model.Role;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -14,9 +14,9 @@ import java.time.LocalDateTime;
 public class KnowledgePostDetailResponse extends PostDetailResponse {
     private Role role;
 
-    public KnowledgePostDetailResponse(String nickname, String profileImageUrl, Role role, PostCategory postCategory, String title, String content,
+    public KnowledgePostDetailResponse(Long authorId, String nickname, String profileImageUrl, Role role, PostCategory postCategory, String title, String content,
                                        int viewCount, int likeCount, Boolean isLiked, Boolean isScraped, LocalDateTime earliestTime, PaginationResult comments) {
-        super(nickname, profileImageUrl, postCategory, title, content, viewCount, likeCount, isLiked, isScraped, earliestTime, comments);
+        super(authorId, nickname, profileImageUrl, postCategory, title, content, viewCount, likeCount, isLiked, isScraped, earliestTime, comments);
         this.role = role;
     }
 }

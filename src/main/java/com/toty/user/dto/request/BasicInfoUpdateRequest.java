@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class BasicInfoUpdateRequest {
     private String nickname;
     private List<String> subscriptionAllowed;
-
+    private String currentPassword;
+    private String newPassword;
 }

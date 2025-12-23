@@ -32,6 +32,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
@@ -45,6 +46,9 @@ dependencies {
 	apiE2ETestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	apiE2ETestImplementation 'io.rest-assured:rest-assured:5.3.1'
 	apiE2ETestImplementation 'com.github.mwiede:jsch:0.2.22'
+
+    // swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 
 	// 이메일
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
@@ -77,6 +81,8 @@ dependencies {
 	// retry
 	implementation 'org.springframework.retry:spring-retry:2.0.8'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'io.micrometer:micrometer-core'
+    implementation 'org.apache.commons:commons-lang3:3.14.0'
 }
 
 sourceSets {

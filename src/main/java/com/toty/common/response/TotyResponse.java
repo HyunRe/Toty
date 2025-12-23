@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class TotyResponse<T> {
-
     private final int status;
     private final T data;
     private final String errorMessage;

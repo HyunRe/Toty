@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface UserRepository extends Repository<User, Long> {
-
     @Query("SELECT u FROM User u WHERE u.id = :id AND u.isDeleted = false")
     Optional<User> findById(@Param("id") Long id);
 
@@ -26,5 +25,10 @@ public interface UserRepository extends Repository<User, Long> {
     @Query("SELECT new com.toty.roleRefreshScheduler.dto.UserIdAndRoleDto(u.id, u.role) FROM User u WHERE u.isDeleted = false")
     List<UserIdAndRoleDto> findAllByIsDeletedFalse();
 
+    @Query("SELECT u FROM User u WHERE u.username = :username AND u.phoneNumber = :phoneNumber AND u.isDeleted = false")
+    Optional<User> findByUsernameAndPhoneNumber(@Param("username") String username, @Param("phoneNumber") String phoneNumber);
+
+    @Query("SELECT u FROM User u WHERE u.email = :email AND u.username = :username AND u.phoneNumber = :phoneNumber AND u.isDeleted = false")
+    Optional<User> findByEmailAndUsernameAndPhoneNumber(@Param("email") String email, @Param("username") String username, @Param("phoneNumber") String phoneNumber);
 
 }

@@ -2,7 +2,7 @@ package com.toty.comment.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.toty.common.domain.BaseTime;
-import com.toty.post.domain.model.Post;
+import com.toty.post.domain.model.post.Post;
 import com.toty.user.domain.model.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -35,6 +35,10 @@ public class Comment extends BaseTime {
     public Comment(User user, Post post, String content) {
         this.user = user;
         this.post = post;
+        this.content = content;
+    }
+
+    public void updateComment(String content) {
         this.content = content;
     }
 }

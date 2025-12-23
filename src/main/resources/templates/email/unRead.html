@@ -1,28 +1,86 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>알림 이메일</title>
-    <link rel="stylesheet" href="../../static/css/email.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #FF9800;
+            padding: 20px;
+            text-align: center;
+        }
+        .header img {
+            max-width: 150px;
+            height: auto;
+        }
+        .content {
+            padding: 30px;
+            text-align: center;
+        }
+        .content h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .content p {
+            color: #666;
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+        .unread-count {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FF9800;
+        }
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background-color: #FF9800;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .footer {
+            background-color: #f9f9f9;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <img src="../../static/img/image-1.png" alt="로고">
+            <img th:src="'cid:logo'" alt="Toty 로고">
         </div>
         <div class="content">
-            <img src="../../static/img/image-2.png" alt="로고" style="width: 30px;">
+            <img th:src="'cid:notice-icon'" alt="알림" style="width: 30px;">
             <h2>확인하지 않은 알림이 있어요!</h2>
             <p>새로운 알림을 확인하세요. 놓치면 안 될 중요한 정보가 포함될 수 있어요.</p>
-            <p><span id="unReadCount"></span> 개의 읽지 않은 알림이 존재해요.</p>
-            <a href="#" class="button">Go To Toty</a>
+            <p><span class="unread-count" th:text="${unreadCount}">0</span> 개의 읽지 않은 알림이 존재해요.</p>
+            <a href="http://localhost:8080/notifications" class="button">알림 확인하기</a>
         </div>
         <div class="footer">
             <p>이 이메일은 자동 발송된 메시지입니다. 회신하지 마세요.</p>
             <p>&copy; 2025 Toty. 모든 권리 보유.</p>
         </div>
     </div>
-    <script src="../../static/js/unRead.js"></script>
 </body>
 </html>

@@ -15,4 +15,10 @@ public class CommentSpecifications {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get("post").get("id"), postId);
     }
+
+    // 특정 사용자 ID로 필터링
+    public static Specification<Comment> hasUserId(Long userId) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("user").get("id"), userId);
+    }
 }

@@ -13,9 +13,4 @@ public class CommentCreateUpdateRequest {
     @NotBlank(message = "내용을 입력 하세요.")
     @Size(min = 1, max = 100, message = "한 글자 이상 내용을 입력 하세요.")
     private String content;
-
-    public CommentCreateUpdateRequest(Long id, String content) {
-        this.id = id;
-        this.content = content;
-    }
 }

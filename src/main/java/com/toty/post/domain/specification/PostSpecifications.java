@@ -1,8 +1,8 @@
 package com.toty.post.domain.specification;
 
 import com.toty.common.baseException.InvalidCategoryException;
-import com.toty.post.domain.model.Post;
-import com.toty.post.domain.model.PostCategory;
+import com.toty.post.domain.model.post.Post;
+import com.toty.post.domain.model.post.PostCategory;
 import org.springframework.data.jpa.domain.Specification;
 import java.time.DayOfWeek;
 import java.time.LocalDate;

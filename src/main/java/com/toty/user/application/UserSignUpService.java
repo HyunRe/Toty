@@ -1,6 +1,6 @@
 package com.toty.user.application;
 
-import com.toty.springconfig.redis.RedisService;
+import com.toty.common.redis.application.RedisService;
 import com.toty.user.domain.model.LoginProvider;
 import com.toty.user.domain.model.User;
 import com.toty.user.domain.repository.UserRepository;
@@ -28,17 +28,27 @@ public class UserSignUpService {
     private final RedisService redisService;
     private DefaultMessageService messageService;
 
-    @PostConstruct
-    public void initMessageService() {
-        this.messageService = NurigoApp.INSTANCE.initialize(
-                "NCSTN8AA40XJD2G1",
-                "V6JX2HOLWB6PRBUJVEIA2E0YZZUUARBT",
-                "https://api.coolsms.co.kr"
-        );
-    }
+    @Value("${spring.coolsms.api.key}")
+    private String apiKey;
+
+    @Value("${spring.coolsms.api.secret}")
+    private String apiSecret;
 
     @Value("${spring.coolsms.api.fromnumber}")
     private String messageFrom;
+
+    @PostConstruct
+    public void initMessageService() {
+        System.out.println("========== CoolSMS 초기화 ==========");
+        System.out.println("API Key: " + (apiKey != null ? apiKey.substring(0, Math.min(5, apiKey.length())) + "..." : "null"));
+        System.out.println("From Number: " + messageFrom);
+        this.messageService = NurigoApp.INSTANCE.initialize(
+                apiKey,
+                apiSecret,
+                "https://api.coolsms.co.kr"
+        );
+        System.out.println("CoolSMS 초기화 완료!");
+    }
 
     @Transactional
     public Long signUp(UserSignUpRequest userSignUpRequest) {
@@ -78,10 +88,15 @@ public class UserSignUpService {
     }
 
     public String sendAuthCodeMessage(String phoneNumber) {
+        System.out.println("========== SMS 인증번호 전송 요청 ==========");
+        System.out.println("수신 번호: " + phoneNumber);
         try {
             String authCode = getAuthCodeSmsResponse(phoneNumber);
+            System.out.println("SMS 전송 성공! 인증번호: " + authCode);
             return authCode;
         } catch (Exception e) {
+            System.err.println("SMS 전송 실패: " + e.getMessage());
+            e.printStackTrace();
             throw new IllegalArgumentException(e);
         }
     }
@@ -96,9 +111,19 @@ public class UserSignUpService {
         String text = ("[Toty] 인증번호[" + authCode + "]를 입력하세요.");
         Message message = createMessage(phoneNumber, text);
 
-        redisService.setData(phoneNumber, authCode, Duration.ofMinutes(5));
+        System.out.println("인증번호 생성: " + authCode);
+        System.out.println("메시지 내용: " + text);
+        System.out.println("발신 번호: " + messageFrom);
+        System.out.println("수신 번호: " + phoneNumber);
 
+        redisService.setData(phoneNumber, authCode, Duration.ofMinutes(5));
+        System.out.println("Redis에 인증번호 저장 완료 (5분 만료)");
+
+        System.out.println("CoolSMS API 호출 중...");
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
+        System.out.println("CoolSMS 응답 - 상태: " + response.getStatusCode());
+        System.out.println("CoolSMS 응답 - 메시지 ID: " + response.getMessageId());
+
         return authCode;
     }
 

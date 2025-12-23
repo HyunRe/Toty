@@ -43,33 +43,46 @@
     <h5>내 계정</h5>
     <ul class="list-unstyled">
         <li><a href="/view/users/info" id="profileMenu">프로필</a></li>
-        <li><a href="/view/posts/myList?postCategory=GENERAL" id="myPostsMenu">내가 작성한 게시글</a></li>
-        <li><a href="/view/posts/myScrape" id="savedPostsMenu">내가 저장한 게시글</a></li>
+        <li><a href="/view/posts/myList?postCategory=GENERAL" id="myPostsMenu">작성한 게시글</a></li>
+        <li><a href="/view/comments/myList" id="myCommentsMenu">작성한 댓글</a></li>
+        <li><a href="/view/posts/myLikeList" id="PostLikesMenu">좋아요한 게시글</a></li>
+        <li><a href="/view/posts/myScrape" id="savedPostsMenu">저장한 게시글</a></li>
     </ul>
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        function setActiveMenu(menuId) {
-            document.getElementById("profileMenu").classList.remove("active-menu");
-            document.getElementById("myPostsMenu").classList.remove("active-menu");
-            document.getElementById("savedPostsMenu").classList.remove("active-menu");
 
-            document.getElementById(menuId).classList.add("active-menu");
+        function clearActive() {
+            document.querySelectorAll(".left-menu a")
+                .forEach(el => el.classList.remove("active-menu"));
         }
 
-        document.getElementById("profileMenu").addEventListener("click", function () {
-            setActiveMenu("profileMenu");
-        });
+        function setActiveByUrl() {
+            const path = location.pathname;
 
-        document.getElementById("myPostsMenu").addEventListener("click", function () {
-            setActiveMenu("myPostsMenu");
-        });
+            clearActive();
 
-        document.getElementById("savedPostsMenu").addEventListener("click", function () {
-            setActiveMenu("savedPostsMenu");
-        });
+            if (path.startsWith("/view/users/info")) {
+                document.getElementById("profileMenu").classList.add("active-menu");
+            }
+            else if (path.startsWith("/view/posts/myList")) {
+                document.getElementById("myPostsMenu").classList.add("active-menu");
+            }
+            else if (path.startsWith("/view/comments/myList")) {
+                document.getElementById("myCommentsMenu").classList.add("active-menu");
+            }
+            else if (path.startsWith("/view/posts/myLikeList")) {
+                document.getElementById("PostLikesMenu").classList.add("active-menu");
+            }
+            else if (path.startsWith("/view/posts/myScrape")) {
+                document.getElementById("savedPostsMenu").classList.add("active-menu");
+            }
+        }
+
+        setActiveByUrl();
     });
 </script>
+
 </body>
 </html>

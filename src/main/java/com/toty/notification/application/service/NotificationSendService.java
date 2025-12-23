@@ -1,6 +1,6 @@
 package com.toty.notification.application.service;
 
-import com.toty.notification.domain.eventHandler.NotificationEvent;
+import com.toty.notification.application.event.NotificationEvent;
 import com.toty.notification.dto.request.NotificationSendRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;

@@ -1,6 +1,6 @@
 package com.toty.post.dto.convert.postlist;
 
-import com.toty.post.domain.model.Post;
+import com.toty.post.domain.model.post.Post;
 import com.toty.post.dto.response.postlist.PostListResponse;
 
 import java.util.List;

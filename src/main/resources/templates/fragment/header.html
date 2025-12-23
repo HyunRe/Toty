@@ -34,6 +34,46 @@
   <!-- Bootstrap -->
   <link href="/css/style.css" rel="stylesheet"/>
   <link rel="stylesheet" href="/css/globals.css"/>
+
+  <style>
+    /* 알림 패널 스타일 */
+    .alarmList {
+      position: fixed !important;
+      top: 80px !important;
+      right: 20px !important;
+      width: 350px !important;
+      max-height: 500px !important;
+      min-height: auto !important;
+      overflow-y: auto !important;
+      background: white !important;
+      border: 1px solid #ddd !important;
+      border-radius: 8px !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+      display: none !important;
+      z-index: 1000 !important;
+    }
+
+    .alarmList.show {
+      display: block !important;
+    }
+
+    .notification-item {
+      transition: background-color 0.2s;
+    }
+
+    .notification-item:hover {
+      background-color: #f0f0f0 !important;
+    }
+
+    .mark-read-btn:hover {
+      text-decoration: underline;
+    }
+
+    #notification-badge {
+      font-size: 10px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <!-- 페이지 body 태그 첫 번째 줄에  <div th:replace="fragments/header :: header"></div> 사용 -->
 <body>
@@ -47,16 +87,16 @@
       </div>
 
       <div class="col-lg-5 text-left">
-        <form action="/search/posts" method="get">
-          <div class="control-group" style="float: left">
+        <form action="/search/posts" method="get" style="display: flex; gap: 10px;">
+          <div class="control-group" style="width: auto; margin-bottom: 0;">
             <select class="form-control" name="field">
               <option value="TITLE">제목</option>
               <option value="CONTENT">내용</option>
               <option value="TITLE_CONTENT">제목+내용</option>
             </select>
           </div>
-          <div class="input-group">
-            <input type="text" class="form-control" name = "keyword" placeholder="검색창"/>
+          <div class="input-group" style="flex: 1;">
+            <input type="text" class="form-control" name="keyword" placeholder="검색창"/>
             <div class="input-group-append">
                   <span
                       class="input-group-text bg-transparent text-primary"
@@ -70,24 +110,35 @@
         </form>
       </div>
 
-      <div class="col-lg-2 col-3 text-center" sec:authorize="isAuthenticated()">
-            <span class="bg-transparent text-primary" style="cursor: pointer">
-              <i class="fa-regular fa-bell" id="header-noti"></i>
-            </span>
-            <a href="/view/chatting/list" class="bg-transparent text-primary" style="cursor: pointer">
-              <i class="fa-regular fa-message" id="header-chat"></i>
-            </a>
-        <span class="bg-transparent text-primary" style="cursor: pointer" id="infoBtn">
-              <i class="fa-regular fa-user" id="header-profile"></i>
-            </span>
+      <div class="col-lg-4 col-6 text-center" id="user-icons-container" style="display: none;">
+        <div style="display: inline-flex; gap: 20px; align-items: center; font-size: 24px; justify-content: center;">
+          <span class="bg-transparent text-primary" style="cursor: pointer; position: relative;">
+            <i class="fa-regular fa-bell" id="header-noti"></i>
+            <span id="notification-badge" style="position: absolute; top: -5px; right: -10px; background-color: #dc3545; color: white; border-radius: 10px; padding: 2px 6px; font-size: 10px; display: none; min-width: 18px; text-align: center;"></span>
+          </span>
+          <a href="/view/chatting/list" class="bg-transparent text-primary" style="cursor: pointer; text-decoration: none;">
+            <i class="fa-regular fa-message" id="header-chat"></i>
+          </a>
+          <span class="bg-transparent text-primary" style="cursor: pointer" id="infoBtn">
+            <i class="fa-regular fa-user" id="header-profile"></i>
+          </span>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- 알림 패널 -->
   <div class="alarmList">
-    <table>
-      <tbody id="list"></tbody>
-    </table>
+    <div style="padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
+      <h6 style="margin: 0;">알림</h6>
+      <button id="mark-all-read-btn" style="background: none; border: none; color: #17a2b8; cursor: pointer; font-size: 12px;">모두 읽음</button>
+    </div>
+    <div id="notification-list" style="padding: 5px;">
+      <!-- 알림 목록이 여기에 동적으로 추가됩니다 -->
+    </div>
+    <div id="no-notification" style="padding: 20px; text-align: center; color: #999; display: none;">
+      알림이 없습니다
+    </div>
   </div>
 
   <!-- 네비게이션 바 -->
@@ -121,14 +172,502 @@
       src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    document
-    .getElementById("header-noti")
-    .addEventListener("click", function () {
-      document.querySelector(".alarmList").classList.toggle("show");
+    // 쿠키에서 토큰 확인하는 공통 함수
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    }
+
+    // 로그인 상태 확인 및 아이콘 표시
+    function checkLoginStatus() {
+      console.log('========== checkLoginStatus 호출됨 ==========');
+      console.log('모든 쿠키:', document.cookie);
+
+      const accessToken = getCookie('accessToken');
+      console.log('accessToken 값:', accessToken);
+      console.log('accessToken 존재 여부:', !!accessToken);
+
+      const userIconsContainer = document.getElementById('user-icons-container');
+      console.log('userIconsContainer 요소:', userIconsContainer);
+
+      if (userIconsContainer) {
+        if (accessToken && accessToken !== 'null' && accessToken !== '') {
+          // 로그인된 상태 - 아이콘 표시
+          console.log('✅ 로그인 상태 확인됨 - 아이콘 표시');
+          userIconsContainer.style.display = 'block';
+          console.log('아이콘 컨테이너 display 설정:', userIconsContainer.style.display);
+
+          // 알림 개수만 업데이트 (목록은 클릭 시에만 로드)
+          updateNotificationCount();
+
+          // FCM 스크립트 로드
+          if (!document.querySelector('script[src="/js/webPush.js"]')) {
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.src = '/js/webPush.js';
+            document.head.appendChild(script);
+            console.log('[HEADER] FCM 스크립트 로드 시작');
+          }
+        } else {
+          // 로그인 안 된 상태 - 아이콘 숨김
+          console.log('❌ 로그인 안 됨 - 아이콘 숨김');
+          userIconsContainer.style.display = 'none';
+        }
+      } else {
+        console.error('❌ user-icons-container 요소를 찾을 수 없음!');
+      }
+    }
+
+    // DOM이 완전히 로드된 후 실행
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', checkLoginStatus);
+    } else {
+      // DOMContentLoaded 이벤트가 이미 발생한 경우
+      checkLoginStatus();
+    }
+
+    // 알림 목록 로드
+    function loadNotifications() {
+      const notificationList = document.getElementById('notification-list');
+      const noNotification = document.getElementById('no-notification');
+
+      // 요소가 없으면 함수 종료
+      if (!notificationList || !noNotification) {
+        console.warn('[HEADER] 알림 패널 요소를 찾을 수 없습니다.');
+        return;
+      }
+
+      console.log('[HEADER] 알림 목록 로드 시작...');
+
+      fetch('/api/notifications/unread')
+        .then(response => response.json())
+        .then(data => {
+          console.log('[HEADER] 알림 목록 응답:', data);
+          notificationList.innerHTML = '';
+
+          if (data.data && data.data.length > 0) {
+            console.log('[HEADER] 알림 개수:', data.data.length);
+            noNotification.style.display = 'none';
+
+            data.data.forEach(notification => {
+              const notificationItem = createNotificationItem(notification);
+              notificationList.appendChild(notificationItem);
+            });
+          } else {
+            console.log('[HEADER] 알림 없음');
+            noNotification.style.display = 'block';
+          }
+
+          updateNotificationCount();
+        })
+        .catch(error => console.error('[HEADER] 알림 로드 실패:', error));
+    }
+
+    // 알림 아이템 생성
+    function createNotificationItem(notification) {
+      console.log('[HEADER] 알림 아이템 생성:', notification);
+      const div = document.createElement('div');
+      div.className = 'notification-item';
+      div.style.cssText = 'padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; background: #f9f9f9;';
+      div.dataset.notificationId = notification.id;  // 중복 확인용 ID 저장
+
+      div.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div style="flex: 1; margin-right: 10px;">
+            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">
+              <strong>${notification.senderNickname || '알 수 없음'}</strong>
+            </div>
+            <div style="font-size: 13px; color: #333;">
+              ${notification.message || '새 알림'}
+            </div>
+            <div style="font-size: 11px; color: #999; margin-top: 5px;">
+              ${formatDate(notification.createdAt)}
+            </div>
+          </div>
+          <button class="mark-read-btn" data-id="${notification.id}" style="background: none; border: none; color: #17a2b8; cursor: pointer; font-size: 11px; padding: 0;">읽음</button>
+        </div>
+      `;
+
+      // 알림 클릭 시 해당 URL로 이동
+      div.addEventListener('click', function(e) {
+        console.log('[HEADER] 알림 아이템 클릭됨');
+        console.log('[HEADER] 클릭된 요소:', e.target);
+        console.log('[HEADER] mark-read-btn 여부:', e.target.classList.contains('mark-read-btn'));
+
+        // "읽음" 버튼이 아닌 경우에만 URL 이동
+        if (!e.target.classList.contains('mark-read-btn')) {
+          console.log('[HEADER] 알림 읽음 처리 시작:', notification.id);
+          console.log('[HEADER] 이동할 URL:', notification.url);
+
+          // 읽음 처리
+          markAsRead(notification.id);
+
+          // URL 이동
+          if (notification.url) {
+            console.log('[HEADER] ✅ URL로 이동:', notification.url);
+            window.location.href = notification.url;
+          } else {
+            console.warn('[HEADER] ⚠️ URL이 없습니다.');
+          }
+        }
+      });
+
+      // 읽음 버튼 클릭
+      const markReadBtn = div.querySelector('.mark-read-btn');
+      if (markReadBtn) {
+        markReadBtn.addEventListener('click', function(e) {
+          console.log('[HEADER] 읽음 버튼 클릭');
+          e.stopPropagation();  // 이벤트 버블링 중지
+          markAsRead(notification.id);
+        });
+      }
+
+      return div;
+    }
+
+    // 날짜 포맷팅
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diff = Math.floor((now - date) / 1000); // 초 단위
+
+      if (diff < 60) return '방금 전';
+      if (diff < 3600) return Math.floor(diff / 60) + '분 전';
+      if (diff < 86400) return Math.floor(diff / 3600) + '시간 전';
+      if (diff < 604800) return Math.floor(diff / 86400) + '일 전';
+
+      return date.toLocaleDateString('ko-KR');
+    }
+
+    // 읽지 않은 알림 개수 업데이트
+    function updateNotificationCount() {
+      console.log('[HEADER] 알림 개수 업데이트 요청');
+      fetch('/api/notifications/unread-count')
+        .then(response => {
+          console.log('[HEADER] 알림 개수 API 응답:', response);
+          return response.json();
+        })
+        .then(count => {
+          console.log('[HEADER] 읽지 않은 알림 개수:', count);
+          const badge = document.getElementById('notification-badge');
+          if (badge) {
+            if (count > 0) {
+              badge.textContent = count > 99 ? '99+' : count;
+              badge.style.display = 'inline-block';
+              console.log('[HEADER] ✅ 배지 표시:', badge.textContent);
+            } else {
+              badge.style.display = 'none';
+              console.log('[HEADER] ❌ 배지 숨김 (알림 없음)');
+            }
+          } else {
+            console.error('[HEADER] ❌ notification-badge 요소를 찾을 수 없음');
+          }
+        })
+        .catch(error => console.error('[HEADER] 알림 개수 로드 실패:', error));
+    }
+
+    // 특정 알림 읽음 처리
+    function markAsRead(notificationId) {
+      fetch(`/api/notifications/${notificationId}/read`, {
+        method: 'PATCH'
+      })
+        .then(response => response.json())
+        .then(() => {
+          loadNotifications();
+        })
+        .catch(error => console.error('알림 읽음 처리 실패:', error));
+    }
+
+    // 모두 읽음 처리
+    const markAllReadBtn = document.getElementById('mark-all-read-btn');
+    if (markAllReadBtn) {
+      markAllReadBtn.addEventListener('click', function() {
+        fetch('/api/notifications/read-all', {
+          method: 'PATCH'
+        })
+          .then(response => response.json())
+          .then(() => {
+            loadNotifications();
+          })
+          .catch(error => console.error('모두 읽음 처리 실패:', error));
+      });
+    }
+
+    // 알림 아이콘 클릭
+    const headerNoti = document.getElementById("header-noti");
+    if (headerNoti) {
+      headerNoti.addEventListener("click", function (e) {
+        e.stopPropagation();
+        console.log('[HEADER] 🔔 알림 아이콘 클릭');
+        const alarmList = document.querySelector(".alarmList");
+        if (alarmList) {
+          alarmList.classList.toggle("show");
+          const isOpen = alarmList.classList.contains("show");
+          console.log('[HEADER] 알림 패널 상태:', isOpen ? '열림' : '닫힘');
+          if (isOpen) {
+            console.log('[HEADER] 알림 목록 로드 시작');
+            loadNotifications();
+          }
+        }
+      });
+    }
+
+    // 알림 패널 외부 클릭 시 닫기
+    document.addEventListener('click', function(e) {
+      const alarmList = document.querySelector('.alarmList');
+      const headerNoti = document.getElementById('header-noti');
+
+      if (alarmList && headerNoti && !alarmList.contains(e.target) && !headerNoti.contains(e.target)) {
+        alarmList.classList.remove('show');
+      }
     });
 
-    document.getElementById("infoBtn").addEventListener("click", function () {
-      location.href = "/view/users/info";
+    // 알림 패널 내부 클릭 시 이벤트 전파 중지 (패널이 닫히지 않도록)
+    const alarmList = document.querySelector('.alarmList');
+    if (alarmList) {
+      alarmList.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+    }
+
+    // 내 정보 버튼 클릭
+    const infoBtn = document.getElementById("infoBtn");
+    if (infoBtn) {
+      infoBtn.addEventListener("click", function () {
+        location.href = "/view/users/info";
+      });
+    }
+
+    // ========== SSE 알림 연결 ==========
+    let notificationEventSource = null;
+    const processedNotifications = new Set(); // 중복 알림 방지
+
+    function createEventSourceWithBackoff(url, handlers = {}) {
+      let es = null;
+      let backoff = 1000;
+      const maxBackoff = 30000;
+      let shouldReconnect = true;
+      let reconnectTimeout = null;
+
+      function connect() {
+        es = new EventSource(url);
+
+        if (handlers.onopen) es.onopen = handlers.onopen;
+        if (handlers.onmessage) es.onmessage = handlers.onmessage;
+
+        if (handlers.events) {
+          Object.entries(handlers.events).forEach(([name, fn]) => {
+            es.addEventListener(name, fn);
+          });
+        }
+
+        es.onerror = (err) => {
+          if (handlers.onerror) handlers.onerror(err);
+          es.close();
+          if (shouldReconnect) {
+            reconnectTimeout = setTimeout(() => {
+              backoff = Math.min(backoff * 2, maxBackoff);
+              connect();
+            }, backoff);
+          }
+        };
+      }
+
+      connect();
+
+      return {
+        close: () => {
+          shouldReconnect = false;
+          if (reconnectTimeout) clearTimeout(reconnectTimeout);
+          if (es) es.close();
+        },
+        getEventSource: () => es
+      };
+    }
+
+    function showToastNotification(data) {
+      console.log('[HEADER] 🔔 토스트 알림 표시:', data);
+      console.log('[HEADER] 알림 URL:', data.url);
+
+      // 토스트 알림 표시
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #333;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        z-index: 10000;
+        max-width: 300px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        cursor: pointer;
+        transition: opacity 0.3s;
+      `;
+
+      toast.innerHTML = `
+        <div style="font-size: 15px; line-height: 1.4;">${data.message || '새로운 알림이 도착했습니다.'}</div>
+      `;
+
+      // URL이 있으면 data 속성에 저장
+      if (data.url) {
+        toast.dataset.url = data.url;
+      }
+
+      document.body.appendChild(toast);
+
+      // 클릭 시 URL로 이동
+      toast.addEventListener('click', function(e) {
+        const url = toast.dataset.url || data.url;
+        console.log('[HEADER] 토스트 클릭, URL로 이동:', url);
+
+        if (url) {
+          window.location.href = url;
+        } else {
+          console.warn('[HEADER] 이동할 URL이 없습니다.');
+        }
+        toast.remove();
+      });
+
+      // 5초 후 자동 제거
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 5000);
+
+      // 알림 개수 업데이트
+      updateNotificationCount();
+
+      // 알림 패널이 열려있으면 목록에 알림 추가
+      const alarmList = document.querySelector('.alarmList');
+      if (alarmList && alarmList.classList.contains('show')) {
+        console.log('[HEADER] 패널이 열려있으므로 목록에 추가');
+        addNotificationToList(data);
+      } else {
+        console.log('[HEADER] 패널이 닫혀있음, 목록에 추가 안함');
+      }
+    }
+
+    // 알림 목록에 새 알림 추가 (실시간)
+    function addNotificationToList(notification) {
+      console.log('[HEADER] 📝 알림 목록 추가 시작:', notification);
+
+      const notificationList = document.getElementById('notification-list');
+      const noNotification = document.getElementById('no-notification');
+
+      if (!notificationList) {
+        console.error('[HEADER] ❌ notification-list 요소를 찾을 수 없음');
+        return;
+      }
+
+      // 중복 확인: 같은 ID의 알림이 이미 목록에 있는지 체크
+      const existingNotification = notificationList.querySelector(`[data-notification-id="${notification.id}"]`);
+      if (existingNotification) {
+        console.log('[HEADER] ⚠️ 이미 목록에 있는 알림입니다. 추가하지 않음:', notification.id);
+        return;
+      }
+
+      // "알림이 없습니다" 메시지 숨기기
+      if (noNotification) {
+        noNotification.style.display = 'none';
+        console.log('[HEADER] "알림이 없습니다" 메시지 숨김');
+      }
+
+      // createdAt이 없으면 현재 시간으로 설정
+      if (!notification.createdAt) {
+        notification.createdAt = new Date().toISOString();
+        console.log('[HEADER] createdAt 설정:', notification.createdAt);
+      }
+
+      // 새 알림 아이템 생성
+      const notificationItem = createNotificationItem(notification);
+      console.log('[HEADER] 알림 아이템 생성 완료');
+
+      // 목록 맨 위에 추가
+      notificationList.insertBefore(notificationItem, notificationList.firstChild);
+      console.log('[HEADER] ✅ 알림 목록에 추가 완료');
+
+      // 알림 개수 업데이트
+      updateNotificationCount();
+    }
+
+    function connectNotificationSSE() {
+      const url = `/api/sse/notifications`;
+      const handlers = {
+        onopen: () => console.log('[HEADER] 알림 SSE 연결됨'),
+        onerror: (err) => console.warn('[HEADER] 알림 SSE 오류', err),
+        events: {
+          "connect": (e) => {
+            console.log('[HEADER] 알림 SSE 초기화:', e.data);
+          },
+          "notification": (e) => {
+            try {
+              if (e.data === "ping") {
+                console.log('[HEADER] SSE ping 수신');
+                return;
+              }
+
+              console.log('[HEADER] ✨ SSE 알림 데이터 수신:', e.data);
+              const notification = JSON.parse(e.data);
+              console.log('[HEADER] 파싱된 알림:', notification);
+              console.log('[HEADER] - id:', notification.id);
+              console.log('[HEADER] - senderId:', notification.senderId);
+              console.log('[HEADER] - senderNickname:', notification.senderNickname);
+              console.log('[HEADER] - eventType:', notification.eventType);
+              console.log('[HEADER] - message:', notification.message);
+              console.log('[HEADER] - url:', notification.url);
+
+              // 중복 알림 방지: notification.id 기반으로 중복 체크
+              if (!notification.id) {
+                console.warn('[HEADER] ⚠️ 알림 ID가 없습니다.');
+                return;
+              }
+
+              if (processedNotifications.has(notification.id)) {
+                console.log('[HEADER] ⚠️ 이미 처리된 알림입니다. 무시:', notification.id);
+                return;
+              }
+
+              // 알림 ID를 Set에 추가 (중복 방지)
+              processedNotifications.add(notification.id);
+              console.log('[HEADER] ✅ 새 알림 처리 시작, ID:', notification.id);
+
+              // 토스트 알림 표시
+              showToastNotification(notification);
+            } catch (err) {
+              console.error('[HEADER] ❌ 알림 SSE 데이터 파싱 오류:', err, e.data);
+            }
+          }
+        }
+      };
+
+      return createEventSourceWithBackoff(url, handlers);
+    }
+
+    // 페이지 로드 시 알림 개수 업데이트 및 SSE 연결 (로그인 상태일 때만)
+    document.addEventListener('DOMContentLoaded', function() {
+      const accessToken = getCookie('accessToken');
+      if (accessToken) {
+        updateNotificationCount();
+
+        // SSE 연결
+        console.log('[HEADER] SSE 연결 시작');
+        notificationEventSource = connectNotificationSSE();
+
+        // 5초마다 알림 개수 업데이트 (폴링 백업)
+        setInterval(updateNotificationCount, 5000);
+      }
+    });
+
+    // 페이지 언로드 시 SSE 연결 종료
+    window.addEventListener('beforeunload', function() {
+      if (notificationEventSource) {
+        console.log('[HEADER] SSE 연결 종료');
+        notificationEventSource.close();
+      }
     });
   </script>
 </div>

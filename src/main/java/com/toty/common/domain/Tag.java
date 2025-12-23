@@ -1,7 +1,6 @@
 package com.toty.common.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.toty.common.baseException.UnknownTagException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

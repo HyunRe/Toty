@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>TOTY_이메일 찾기</title>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet"/>
+    <!-- Bootstrap CSS -->
+    <link href="/css/bootstrap.css" rel="stylesheet"/>
+    <!-- main css -->
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/user.css" type="text/css"/>
+
+    <!--Sweet Alert2-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"></script>
+</head>
+<body>
+<header class="header_area">
+    <div class="main_menu">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-light w-100">
+                <a class="navbar-brand logo_h" href="/" style="margin: auto;">
+                    <img src="/img/logo.png" style="width: 170px;" alt="logo" href="/"/>
+                </a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div>
+        <div class="section pt-5">
+            <div class="row" style="justify-content: center;">
+                <div class="col-lg-8 col-md-8">
+                    <h3 class="mb-30 title_color" style="text-align: center;">이메일 찾기</h3>
+                    <p style="text-align: center; color: #777;">이름과 전화번호를 입력하여 이메일을 찾을 수 있습니다.</p>
+
+                    <form id="findEmailForm">
+                        <div class="mt-10">
+                            <input type="text" name="username" id="username" placeholder="이름"
+                                   onfocus="this.placeholder = ''" onblur="this.placeholder = '이름'"
+                                   required class="single-input">
+                        </div>
+                        <div class="mt-10">
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" name="phoneNumber" id="phoneNumber" placeholder="전화번호 (예: 010-1234-5678)"
+                                       onfocus="this.placeholder = ''" onblur="this.placeholder = '전화번호 (예: 010-1234-5678)'"
+                                       required class="single-input" style="flex: 1;">
+                                <button type="button" class="genric-btn info" id="authNumReq" style="white-space: nowrap; padding: 0 15px;">인증번호 받기</button>
+                            </div>
+                        </div>
+
+                        <div class="mt-10">
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="authNum" placeholder="인증번호 6자리" maxlength="6"
+                                       onfocus="this.placeholder = ''" onblur="this.placeholder = '인증번호 6자리'"
+                                       class="single-input" style="flex: 1;">
+                                <button type="button" class="genric-btn info" id="authNumRes" disabled style="white-space: nowrap; padding: 0 15px;">확인</button>
+                            </div>
+                        </div>
+
+                        <div class="mt-10">
+                            <button type="submit" class="main_btn" id="findEmailBtn" style="width: 100%; font-size: medium;" disabled>
+                                이메일 찾기
+                            </button>
+                        </div>
+
+                        <div class="mt-10">
+                            <a href="/view/users/login" class="genric-btn default radius"
+                               style="width: 100%; font-size: medium;">로그인으로 돌아가기</a>
+                        </div>
+                    </form>
+
+                    <!-- 결과 표시 영역 -->
+                    <div id="result" class="mt-10" style="display: none;">
+                        <div class="alert alert-success" role="alert">
+                            <h5>이메일을 찾았습니다!</h5>
+                            <p id="foundEmail" style="font-size: 18px; font-weight: bold;"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script>
+const swalConfig = {confirmButtonColor: '#1f9bcf'};
+let isPhoneVerified = false;
+
+// 전화번호 입력 시 인증 상태 초기화
+document.getElementById('phoneNumber').addEventListener('input', function() {
+    isPhoneVerified = false;
+    document.getElementById('authNumRes').disabled = true;
+    document.getElementById('authNum').value = '';
+    document.getElementById('findEmailBtn').disabled = true;
+});
+
+// 인증번호 요청
+document.getElementById('authNumReq').addEventListener('click', function() {
+    const phone = document.getElementById('phoneNumber').value;
+    const username = document.getElementById('username').value;
+
+    if (!username) {
+        Swal.fire({
+            icon: 'warning',
+            text: '이름을 먼저 입력해주세요.',
+            ...swalConfig
+        });
+        return;
+    }
+
+    if (!phone) {
+        Swal.fire({
+            icon: 'warning',
+            text: '전화번호를 입력해주세요.',
+            ...swalConfig
+        });
+        return;
+    }
+
+    const phonePattern = /^(01[016789]{1})-?[0-9]{3,4}-?[0-9]{4}$/;
+    if (!phonePattern.test(phone)) {
+        Swal.fire({
+            icon: 'warning',
+            text: '올바른 전화번호 형식이 아닙니다.',
+            ...swalConfig
+        });
+        return;
+    }
+
+    const phoneNumber = phone.replace(/-/g, '');
+    console.log('[FIND_EMAIL] SMS 인증번호 요청:', phoneNumber);
+
+    $.ajax({
+        url: '/api/users/authCode',
+        method: 'POST',
+        data: { phoneNumber: phoneNumber },
+        success: function(response) {
+            console.log('[FIND_EMAIL] SMS 인증번호 전송 성공:', response);
+            Swal.fire({
+                icon: 'success',
+                text: '인증번호가 전송되었습니다.',
+                ...swalConfig
+            });
+            document.getElementById('authNumRes').disabled = false;
+            isPhoneVerified = false;
+        },
+        error: function(error) {
+            console.error('[FIND_EMAIL] SMS 인증번호 전송 실패:', error);
+            Swal.fire({
+                icon: 'error',
+                text: error.responseJSON?.message || 'SMS 전송에 실패했습니다.',
+                ...swalConfig
+            });
+        }
+    });
+});
+
+// 인증번호 확인
+document.getElementById('authNumRes').addEventListener('click', function() {
+    const authNum = document.getElementById('authNum').value;
+
+    if (!authNum || authNum.length !== 6) {
+        Swal.fire({
+            icon: 'warning',
+            text: '인증번호 6자리를 입력해주세요.',
+            ...swalConfig
+        });
+        return;
+    }
+
+    const phone = document.getElementById('phoneNumber').value;
+    const phoneNumber = phone.replace(/-/g, '');
+    console.log('[FIND_EMAIL] 인증번호 확인 요청:', { phoneNumber, authNum });
+
+    $.ajax({
+        url: '/api/users/check-authCode',
+        method: 'POST',
+        data: {
+            phoneNumber: phoneNumber,
+            authCode: authNum
+        },
+        success: function(response) {
+            console.log('[FIND_EMAIL] 인증번호 확인 성공:', response);
+            Swal.fire({
+                icon: 'success',
+                text: '인증이 완료되었습니다.',
+                ...swalConfig
+            });
+            isPhoneVerified = true;
+            document.getElementById('authNumRes').disabled = true;
+            document.getElementById('findEmailBtn').disabled = false;
+        },
+        error: function(error) {
+            console.error('[FIND_EMAIL] 인증번호 확인 실패:', error);
+            Swal.fire({
+                icon: 'error',
+                text: error.responseJSON?.message || '인증번호가 일치하지 않습니다.',
+                ...swalConfig
+            });
+            isPhoneVerified = false;
+            document.getElementById('findEmailBtn').disabled = true;
+        }
+    });
+});
+
+// 이메일 찾기 폼 제출
+document.getElementById('findEmailForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const phoneNumber = document.getElementById('phoneNumber').value.replace(/-/g, '');
+
+    if (!username || !phoneNumber) {
+        Swal.fire({
+            icon: 'warning',
+            text: '이름과 전화번호를 모두 입력해주세요.',
+            ...swalConfig
+        });
+        return;
+    }
+
+    if (!isPhoneVerified) {
+        Swal.fire({
+            icon: 'warning',
+            text: '전화번호 인증을 완료해주세요.',
+            ...swalConfig
+        });
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/users/find-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, phoneNumber })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            document.getElementById('foundEmail').textContent = data.data.email;
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('findEmailForm').style.display = 'none';
+        } else {
+            Swal.fire({
+                icon: 'error',
+                text: data.message || '이메일을 찾을 수 없습니다. 입력하신 정보를 확인해주세요.',
+                ...swalConfig
+            });
+        }
+    } catch (error) {
+        console.error('이메일 찾기 오류:', error);
+        Swal.fire({
+            icon: 'error',
+            text: '이메일 찾기 중 오류가 발생했습니다.',
+            ...swalConfig
+        });
+    }
+});
+</script>
+</body>
+</html>

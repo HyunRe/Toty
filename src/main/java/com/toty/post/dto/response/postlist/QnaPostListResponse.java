@@ -1,6 +1,6 @@
 package com.toty.post.dto.response.postlist;
 
-import com.toty.post.domain.model.PostTag;
+import com.toty.post.domain.model.post.PostTag;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

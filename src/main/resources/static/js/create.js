@@ -32,7 +32,7 @@ $(document).ready(function () {
 
     // 카테고리 선택 시 태그 활성화/비활성화
     $("#postCategory").change(function () {
-        if ($(this).val() === "Qna") {
+        if ($(this).val() === "QnA") {
             $("#postTags").show(); // 태그 영역 표시
             $("#postTags input").prop("disabled", false); // 체크박스 활성화
         } else {
@@ -61,7 +61,8 @@ $(document).ready(function () {
             data: JSON.stringify(postData),
             success: function (response) {
                 alert('게시글이 성공적으로 등록되었습니다.');
-                window.location.href = `/view/posts/list`;
+                const category = $('#postCategory').val();
+                window.location.href = `/view/posts/categoryList?postCategory=${category}`;
             },
             error: function () {
                 alert('게시글 등록 실패');

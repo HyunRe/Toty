@@ -1,6 +1,5 @@
 package com.toty.user.domain.model;
 
-
 import com.toty.common.domain.BaseTime;
 import com.toty.user.dto.request.UserInfoUpdateRequest;
 import jakarta.persistence.*;
@@ -15,7 +14,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTime {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -47,7 +45,7 @@ public class User extends BaseTime {
     private LoginProvider loginProvider;
 
     @Embedded
-    private SubscribeInfo subscribeInfo;
+    private UserSubscribeInfo userSubscribeInfo;
 
     @Column(name = "status_message")
     private String statusMessage;
@@ -68,13 +66,13 @@ public class User extends BaseTime {
         this.loginProvider = loginProvider;
         this.username = username;
         this.isDeleted = isDeleted;
-        this.subscribeInfo = new SubscribeInfo(smsSubscribed, emailSubscribed, notificationAllowed);
+        this.userSubscribeInfo = new UserSubscribeInfo(smsSubscribed, emailSubscribed, notificationAllowed);
     }
 
     public void updateInfo(UserInfoUpdateRequest newInfo, String imgPath) {
         this.nickname = newInfo.getNickname();
         this.profileImageUrl = imgPath;
-        this.subscribeInfo = new SubscribeInfo(newInfo.isEmailSubscribed(), newInfo.isSmsSubscribed(), newInfo.isNotificationAllowed());
+        this.userSubscribeInfo = new UserSubscribeInfo(newInfo.isEmailSubscribed(), newInfo.isSmsSubscribed(), newInfo.isNotificationAllowed());
         this.statusMessage = newInfo.getStatusMessage();
         this.phoneNumber = newInfo.getPhoneNumber();
     }
@@ -90,15 +88,15 @@ public class User extends BaseTime {
 
     // 구독 변경
     public void updateEmailSubscription(boolean emailSubscribed) {
-        this.subscribeInfo = this.subscribeInfo.updateEmailSubscription(emailSubscribed);
+        this.userSubscribeInfo = this.userSubscribeInfo.updateEmailSubscription(emailSubscribed);
     }
 
     public void updateSmsSubscription(boolean smsSubscribed) {
-        this.subscribeInfo = this.subscribeInfo.updateSmsSubscription(smsSubscribed);
+        this.userSubscribeInfo = this.userSubscribeInfo.updateSmsSubscription(smsSubscribed);
     }
 
     public void updateNotificationAllowed(boolean notificationAllowed) {
-        this.subscribeInfo = this.subscribeInfo.updateNotificationAllowed(notificationAllowed);
+        this.userSubscribeInfo = this.userSubscribeInfo.updateNotificationAllowed(notificationAllowed);
     }
 
     // 이미지 변경
@@ -116,9 +114,11 @@ public class User extends BaseTime {
         this.nickname = nickname;
     }
 
+    // 비밀번호 변경
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
     public void saveStatusMessage(String request) { this.statusMessage = request; }
-
-
-
 }
 

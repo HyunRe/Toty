@@ -23,7 +23,7 @@
 }
 
 .post-details h3 {
-    margin: 0;
+    margin: 5px 0 0 0;
     font-size: 1.25rem;
     font-weight: bold;
 }
@@ -128,7 +128,13 @@ hr {
     display: flex;
     align-items: flex-start;
     margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
     position: relative;
+}
+
+.comment-item:last-child {
+    border-bottom: none;
 }
 
 .comment-item img {
@@ -148,6 +154,13 @@ hr {
 .comment-item .comment-meta {
     display: flex;
     align-items: center;
+    margin-top: 8px;
+}
+
+.comment-time {
+    font-size: 13px !important;
+    color: #666 !important;
+    font-weight: normal;
 }
 
 .comment-form {

@@ -1,7 +1,7 @@
 package com.toty.user.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.toty.user.domain.model.Role;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.Builder;
@@ -38,6 +38,7 @@ public class UserInfoResponse {
 
     private Long followingCount;
 
+    @JsonProperty("isFollowing")
     private boolean isFollowing; // 타인 정보 조회만
 
     private Role role;

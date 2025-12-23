@@ -60,8 +60,19 @@ if(userInfo) {
     location.href = `/api/users/detail`;
   });
 
-  document.getElementById('logout').addEventListener('click', function () {
-    location.href = `/api/users/logout`;
+  document.getElementById('logout').addEventListener('click', async function () {
+    try {
+      // FCM 토큰 비활성화
+      if (window.FcmManager && typeof window.FcmManager.deactivateFcmToken === 'function') {
+        await window.FcmManager.deactivateFcmToken();
+        console.log('[LOGOUT] FCM 토큰 비활성화 완료');
+      }
+    } catch (error) {
+      console.error('[LOGOUT] FCM 토큰 비활성화 중 오류:', error);
+    } finally {
+      // 로그아웃 처리
+      location.href = `/api/users/logout`;
+    }
   });
 }
 

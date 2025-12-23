@@ -17,9 +17,9 @@ import lombok.Getter;
 public abstract class BaseTime {
     @CreatedDate
     @Column(name = "created_at")
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at")
-    LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 }

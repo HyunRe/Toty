@@ -82,51 +82,7 @@ function changeCategory(postCategory, page = 1) {
                     date.textContent = `작성일: ${formattedDate}`;
                     info.appendChild(date);
 
-                    // 수정과 삭제 버튼 추가
-                    const buttons = document.createElement('div');
-                    buttons.classList.add('btn-group', 'btn-group-sm');
-
-                    const editButton = document.createElement('button');
-                    editButton.classList.add('btn', 'btn-primary');
-                    editButton.textContent = '수정';
-                    editButton.onclick = (e) => {
-                        e.stopPropagation();
-                        location.href = `/view/posts/update/${post.id}`;
-                    };
-
-                    const deleteButton = document.createElement('button');
-                    deleteButton.classList.add('btn', 'btn-secondary');
-                    deleteButton.textContent = '삭제';
-                    deleteButton.onclick = (e) => {
-                        e.stopPropagation();
-                        if (confirm('정말로 삭제하시겠습니까?')) {
-                            fetch(`/api/posts/${post.id}`, {
-                                method: 'DELETE',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                }
-                            })
-                            .then(response => {
-                                if (response.ok) {
-                                    alert('게시글이 삭제되었습니다.');
-                                    window.location.href = `/view/posts/myList?postCategory=${postCategory}`;
-                                } else {
-                                    alert('게시글 삭제 실패');
-                                }
-                            })
-                            .catch(error => {
-                                console.error('삭제 요청 실패:', error);
-                                alert('게시글 삭제 중 오류가 발생했습니다.');
-                            });
-                        }
-                    };
-
-                    buttons.appendChild(editButton);
-                    buttons.appendChild(deleteButton);
-                    postItem.appendChild(buttons);
-
                     postItem.appendChild(info);
-
                     // 게시글 항목을 리스트에 추가
                     postList.appendChild(postItem);
                 });

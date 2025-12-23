@@ -96,24 +96,7 @@
                      style="padding-top: 0.5rem;">
             </div>
 
-            <div class="col-md-7 form-group">
-                <label>이메일</label>
-                <div class="check-group">
-                  <input class="form-control" type="text" id="uname" name="uname"
-                         th:value="${userInfo.username}"  style="width: 100%;" readonly>
-                </div>
-                <input type="hidden" th:value="${userInfo.id}" name="uid" id="uid">
-            </div>
-
-            <div class="col-md-7 form-group">
-              <label>이름</label>
-              <div class="check-group">
-                <input class="form-control" type="text" id="uname" name="uname"
-                       th:value="${userInfo.id}"  style="width: 100%;" readonly>
-              </div>
-              <input type="hidden" th:value="${userInfo.id}" name="uid" id="uid">
-            </div>
-            
+            <input type="hidden" th:value="${userInfo.id}" name="uid" id="uid">
 
             <div class="col-md-7 form-group">
                 <label>닉네임</label>
@@ -125,27 +108,47 @@
                   </button>
                 </div>
               </div>
+
+            <div class="col-md-7 form-group">
+              <label>현재 비밀번호</label>
+              <input class="form-control" type="password" id="currentPassword" name="currentPassword"
+                     placeholder="현재 비밀번호를 입력해 주세요." autocomplete="off">
+            </div>
+
+            <div class="col-md-7 form-group">
+              <label>새 비밀번호</label>
+              <input class="form-control" type="password" id="newPassword" name="newPassword"
+                     placeholder="새 비밀번호를 입력해 주세요. (최소 8자)" autocomplete="off">
+              <small style="color: #6c757d;">비밀번호를 변경하지 않으려면 비워두세요.</small>
+            </div>
+
+            <div class="col-md-7 form-group">
+              <label>새 비밀번호 확인</label>
+              <input class="form-control" type="password" id="confirmPassword" name="confirmPassword"
+                     placeholder="새 비밀번호를 다시 입력해 주세요." autocomplete="off">
+              <font id="pwdCheck" style="font-size: 12px; display: block; margin-top: 5px;"></font>
+            </div>
             <div class="col-md-7 form-group custom-control">
               <label>수신 동의</label>
               <div class="switch-wrap d-flex justify-content-between">
                 <label>SMS 수신 동의</label>
                 <!-- <div class="primary-checkbox"> -->
                     <div class="custom-control custom-checkbox">
-                  <input type="checkbox" id="sms-subscribe" class="custom-control-input">
+                  <input type="checkbox" id="sms-subscribe" name="smsSubscribed" class="custom-control-input" th:checked="${userInfo.smsSubscribed}">
                   <label for="sms-subscribe" class="custom-control-label"></label>
                 </div>
               </div>
               <div class="switch-wrap d-flex justify-content-between">
                 <label>메일 수신 동의</label>
                 <div class="custom-control custom-checkbox">
-                  <input type="checkbox" id="email-subscribe" checked="" class="custom-control-input">
+                  <input type="checkbox" id="email-subscribe" name="emailSubscribed" class="custom-control-input" th:checked="${userInfo.emailSubscribed}">
                   <label for="email-subscribe" class="custom-control-label"></label>
                 </div>
               </div>
               <div class="switch-wrap d-flex justify-content-between">
                 <label>앱 알림 수신 동의</label>
                 <div class="custom-control custom-checkbox">
-                  <input type="checkbox" id="noti-subscribe" class="custom-control-input">
+                  <input type="checkbox" id="noti-subscribe" name="notificationAllowed" class="custom-control-input" th:checked="${userInfo.notificationAllowed}">
                   <label for="noti-subscribe" class="custom-control-label"></label>
                 </div>
               </div>
@@ -206,12 +209,16 @@ const swalConfig = {confirmButtonColor: '#1f9bcf'};
       return;
     }
 
+    console.log('닉네임 중복 확인 시작:', nickname);
+
     $.ajax({
       url: '/api/users/check-nickname',
       type: 'GET',
       data: {nickname: nickname},
       dataType: 'json',
       success: function (response) {
+        console.log('닉네임 중복 확인 응답:', response);
+
         if (!response) {
           Swal.fire({
             icon: 'error',
@@ -220,17 +227,12 @@ const swalConfig = {confirmButtonColor: '#1f9bcf'};
           });
           return;
         }
-        if (response.status === 'error') {
-          Swal.fire({
-            icon: 'warning',
-            text: response.errorMessage,
-            ...swalConfig,
-          });
-        }
-        if (response.status === 'success') {
+
+        // 성공 응답 처리 (status가 200이면 사용 가능한 닉네임)
+        if (response.status === 200) {
           Swal.fire({
             icon: 'success',
-            text: response.data.message,
+            text: response.message || '사용할 수 있는 닉네임입니다.',
             showCancelButton: true,
             cancelButtonColor: '#d33',
             confirmButtonText: '사용',
@@ -238,6 +240,7 @@ const swalConfig = {confirmButtonColor: '#1f9bcf'};
             ...swalConfig,
           }).then((result) => {
             if (result.isConfirmed) {
+              console.log('닉네임 사용 확정');
               // 중복검사 실행 여부를 확인하는 속성 값!
               document
               .getElementById('checkNicknameBtn')
@@ -245,16 +248,37 @@ const swalConfig = {confirmButtonColor: '#1f9bcf'};
               document
               .getElementById('checkNicknameBtn')
               .setAttribute('disabled', true);
+            } else {
+              console.log('닉네임 사용 취소');
             }
+          });
+        } else {
+          // 에러 응답 처리
+          Swal.fire({
+            icon: 'warning',
+            text: response.message || '닉네임을 확인할 수 없습니다.',
+            ...swalConfig,
           });
         }
       },
-      error: function () {
-        Swal.fire({
-          icon: 'error',
-          text: '서버 응답이 올바르지 않습니다.',
-          ...swalConfig,
-        });
+      error: function (xhr, status, error) {
+        console.error('닉네임 중복 확인 에러:', error);
+        console.error('XHR:', xhr);
+
+        // 서버에서 에러 응답을 보낸 경우
+        if (xhr.responseJSON) {
+          Swal.fire({
+            icon: 'warning',
+            text: xhr.responseJSON.message || '이미 사용 중인 닉네임입니다.',
+            ...swalConfig,
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            text: '서버 응답이 올바르지 않습니다.',
+            ...swalConfig,
+          });
+        }
       },
     });
   }
@@ -270,14 +294,137 @@ const swalConfig = {confirmButtonColor: '#1f9bcf'};
     }
   });
 
+  // 비밀번호 확인 검증
+  document.getElementById('confirmPassword').addEventListener('keyup', function() {
+    const newPwd = document.getElementById('newPassword').value;
+    const confirmPwd = this.value;
+    const pwdCheck = document.getElementById('pwdCheck');
+
+    if (!newPwd && !confirmPwd) {
+      pwdCheck.innerHTML = '';
+      return;
+    }
+
+    if (newPwd !== confirmPwd) {
+      pwdCheck.innerHTML = '비밀번호가 일치하지 않습니다';
+      pwdCheck.style.color = 'red';
+    } else {
+      pwdCheck.innerHTML = '비밀번호가 일치합니다';
+      pwdCheck.style.color = 'green';
+    }
+  });
+
+  // 새 비밀번호 입력 시에도 확인
+  document.getElementById('newPassword').addEventListener('keyup', function() {
+    const newPwd = this.value;
+    const confirmPwd = document.getElementById('confirmPassword').value;
+    const pwdCheck = document.getElementById('pwdCheck');
+
+    if (!newPwd && !confirmPwd) {
+      pwdCheck.innerHTML = '';
+      return;
+    }
+
+    if (confirmPwd && newPwd !== confirmPwd) {
+      pwdCheck.innerHTML = '비밀번호가 일치하지 않습니다';
+      pwdCheck.style.color = 'red';
+    } else if (confirmPwd && newPwd === confirmPwd) {
+      pwdCheck.innerHTML = '비밀번호가 일치합니다';
+      pwdCheck.style.color = 'green';
+    } else {
+      pwdCheck.innerHTML = '';
+    }
+  });
+
 
   document.getElementById('formSubmit').addEventListener('click', checkForm);
 
   function checkForm() {
 
     console.log('checkForm');
-    const updateForm = document.getElementById('updateForm');
-    const formData = new FormData(updateForm);
+
+    // 비밀번호 변경 검증
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    // 비밀번호 변경을 원하는 경우
+    if (newPassword || confirmPassword) {
+      if (!currentPassword) {
+        Swal.fire({
+          icon: 'warning',
+          text: '비밀번호를 변경하려면 현재 비밀번호를 입력해주세요.',
+          ...swalConfig,
+        });
+        return false;
+      }
+
+      if (newPassword !== confirmPassword) {
+        Swal.fire({
+          icon: 'warning',
+          text: '새 비밀번호와 비밀번호 확인이 일치하지 않습니다.',
+          ...swalConfig,
+        });
+        return false;
+      }
+
+      if (newPassword.length < 8) {
+        Swal.fire({
+          icon: 'warning',
+          text: '새 비밀번호는 최소 8자 이상이어야 합니다.',
+          ...swalConfig,
+        });
+        return false;
+      }
+    }
+
+    // basicInfo 객체 생성 (배열 초기화 필수!)
+    const basicInfo = {
+      nickname: document.querySelector('#nickname').value,
+      subscriptionAllowed: []
+    };
+
+    // 체크박스 값에 따라 배열에 추가
+    if (document.getElementById('email-subscribe').checked) {
+      basicInfo.subscriptionAllowed.push('email');
+    }
+    if (document.getElementById('sms-subscribe').checked) {
+      basicInfo.subscriptionAllowed.push('sms');
+    }
+    if (document.getElementById('noti-subscribe').checked) {
+      basicInfo.subscriptionAllowed.push('notification');
+    }
+
+    // 비밀번호 변경 시에만 basicInfo에 추가
+    if (newPassword) {
+      basicInfo.currentPassword = currentPassword;
+      basicInfo.newPassword = newPassword;
+    }
+
+    console.log('BasicInfo 내용:', basicInfo);
+
+    // FormData 생성
+    const formData = new FormData();
+
+    // basicInfo를 JSON Blob으로 추가
+    formData.append(
+      'basicInfo',
+      new Blob([JSON.stringify(basicInfo)], {
+        type: 'application/json',
+      })
+    );
+
+    // 프로필 이미지 파일이 있으면 추가
+    const profileImageFile = document.getElementById('formFile').files[0];
+    if (profileImageFile) {
+      formData.append('profileImage', profileImageFile);
+    }
+
+    console.log('FormData 내용:');
+    for (let [key, value] of formData.entries()) {
+      console.log(key, ':', value);
+    }
+
     // let file = document.getElementById('formFile').files[0];
     // if (file) {
     //   formData.append('profileImage', file);
@@ -297,27 +444,48 @@ const swalConfig = {confirmButtonColor: '#1f9bcf'};
 
 
 
-    fetch(updateForm.action, {
+    fetch('/api/users/update', {
       method: 'POST',
       body: formData,
     })
     .then((response) => {
-      if (response.ok) {
-        return response.json(); // 응답 데이터 확인
-      }
-      throw new Error('업데이트 실패!');
+      return response.json().then(data => {
+        if (response.ok) {
+          return data;
+        } else {
+          // 에러 응답 처리
+          throw {
+            status: data.status,
+            message: data.errorMessage || data.message || '업데이트 실패!'
+          };
+        }
+      });
     })
     .then((data) => {
-      alert(data.data.message);
-      console.log(data);
-      if (window.opener && !window.opener.closed) {
-        window.opener.location.reload(); // 부모 창 새로고침
-      }
-      window.close(); // 팝업창 닫기
+      console.log('업데이트 성공:', data);
+      Swal.fire({
+        icon: 'success',
+        text: '회원정보가 수정되었습니다.',
+        ...swalConfig,
+      }).then(() => {
+        if (window.opener && !window.opener.closed) {
+          window.opener.location.reload(); // 부모 창 새로고침
+        }
+        window.close(); // 팝업창 닫기
+      });
     })
     .catch((error) => {
       console.error('Error:', error);
-      alert('업데이트 실패! 다시 시도해 주세요.');
+
+      // 에러 메시지 표시
+      const errorMessage = error.message || '업데이트 실패! 다시 시도해 주세요.';
+
+      Swal.fire({
+        icon: 'error',
+        title: '오류',
+        text: errorMessage,
+        ...swalConfig,
+      });
     });
   
   }
