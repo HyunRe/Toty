@@ -7,7 +7,9 @@
       "Bash(/Users/jojeongbin/IdeaProjects/Toty/.github/workflows/deploy.yml)",
       "Bash(/Users/jojeongbin/IdeaProjects/Toty/.env.example)",
       "Bash(/Users/jojeongbin/IdeaProjects/Toty/src/main/resources/application-prod.yaml)",
-      "Bash(/Users/jojeongbin/IdeaProjects/Toty/src/main/resources/application-secret.yaml.example)"
+      "Bash(/Users/jojeongbin/IdeaProjects/Toty/src/main/resources/application-secret.yaml.example)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)"
     ],
     "deny": [],
     "ask": []
