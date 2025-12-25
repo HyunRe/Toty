@@ -34,10 +34,14 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
     unitTestImplementation 'org.springframework.boot:spring-boot-starter-test'
     unitTestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -135,3 +139,10 @@ tasks.register('apiE2ETest', Test) {
 
 check.dependsOn unitTest
 check.dependsOn apiE2ETest
+
+/* =======================
+   🔥 CI에서 Lombok 깨짐 방지 (필수)
+ ======================= */
+tasks.withType(JavaCompile).configureEach {
+    options.annotationProcessorPath = configurations.annotationProcessor
+}
