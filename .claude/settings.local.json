@@ -9,7 +9,8 @@
       "Bash(/Users/jojeongbin/IdeaProjects/Toty/src/main/resources/application-prod.yaml)",
       "Bash(/Users/jojeongbin/IdeaProjects/Toty/src/main/resources/application-secret.yaml.example)",
       "Bash(git checkout:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(git fetch:*)"
     ],
     "deny": [],
     "ask": []
