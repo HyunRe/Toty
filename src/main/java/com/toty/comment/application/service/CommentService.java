@@ -1,7 +1,7 @@
 package com.toty.comment.application.service;
 
 import com.toty.comment.domain.event.CommentEvent;
-import com.toty.comment.domain.model.Comment;
+import com.toty.comment.domain.model.comment.Comment;
 import com.toty.comment.domain.repository.CommentRepository;
 import com.toty.comment.dto.CommentDto;
 import com.toty.comment.dto.request.CommentCreateUpdateRequest;

@@ -1,0 +1,115 @@
+name: CI/CD with Docker and AWS CodeDeploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+env:
+  AWS_REGION: ap-northeast-2
+  CODE_DEPLOY_APP_NAME: toty-app
+  CODE_DEPLOY_DEPLOYMENT_GROUP: toty-deployment-group
+
+jobs:
+  # =========================
+  # 1️⃣ CI - Test
+  # =========================
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run unit tests
+        run: ./gradlew test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: build/test-results/
+
+  # =========================
+  # 2️⃣ CD - Build & Deploy
+  # =========================
+  build-and-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    # 🚨 main 브랜치만 배포
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Spring Boot JAR
+        run: ./gradlew clean bootJar -x test
+
+      # =========================
+      # 배포 패키지 생성
+      # =========================
+      - name: Make deployment package
+        run: |
+          mkdir -p deploy
+          cp docker-compose.yml deploy/
+          cp Dockerfile deploy/
+          cp appspec.yml deploy/
+          cp -r scripts deploy/
+          cp build/libs/*.jar deploy/app.jar
+          cd deploy
+          zip -r ../toty-deploy.zip .
+
+      # =========================
+      # AWS 인증
+      # =========================
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # =========================
+      # S3 업로드
+      # =========================
+      - name: Upload to S3
+        run: |
+          aws s3 cp toty-deploy.zip \
+            s3://${{ secrets.S3_BUCKET_NAME }}/deploy/toty-deploy-${{ github.sha }}.zip
+
+      # =========================
+      # CodeDeploy 실행
+      # =========================
+      - name: Create CodeDeploy deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
+            --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP }} \
+            --s3-location bucket=${{ secrets.S3_BUCKET_NAME }},key=deploy/toty-deploy-${{ github.sha }}.zip,bundleType=zip \
+            --file-exists-behavior OVERWRITE \
+            --description "Deployment from GitHub Actions - ${{ github.sha }}"

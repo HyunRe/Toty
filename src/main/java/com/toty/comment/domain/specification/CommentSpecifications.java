@@ -1,6 +1,6 @@
 package com.toty.comment.domain.specification;
 
-import com.toty.comment.domain.model.Comment;
+import com.toty.comment.domain.model.comment.Comment;
 import org.springframework.data.jpa.domain.Specification;
 
 public class CommentSpecifications {

@@ -70,6 +70,9 @@ public class SecurityConfig {
                         // 알림 조회 / 읽음 / 삭제
                         .requestMatchers("/api/notifications/**").authenticated()
 
+                        // 이미지 업로드 (로그인 필수)
+                        .requestMatchers("/api/images/**").authenticated()
+
                         // 나머지 모든 요청은 인증 필요 (로그인 필수!)
                         .anyRequest().authenticated()
                 )

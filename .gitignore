@@ -38,12 +38,20 @@ out/
 
 /logs/
 
-application-local.yaml
+# application-local.yaml은 더 이상 gitignore 안 함 (시크릿 정보 없음)
 application-test.yaml
 application-deploy.yaml
 application-staging.yaml
+application-secret.yaml
 
 ### FCM ###
 src/main/resources/firebase/*.json
 
 README-SECRET.md
+
+### Docker & CI/CD ###
+.env
+docker-compose.override.yml
+
+### AWS ###
+config/firebase/

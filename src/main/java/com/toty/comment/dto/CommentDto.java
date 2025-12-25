@@ -2,7 +2,7 @@ package com.toty.comment.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.toty.comment.domain.model.Comment;
+import com.toty.comment.domain.model.comment.Comment;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

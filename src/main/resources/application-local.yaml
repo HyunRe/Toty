@@ -1,0 +1,119 @@
+spring:
+  # Thymeleaf
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    cache: false
+
+  # Static Resources
+  resources:
+    static-locations: classpath:/static/, file:uploads/posts/images/
+
+  # Database - 실제 값은 application-secret.yaml에 있음
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # JPA
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+        auto_quote_keyword: true
+        show_sql: false
+        default_batch_fetch_size: 10
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+  # Elasticsearch - 실제 credentials는 application-secret.yaml에 있음
+  # (url, username, password는 secret에서 로드)
+
+  # File Upload
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+  # OAuth2 - 실제 client-id/secret은 application-secret.yaml에 있음
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            scope: profile_nickname,account_email,profile_image
+            client-name: Kakao
+            authorization-grant-type: authorization_code
+            provider: kakao
+          github:
+            scope: user
+          google:
+            scope: email,profile
+        provider:
+          kakao:
+            user-name-attribute: kakao_account
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+
+  # Email - 실제 credentials는 application-secret.yaml에 있음
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
+
+  # JSON
+  jackson:
+    default-property-inclusion: non_null
+
+  # Profile 설정 - application-secret.yaml도 함께 로드
+  profiles:
+    include: secret
+
+# User Image Path (로컬 개발용)
+user:
+  img-path: C:/toty/userProfileImg/
+
+# Server
+server:
+  port: 8070
+
+# Redis - 실제 password는 application-secret.yaml에 있음
+redis:
+  host: localhost
+  port: 6379
+
+# Firebase - 실제 credentials는 application-secret.yaml에 있음
+firebase:
+  service-account: classpath:firebase/toty-6d4b4-firebase-adminsdk-fbsvc-f5eb24e27a.json
+  admin-key: classpath:firebase/toty-6d4b4-firebase-adminsdk-fbsvc-f5eb24e27a.json
+  credentials:
+    path: src/main/resources/firebase/toty-6d4b4-firebase-adminsdk-fbsvc-f5eb24e27a.json
+
+# File Upload Path (로컬 개발용)
+file:
+  upload-dir: /Users/jojeongbin/IdeaProjects/Toty/uploads/posts/images
+
+# Swagger
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui
+    operationsSorter: method
+    tagsSorter: alpha
+
+# AWS S3 - 실제 credentials는 application-secret.yaml에 있음
+# (access-key, secret-key, bucket은 secret에서 로드)
+cloud:
+  aws:
+    stack:
+      auto: false

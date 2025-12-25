@@ -1,4 +1,4 @@
-package com.toty.comment.domain.model;
+package com.toty.comment.domain.model.commentEs;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

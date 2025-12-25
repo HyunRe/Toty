@@ -5,7 +5,7 @@ import com.toty.common.domain.BaseTime;
 import com.toty.user.domain.model.User;
 import jakarta.persistence.*;
 import lombok.*;
-import com.toty.comment.domain.model.Comment;
+import com.toty.comment.domain.model.comment.Comment;
 
 import java.util.ArrayList;
 import java.util.List;

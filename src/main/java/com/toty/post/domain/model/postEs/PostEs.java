@@ -1,6 +1,6 @@
 package com.toty.post.domain.model.postEs;
 
-import com.toty.comment.domain.model.CommentEs;
+import com.toty.comment.domain.model.commentEs.CommentEs;
 import com.toty.post.domain.model.post.PostCategory;
 import lombok.*;
 import org.springframework.data.annotation.Id;

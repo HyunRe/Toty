@@ -1,0 +1,175 @@
+# JWT
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+
+spring:
+  application:
+    name: toty
+
+  # Thymeleaf
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    cache: true
+
+  # Static Resources
+  resources:
+    static-locations: classpath:/static/
+
+  # Database
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # JPA
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+        auto_quote_keyword: true
+        show_sql: false
+        default_batch_fetch_size: 100
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+  # Redis
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST}
+      port: ${SPRING_REDIS_PORT}
+      password: ${SPRING_REDIS_PASSWORD}
+
+  # File Upload
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+  # Security OAuth2
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_ID}
+            scope: profile_nickname,account_email,profile_image
+            client-name: Kakao
+            authorization-grant-type: authorization_code
+            redirect-uri: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_REDIRECT_URI}
+            provider: kakao
+          github:
+            client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID}
+            client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET}
+            scope: user
+          google:
+            client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
+            client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
+            scope: email,profile
+        provider:
+          kakao:
+            user-name-attribute: kakao_account
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+
+  # Email
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
+
+  # JSON
+  jackson:
+    default-property-inclusion: non_null
+
+# Server
+server:
+  port: 8070
+  error:
+    include-message: always
+    include-stacktrace: never
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+
+# AWS S3
+cloud:
+  aws:
+    credentials:
+      access-key: ${CLOUD_AWS_CREDENTIALS_ACCESS_KEY}
+      secret-key: ${CLOUD_AWS_CREDENTIALS_SECRET_KEY}
+    s3:
+      bucket: ${CLOUD_AWS_S3_BUCKET}
+    region:
+      static: ${CLOUD_AWS_REGION_STATIC}
+    stack:
+      auto: false
+
+# CoolSMS
+coolsms:
+  api:
+    key: ${SPRING_COOLSMS_API_KEY}
+    secret: ${SPRING_COOLSMS_API_SECRET}
+    fromnumber: ${SPRING_COOLSMS_API_FROMNUMBER}
+
+# Firebase
+firebase:
+  service-account: /app/config/firebase/service-account.json
+  project-id: ${FIREBASE_PROJECT_ID}
+  admin-key: /app/config/firebase/service-account.json
+  credentials:
+    path: /app/config/firebase/service-account.json
+  messaging:
+    vapid-key: ${FIREBASE_MESSAGING_VAPID_KEY}
+
+# Swagger
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.toty: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+  file:
+    name: /app/logs/application.log
+    max-size: 100MB
+    max-history: 30

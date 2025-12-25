@@ -3,6 +3,7 @@ package com.toty.user.application;
 import com.toty.common.domain.Tag;
 import com.toty.common.exception.ErrorCode;
 import com.toty.common.exception.ExpectedException;
+import com.toty.common.image.application.ImageUploadService;
 import com.toty.following.domain.repository.FollowingRepository;
 import com.toty.user.domain.model.Site;
 import com.toty.user.domain.model.User;
@@ -21,13 +22,10 @@ import jakarta.transaction.Transactional;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -40,9 +38,7 @@ public class UserInfoService {
     private final UserService userService;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-
-    @Value("${user.img-path}")
-    private String basePath;
+    private final ImageUploadService imageUploadService;
 
     // 본인 확인
     private boolean isNotOwner(User user, Long id){
@@ -116,15 +112,9 @@ public class UserInfoService {
         }
 
         if (imgFile != null && !imgFile.isEmpty()) {
-            try {
-                String savePath = basePath + userId;
-                String contentType = imgFile.getContentType().split("/")[1];
-                String imgPath = savePath + "." + contentType;
-                imgFile.transferTo(new File(imgPath)); // ex) --.jpg, --hi.png
-                foundUser.updateprofileImg(imgPath);
-            } catch (IOException e) {
-                throw new ExpectedException(ErrorCode.PROFILE_IMAGE_SAVE_ERROR);
-            }
+            // S3에 프로필 이미지 업로드
+            String imageUrl = imageUploadService.uploadForProfile(userId, imgFile);
+            foundUser.updateprofileImg(imageUrl);
         }
 
         // 수신 동의 초기화 (모두 false로)

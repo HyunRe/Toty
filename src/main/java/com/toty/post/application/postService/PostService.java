@@ -2,6 +2,7 @@ package com.toty.post.application.postService;
 
 import com.toty.common.exception.ErrorCode;
 import com.toty.common.exception.ExpectedException;
+import com.toty.common.image.application.ImageUploadService;
 import com.toty.post.domain.factory.creation.PostCreationStrategyFactory;
 import com.toty.post.domain.factory.update.PostUpdateStrategyFactory;
 import com.toty.post.domain.strategy.creation.PostCreationStrategy;
@@ -21,6 +22,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostCreationStrategyFactory postCreationStrategyFactory;
     private final PostUpdateStrategyFactory postUpdateStrategyFactory;
+    private final ImageUploadService imageUploadService;
 
     // 게시글 가져 오기
     public Post findPostById(Long id) {
@@ -68,6 +70,9 @@ public class PostService {
         if (!isOwner(user, post.getUser().getId())) {
             throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
         }
+
+        // 게시글에 첨부된 이미지들을 S3와 DB에서 먼저 삭제
+        imageUploadService.deletePostImages(id);
 
         // 정말로 삭제 할 것인지 확인 필요 - 프론트에서 처리
         postRepository.delete(post);

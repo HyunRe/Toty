@@ -2,7 +2,7 @@ package com.toty.comment.presentation.view;
 
 import com.toty.comment.application.service.CommentPaginationService;
 import com.toty.comment.application.service.CommentService;
-import com.toty.comment.domain.model.Comment;
+import com.toty.comment.domain.model.comment.Comment;
 import com.toty.common.annotation.CurrentUser;
 import com.toty.common.pagination.PaginationResult;
 import com.toty.user.domain.model.User;

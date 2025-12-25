@@ -66,7 +66,12 @@ public enum ErrorCode {
     FCM_TOKEN_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "비활성화된 FCM 토큰 삭제에 실패했습니다."),
 
     // 채팅
-    FAIL_ROOM_CREATE(HttpStatus.FORBIDDEN, "단톡방을 생성할수 없습니다");
+    FAIL_ROOM_CREATE(HttpStatus.FORBIDDEN, "단톡방을 생성할수 없습니다"),
+
+    // 이미지
+    IMAGE_COUNT_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "이미지 개수 제한을 초과했습니다."),
+    S3_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S3 업로드에 실패했습니다.");
+
     private final HttpStatus httpStatus;
     private final String message;
 }

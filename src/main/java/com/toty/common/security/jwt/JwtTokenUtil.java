@@ -11,17 +11,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 // * 리프레시 토큰 발행 메서드 추가, createCookie 메서드 jwtRequestFilter에서 여기로 옮겨옴
 @Component
 @RequiredArgsConstructor
 public class JwtTokenUtil {
-    private String SECRET_KEY = "BESP2JupiterELASTICSEARCHPROJECTWOWOWOWOWOWOWOWOWOWOWO";
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
+
+    @Value("${jwt.access-token-expiration}")
+    private long ACCESS_TOKEN_TTL; // 액세스 토큰 수명
+
+    @Value("${jwt.refresh-token-expiration}")
+    private long REFRESH_TOKEN_TTL; // 리프레시 토큰 수명
+
     private final RedisService redisService;
-    // * TTL 설정
-    public static final long ACCESS_TOKEN_TTL = 1000*60*60*2; // 액세스 토큰 수명 2시간
-    public static final long REFRESH_TOKEN_TTL = 1000*60*60*24*14; // 액세스 토큰 수명 2주
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();

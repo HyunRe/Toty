@@ -1,4 +1,4 @@
-package com.toty.comment.domain.model;
+package com.toty.comment.domain.model.comment;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.toty.common.domain.BaseTime;
