@@ -33,7 +33,7 @@ services:
       - redis-data:/data
     networks:
       - toty-network
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    command: redis-server --appendonly yes --requirepass ${SPRING_REDIS_PASSWORD}
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
