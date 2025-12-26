@@ -35,7 +35,7 @@ services:
       - toty-network
     command: redis-server --appendonly yes --requirepass ${SPRING_REDIS_PASSWORD}
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${SPRING_REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 3s
       retries: 5
@@ -84,7 +84,7 @@ services:
       # Redis
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
-      SPRING_REDIS_PASSWORD: ${REDIS_PASSWORD}
+      SPRING_REDIS_PASSWORD: ${SPRING_REDIS_PASSWORD}
 
       # Elasticsearch 설정 추가
       SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
