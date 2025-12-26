@@ -6,7 +6,7 @@ WORKDIR /app
 RUN groupadd -r spring && useradd -r -g spring spring
 
 # CI에서 빌드된 JAR 복사
-COPY build/libs/*.jar app.jar
+COPY app.jar app.jar
 
 # Actuator healthcheck용 curl 설치
 RUN apt-get update \
