@@ -52,6 +52,10 @@ spring:
       port: ${SPRING_REDIS_PORT}
       password: ${SPRING_REDIS_PASSWORD}
 
+  # Elasticsearch 추가
+  elasticsearch:
+    uris: ${SPRING_ELASTICSEARCH_URIS}
+
   # File Upload
   servlet:
     multipart:

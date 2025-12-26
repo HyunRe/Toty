@@ -40,6 +40,25 @@ services:
       timeout: 3s
       retries: 5
 
+  # Elasticsearch 추가
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
+    container_name: toty-es
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # 프리티어라면 512m 권장
+      - xpack.security.enabled=false
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    networks:
+      - toty-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -vq '\"status\":\"red\"'"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+
   # Spring Boot Application
   app:
     build:
@@ -51,6 +70,8 @@ services:
       mysql:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      elasticsearch: # ES가 정상일 때 앱 시작
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: prod
@@ -65,29 +86,26 @@ services:
       SPRING_REDIS_PORT: 6379
       SPRING_REDIS_PASSWORD: ${REDIS_PASSWORD}
 
-      # JWT
+      # Elasticsearch 설정 추가
+      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
+
+      # JWT (기존 설정 유지)
       JWT_SECRET: ${JWT_SECRET}
       JWT_ACCESS_TOKEN_EXPIRATION: ${JWT_ACCESS_TOKEN_EXPIRATION}
       JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION}
 
-      # OAuth2
+      # ... 이하 OAuth2, Email, SMS, Firebase 설정 동일하게 유지 ...
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID}
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KAKAO_REDIRECT_URI: ${KAKAO_REDIRECT_URI}
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-
-      # Email
       SPRING_MAIL_USERNAME: ${MAIL_USERNAME}
       SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
-
-      # SMS (CoolSMS)
       SPRING_COOLSMS_API_KEY: ${COOLSMS_API_KEY}
       SPRING_COOLSMS_API_SECRET: ${COOLSMS_API_SECRET}
       SPRING_COOLSMS_API_FROMNUMBER: ${COOLSMS_FROM_NUMBER}
-
-      # Firebase
       FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
       FIREBASE_MESSAGING_VAPID_KEY: ${FIREBASE_VAPID_KEY}
 
@@ -113,6 +131,8 @@ volumes:
   mysql-data:
     driver: local
   redis-data:
+    driver: local
+  es-data: # ES 볼륨 추가
     driver: local
   app-logs:
     driver: local
