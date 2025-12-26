@@ -10,7 +10,10 @@
       "Bash(/Users/jojeongbin/IdeaProjects/Toty/src/main/resources/application-secret.yaml.example)",
       "Bash(git checkout:*)",
       "Bash(git merge:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(./gradlew compileJava:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

@@ -79,9 +79,19 @@ public class JwtTokenUtil {
         return createToken(claims, useremail, TTL);
     }
 
-    // * 리프레시 토큰 생성 (만료 시간만 포함)
+    // * 액세스 토큰 생성 (기본 TTL 사용)
+    public String generateAccessToken(String useremail) {
+        return generateToken(useremail, ACCESS_TOKEN_TTL);
+    }
+
+    // * 리프레시 토큰 생성 (TTL 인자 추가)
     public String generateRefreshToken(long TTL) {
         return createRefreshToken(TTL);
+    }
+
+    // * 리프레시 토큰 생성 (기본 TTL 사용)
+    public String generateRefreshToken(String useremail) {
+        return generateToken(useremail, REFRESH_TOKEN_TTL);
     }
 
     // 토큰 유효성 검사

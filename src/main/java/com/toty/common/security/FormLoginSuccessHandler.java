@@ -1,8 +1,5 @@
 package com.toty.common.security;
 
-import static com.toty.common.security.jwt.JwtTokenUtil.ACCESS_TOKEN_TTL;
-import static com.toty.common.security.jwt.JwtTokenUtil.REFRESH_TOKEN_TTL;
-
 import com.toty.common.security.jwt.JwtTokenUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,8 +24,8 @@ public class FormLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
             Authentication authentication) throws ServletException, IOException {
 
         // 새로 발급하고 response에 넣는 과정
-        String accessToken = jwtTokenUtil.generateToken(authentication.getName(), ACCESS_TOKEN_TTL);
-        String refreshToken = jwtTokenUtil.generateToken(authentication.getName(), REFRESH_TOKEN_TTL);
+        String accessToken = jwtTokenUtil.generateAccessToken(authentication.getName());
+        String refreshToken = jwtTokenUtil.generateRefreshToken(authentication.getName());
 
         jwtTokenUtil.storeRefreshToken(authentication.getName(), refreshToken);
 
@@ -37,5 +34,5 @@ public class FormLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
         response.addCookie(jwtTokenUtil.createCookie("refreshToken", refreshToken, true));
         super.onAuthenticationSuccess(request, response, authentication);
     }
-    
+
 }

@@ -28,6 +28,10 @@ public class NotificationSendRequest {
         this.fromRedis = fromRedis;
     }
 
+    public String getType() {
+        return eventType != null ? eventType.getEvent() : null;
+    }
+
     public NotificationSendRequest toBaseRequest(NotificationSendRequest request) {
         return new NotificationSendRequest(
                 request.getReceiverId(),
