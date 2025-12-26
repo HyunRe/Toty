@@ -147,13 +147,10 @@ coolsms:
 
 # Firebase
 firebase:
-  service-account: /app/config/firebase/service-account.json
   project-id: ${FIREBASE_PROJECT_ID}
-  admin-key: /app/config/firebase/service-account.json
-  credentials:
-    path: /app/config/firebase/service-account.json
   messaging:
     vapid-key: ${FIREBASE_MESSAGING_VAPID_KEY}
+  service-account-json: ${FIREBASE_SERVICE_ACCOUNT_JSON}
 
 # Swagger
 springdoc:
