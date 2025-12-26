@@ -23,13 +23,7 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
      * (예: 특정 유저가 게시글에 올린 이미지들만 따로 모아볼 때 사용)
      */
     List<Image> findByUserIdAndType(Long userId, ImageType type);
-
-    /**
-     * 특정 사용자의 '프로필 타입' 이미지를 단건 조회합니다.
-     * (주로 유저 정보 조회 시 프로필 사진 경로를 가져오기 위해 사용)
-     */
-    Optional<Image> findByUserIdAndType_Profile(Long userId);
-
+    
     /**
      * 특정 게시글(Post)에 포함된 이미지 리스트를 조회합니다.
      * (게시글 상세 보기 시 첨부된 이미지들을 불러올 때 사용)
