@@ -4,12 +4,6 @@ jwt:
   access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
   refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
 
-# Redis
-redis:
-  host: ${SPRING_REDIS_HOST}
-  port: ${SPRING_REDIS_PORT}
-  password: ${SPRING_REDIS_PASSWORD}
-
 spring:
   application:
     name: toty
@@ -149,7 +143,7 @@ coolsms:
 firebase:
   project-id: ${FIREBASE_PROJECT_ID}
   messaging:
-    vapid-key: ${FIREBASE_MESSAGING_VAPID_KEY}
+    vapid-key: ${FIREBASE_VAPID_KEY}
   service-account-json: ${FIREBASE_SERVICE_ACCOUNT_JSON}
 
 # Swagger
