@@ -61,6 +61,9 @@ public class SecurityConfig {
                         // 에러 페이지 - 인증 불필요
                         .requestMatchers("/error").permitAll()
 
+                        // Actuator endpoint
+                        .requestMatchers("/actuator/health").permitAll()
+
                         // SSE 구독 (로그인 필수)
                         .requestMatchers("/api/sse/**").authenticated()
 
