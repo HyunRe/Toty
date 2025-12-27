@@ -161,9 +161,7 @@ management:
         include: health,info
   endpoint:
     health:
-      show-details: never
-      probes:
-        enabled: true  # Liveness/Readiness 프로브 활성화
+      show-details: always
 
 # Logging
 logging:
