@@ -2,7 +2,6 @@ package com.toty.post.presentation.post.api;
 
 import com.toty.common.pagination.PaginationResult;
 import com.toty.common.annotation.CurrentUser;
-import com.toty.post.application.postService.PostImageService;
 import com.toty.post.application.postService.PostLikeService;
 import com.toty.post.application.postService.PostLikePaginationService;
 import com.toty.post.application.postService.PostPaginationService;
@@ -21,9 +20,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @Tag(name = "Post", description = "게시글 API")
 @RestController
@@ -34,7 +30,6 @@ public class PostApiController {
     private final PostPaginationService postPaginationService;
     private final PostLikePaginationService postLikePaginationService;
     private final PostLikeService postLikeService;
-    private final PostImageService postImageService;
     private final UserScrapeService userScrapeService;
 
     @Operation(summary = "게시글 삭제", description = "특정 게시글을 삭제합니다")
@@ -77,13 +72,6 @@ public class PostApiController {
                                                    @CurrentUser User user) {
         boolean isScraped = userScrapeService.isPostScrapedByUser(id, user.getId());
         return ResponseEntity.ok(isScraped);
-    }
-
-    @Operation(summary = "이미지 업로드", description = "게시글에 첨부할 이미지를 업로드합니다")
-    @PostMapping("/upload-image")
-    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
-        String fileUrl = postImageService.saveImage(file, "uploads/posts/images");
-        return ResponseEntity.ok(fileUrl);
     }
 
     @Operation(summary = "게시글 작성", description = "새로운 게시글을 작성합니다")

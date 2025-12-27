@@ -16,13 +16,15 @@ $(document).ready(function () {
         const formData = new FormData();
         formData.append("file", file);
         $.ajax({
-            url: '/api/posts/upload-image', // 이미지 업로드 엔드포인트
+            url: '/api/images/summernote', // S3 이미지 업로드 엔드포인트
             method: 'POST',
             data: formData,
             contentType: false,
             processData: false,
-            success: function (url) {
-                $('#content').summernote('insertImage', url);
+            success: function (response) {
+                // S3 URL을 Summernote에 삽입
+                const imageUrl = response.url;
+                $('#content').summernote('insertImage', imageUrl);
             },
             error: function () {
                 alert('이미지 업로드 실패');

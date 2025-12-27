@@ -10,8 +10,15 @@ public class RevokeMentorUrlStrategy implements NotificationUrlStrategy {
         return EventType.REVOKE_MENTOR;
     }
 
+    // 로컬
+//    @Override
+//    public String generateUrl(String referenceId) {
+//        return "/view/users/home";
+//    }
+
+    // 서버
     @Override
     public String generateUrl(String referenceId) {
-        return "http://localhost:8070/view/users/home";
+        return "/view/users/home";
     }
 }

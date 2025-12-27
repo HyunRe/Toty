@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", async function () {
     try {
         // API 요청 (실제 엔드포인트로 변경 필요)
-        let response = await fetch("https://your-api.com/mentor-info", {
+        let response = await fetch("/view/users/info", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
@@ -28,7 +28,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         // 버튼
         let button = document.querySelector(".button");
         if (button) {
-            button.setAttribute("href", "https://localhost:8070/main");
+            // 로컬
+//            button.setAttribute("href", "https://localhost:8070/main");
+
+            // 서버
+            button.setAttribute("href", "/view/users/home");
         }
 
     } catch (error) {
