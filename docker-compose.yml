@@ -44,20 +44,24 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
     container_name: toty-es
-    restart: unless-stopped
     environment:
       - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # 프리티어라면 512m 권장
-      - xpack.security.enabled=false
-    volumes:
-      - es-data:/usr/share/elasticsearch/data
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    # 아래 entrypoint/command 부분을 추가하여 nori 플러그인 설치
+    entrypoint: >
+      sh -c "
+        bin/elasticsearch-plugin install --batch analysis-nori || true;
+        /usr/local/bin/docker-entrypoint.sh elasticsearch
+      "
+    ports:
+      - "9200:9200"
     networks:
       - toty-network
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -vq '\"status\":\"red\"'"]
-      interval: 20s
-      timeout: 10s
-      retries: 5
+      test: [ "CMD-SHELL", "curl -s http://localhost:9200/_cat/health?h=status | grep -q 'green\\|yellow'" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   # Spring Boot Application
   app:
