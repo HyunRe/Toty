@@ -42,7 +42,7 @@ services:
 
   # Elasticsearch 추가
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
     container_name: toty-es
     environment:
       - discovery.type=single-node
