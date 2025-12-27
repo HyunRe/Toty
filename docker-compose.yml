@@ -42,12 +42,12 @@ services:
 
   # Elasticsearch 추가
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
-    container_name: toty-es
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0 #. 버전 업그레이드
+    container_name: toty-es 1
     environment:
       - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - xpack.security.enabled=false # 보안 설정 이슈 방지 (개발/테스트용)
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g" # 2. 메모리 1GB로 증설
+      - xpack.security.enabled=false # 3. 클라이언트와의 호환성을 위해 보안 기능 해제
     entrypoint: >
       sh -c "
         if ! bin/elasticsearch-plugin list | grep -q 'analysis-nori'; then
@@ -60,12 +60,12 @@ services:
     networks:
       - toty-network
     healthcheck:
-      # curl 대신 내부 통신 확인, start_period 추가가 핵심
-      test: [ "CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"\\(green\\|yellow\\)\"'" ]
+      # 8.17.0의 응답 구조에 맞춘 견고한 헬스체크
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"\\(green\\|yellow\\)\"'"]
       interval: 20s
       timeout: 10s
       retries: 15
-      start_period: 60s # 플러그인 설치 및 부팅을 위해 최소 1분은 기다려줌
+      start_period: 90s # 4. 플러그인 설치 및 엔진 부팅 시간을 위해 대기 시간 연장
 
   # Spring Boot Application
   app:
