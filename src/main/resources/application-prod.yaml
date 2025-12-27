@@ -162,6 +162,11 @@ management:
   endpoint:
     health:
       show-details: always
+      probes:
+        enabled: true  # validate.sh가 사용하는 /readiness 경로를 활성화합니다.
+  health:
+    elasticsearch:
+      indices-status: yellow  # ES가 yellow여도 Readiness가 200 OK를 반환하게 합니다.
 
 # Logging
 logging:
