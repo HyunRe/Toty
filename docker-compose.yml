@@ -43,7 +43,7 @@ services:
   # Elasticsearch 추가
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0 #. 버전 업그레이드
-    container_name: toty-es 1
+    container_name: toty-es
     environment:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g" # 2. 메모리 1GB로 증설
