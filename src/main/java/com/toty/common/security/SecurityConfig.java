@@ -62,7 +62,7 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
 
                         // Actuator endpoint
-                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
 
                         // SSE 구독 (로그인 필수)
                         .requestMatchers("/api/sse/**").authenticated()
