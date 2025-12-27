@@ -47,10 +47,12 @@ services:
     environment:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    # 아래 entrypoint/command 부분을 추가하여 nori 플러그인 설치
+      - xpack.security.enabled=false # 보안 설정 이슈 방지 (개발/테스트용)
     entrypoint: >
       sh -c "
-        bin/elasticsearch-plugin install --batch analysis-nori || true;
+        if ! bin/elasticsearch-plugin list | grep -q 'analysis-nori'; then
+          bin/elasticsearch-plugin install --batch analysis-nori;
+        fi;
         /usr/local/bin/docker-entrypoint.sh elasticsearch
       "
     ports:
@@ -58,10 +60,12 @@ services:
     networks:
       - toty-network
     healthcheck:
-      test: [ "CMD-SHELL", "curl -s http://localhost:9200/_cat/health?h=status | grep -q 'green\\|yellow'" ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+      # curl 대신 내부 통신 확인, start_period 추가가 핵심
+      test: [ "CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"\\(green\\|yellow\\)\"'" ]
+      interval: 20s
+      timeout: 10s
+      retries: 15
+      start_period: 60s # 플러그인 설치 및 부팅을 위해 최소 1분은 기다려줌
 
   # Spring Boot Application
   app:
