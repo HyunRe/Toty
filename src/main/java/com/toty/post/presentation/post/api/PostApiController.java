@@ -2,10 +2,10 @@ package com.toty.post.presentation.post.api;
 
 import com.toty.common.pagination.PaginationResult;
 import com.toty.common.annotation.CurrentUser;
-import com.toty.post.application.postService.PostLikeService;
-import com.toty.post.application.postService.PostLikePaginationService;
-import com.toty.post.application.postService.PostPaginationService;
-import com.toty.post.application.postService.PostService;
+import com.toty.post.application.post.PostLikeService;
+import com.toty.post.application.post.PostLikePaginationService;
+import com.toty.post.application.post.PostPaginationService;
+import com.toty.post.application.post.PostService;
 import com.toty.post.domain.model.post.Post;
 import com.toty.post.dto.request.PostLikeActionRequest;
 import com.toty.post.dto.request.PostCreateRequest;

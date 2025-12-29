@@ -1,4 +1,4 @@
-package com.toty.post.application.postService;
+package com.toty.post.application.post;
 
 import com.toty.comment.application.service.CommentPaginationService;
 import com.toty.common.exception.ErrorCode;

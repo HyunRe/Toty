@@ -1,4 +1,4 @@
-package com.toty.post.application.postEsService;
+package com.toty.post.application.postEs;
 
 import com.toty.common.exception.ErrorCode;
 import com.toty.common.exception.ExpectedException;

@@ -1,7 +1,7 @@
 package com.toty.post.presentation.postEs.api;
 
 import com.toty.common.response.TotyResponse;
-import com.toty.post.application.postEsService.PostSearchService;
+import com.toty.post.application.postEs.PostSearchService;
 import com.toty.post.domain.model.post.PostCategory;
 import com.toty.post.domain.model.postEs.PostEs;
 import com.toty.post.domain.model.postEs.SearchField;

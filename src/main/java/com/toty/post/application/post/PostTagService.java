@@ -1,4 +1,4 @@
-package com.toty.post.application.postService;
+package com.toty.post.application.post;
 
 import com.toty.post.domain.model.post.Post;
 import com.toty.post.domain.model.post.PostTag;

@@ -1,4 +1,4 @@
-package com.toty.post.application.postService;
+package com.toty.post.application.post;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

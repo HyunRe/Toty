@@ -1,4 +1,4 @@
-package com.toty.post.application.postService;
+package com.toty.post.application.post;
 
 import com.toty.common.baseException.NotificationSendException;
 import com.toty.common.exception.ErrorCode;
