@@ -18,12 +18,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Tag(name = "User", description = "사용자 API")
 @RestController
 @RequestMapping("/api/users")
@@ -43,11 +45,10 @@ public class UserApiController {
     @Operation(summary = "이메일 중복 확인", description = "회원가입 시 이메일 사용 가능 여부를 확인합니다")
     @GetMapping("/check-email")
     public ResponseEntity emailValidation(@RequestParam(name = "email") String email) {
-        System.out.println("========== 이메일 중복 확인 API 호출 ==========");
-        System.out.println("요청 이메일: " + email);
+        log.info("이메일 중복 확인 API 호출 - email: {}", email);
         try {
             String response = userSignUpService.validateEmail(email);
-            System.out.println("이메일 사용 가능: " + email);
+            log.info("이메일 사용 가능: {}", email);
             SuccessResponse successResponse = new SuccessResponse(
                     HttpStatus.OK.value(),
                     "사용할 수 있는 이메일입니다.",
@@ -55,7 +56,7 @@ public class UserApiController {
             );
             return ResponseEntity.ok(successResponse);
         } catch (IllegalArgumentException e) {
-            System.err.println("이메일 중복: " + email + " - " + e.getMessage());
+            log.warn("이메일 중복: {} - {}", email, e.getMessage());
             throw e;
         }
     }
@@ -63,11 +64,10 @@ public class UserApiController {
     @Operation(summary = "닉네임 중복 확인", description = "회원가입 시 닉네임 사용 가능 여부를 확인합니다")
     @GetMapping("/check-nickname")
     public ResponseEntity nicknameValidation(@RequestParam(name = "nickname") String nickname) {
-        System.out.println("========== 닉네임 중복 확인 API 호출 ==========");
-        System.out.println("요청 닉네임: " + nickname);
+        log.info("닉네임 중복 확인 API 호출 - nickname: {}", nickname);
         try {
             String response = userSignUpService.validateNickname(nickname);
-            System.out.println("닉네임 사용 가능: " + nickname);
+            log.info("닉네임 사용 가능: {}", nickname);
             SuccessResponse successResponse = new SuccessResponse(
                     HttpStatus.OK.value(),
                     "사용할 수 있는 닉네임입니다.",
@@ -75,7 +75,7 @@ public class UserApiController {
             );
             return ResponseEntity.ok(successResponse);
         } catch (IllegalArgumentException e) {
-            System.err.println("닉네임 중복: " + nickname + " - " + e.getMessage());
+            log.warn("닉네임 중복: {} - {}", nickname, e.getMessage());
             throw e;
         }
     }
@@ -83,11 +83,10 @@ public class UserApiController {
     @Operation(summary = "휴대폰 인증번호 요청", description = "회원가입 시 휴대폰 번호로 인증번호를 전송합니다")
     @PostMapping("/authCode")
     public ResponseEntity sendAuthCode(@RequestParam(name = "phoneNumber") String phoneNumber) {
-        System.out.println("========== SMS 인증번호 요청 API 호출 ==========");
-        System.out.println("요청 전화번호: " + phoneNumber);
+        log.info("SMS 인증번호 요청 API 호출 - phoneNumber: {}", phoneNumber);
         try {
             String response = userSignUpService.sendAuthCodeMessage(phoneNumber);
-            System.out.println("SMS 인증번호 전송 성공!");
+            log.info("SMS 인증번호 전송 성공 - phoneNumber: {}", phoneNumber);
             SuccessResponse successResponse = new SuccessResponse(
                     HttpStatus.OK.value(),
                     "인증번호가 전송되었습니다.",
@@ -95,8 +94,7 @@ public class UserApiController {
             );
             return ResponseEntity.ok(successResponse);
         } catch (Exception e) {
-            System.err.println("SMS 인증번호 전송 실패: " + e.getMessage());
-            e.printStackTrace();
+            log.error("SMS 인증번호 전송 실패 - phoneNumber: {}", phoneNumber, e);
             throw e;
         }
     }
@@ -105,11 +103,10 @@ public class UserApiController {
     @PostMapping("/check-authCode")
     public ResponseEntity checkAuthCode(@RequestParam(name = "authCode") String authCode,
             @RequestParam(name = "phoneNumber") String phoneNumber) {
-        System.out.println("========== SMS 인증번호 확인 API 호출 ==========");
-        System.out.println("전화번호: " + phoneNumber + ", 인증번호: " + authCode);
+        log.info("SMS 인증번호 확인 API 호출 - phoneNumber: {}", phoneNumber);
         try {
             Boolean response = userSignUpService.checkAuthCode(phoneNumber, authCode);
-            System.out.println("SMS 인증번호 확인 성공!");
+            log.info("SMS 인증번호 확인 성공 - phoneNumber: {}", phoneNumber);
             SuccessResponse successResponse = new SuccessResponse(
                     HttpStatus.OK.value(),
                     "인증되었습니다.",
@@ -117,7 +114,7 @@ public class UserApiController {
             );
             return ResponseEntity.ok(successResponse);
         } catch (IllegalArgumentException e) {
-            System.err.println("SMS 인증번호 확인 실패: " + e.getMessage());
+            log.warn("SMS 인증번호 확인 실패 - phoneNumber: {}, error: {}", phoneNumber, e.getMessage());
             throw e;
         }
     }

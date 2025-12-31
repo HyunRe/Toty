@@ -12,7 +12,13 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "posts", indexes = {
+    @Index(name = "idx_user_id", columnList = "user_id"),
+    @Index(name = "idx_post_category", columnList = "postCategory"),
+    @Index(name = "idx_created_at", columnList = "createdAt"),
+    @Index(name = "idx_updated_at", columnList = "updatedAt"),
+    @Index(name = "idx_user_category", columnList = "user_id, postCategory")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends BaseTime {
