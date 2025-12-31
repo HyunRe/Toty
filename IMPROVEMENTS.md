@@ -2,15 +2,21 @@
 
 > 2024년 12월 31일 작성
 >
-> Week 1-4 성능 및 보안 개선 로드맵 완료
+> Week 1-8 성능, 보안, 아키텍처 개선 로드맵 완료
 
 ## 목차
 - [개요](#개요)
-- [1. N+1 쿼리 해결](#1-n1-쿼리-해결)
-- [2. Redis 캐싱 도입](#2-redis-캐싱-도입)
-- [3. 비동기 처리 추가](#3-비동기-처리-추가)
-- [4. JWT 토큰 로테이션 및 블랙리스트](#4-jwt-토큰-로테이션-및-블랙리스트)
-- [5. 로깅 개선](#5-로깅-개선)
+- [Phase 1: 성능 및 보안 개선 (Week 1-4)](#phase-1-성능-및-보안-개선-week-1-4)
+  - [1. N+1 쿼리 해결](#1-n1-쿼리-해결)
+  - [2. Redis 캐싱 도입](#2-redis-캐싱-도입)
+  - [3. 비동기 처리 추가](#3-비동기-처리-추가)
+  - [4. JWT 토큰 로테이션 및 블랙리스트](#4-jwt-토큰-로테이션-및-블랙리스트)
+  - [5. 로깅 개선](#5-로깅-개선)
+- [Phase 2: 아키텍처 개선 (Week 5-8)](#phase-2-아키텍처-개선-week-5-8)
+  - [6. Value Object 패턴 도입](#6-value-object-패턴-도입)
+  - [7. Domain Events 인프라 구현](#7-domain-events-인프라-구현)
+  - [8. Service 책임 분리 (CQRS 패턴)](#8-service-책임-분리-cqrs-패턴)
+  - [9. 장애 알림 시스템 구현](#9-장애-알림-시스템-구현)
 - [변경 파일 목록](#변경-파일-목록)
 - [성능 개선 효과](#성능-개선-효과)
 - [다음 단계](#다음-단계)
@@ -22,13 +28,23 @@
 멘토링 플랫폼 Toty 프로젝트의 성능, 보안, 코드 품질을 개선하기 위한 고도화 작업을 진행했습니다.
 
 ### 주요 개선 사항
+
+#### Phase 1: 성능 및 보안 개선 (Week 1-4)
 - ✅ **N+1 쿼리 문제 해결** - fetch join으로 데이터베이스 쿼리 수 대폭 감소
 - ✅ **Redis 캐싱 도입** - 사용자 정보 조회 성능 향상 (캐시 히트 시 DB 부하 제로)
 - ✅ **비동기 처리** - S3 이미지 삭제 비동기화로 응답 속도 개선
 - ✅ **JWT 보안 강화** - 토큰 로테이션 및 블랙리스트로 보안 수준 향상
 - ✅ **로깅 체계 개선** - System.out → SLF4J로 전환하여 프로덕션 레벨 로깅 구현
 
+#### Phase 2: 아키텍처 개선 (Week 5-8)
+- ✅ **Value Object 패턴** - Email, PhoneNumber, Nickname 도메인 객체화
+- ✅ **Domain Events 인프라** - 이벤트 기반 아키텍처 기반 마련
+- ✅ **Service 책임 분리** - CQRS 패턴 적용 (ChatRoomService)
+- ✅ **장애 알림 시스템** - 헬스 체크 모니터링 및 자동 알림
+
 ---
+
+## Phase 1: 성능 및 보안 개선 (Week 1-4)
 
 ## 1. N+1 쿼리 해결
 
@@ -415,15 +431,270 @@ log.error("Redis 작업 오류 발생: {}", e.getMessage(), e);
 
 ---
 
+## Phase 2: 아키텍처 개선 (Week 5-8)
+
+## 6. Value Object 패턴 도입
+
+### 개념
+Value Object는 도메인 개념을 캡슐화하고, 비즈니스 규칙을 강제하는 불변 객체입니다.
+
+### Email Value Object
+```java
+@Embeddable
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Email {
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+    );
+
+    @Column(name = "email", nullable = false, unique = true)
+    private String value;
+
+    private Email(String value) {
+        validate(value);
+        this.value = value.toLowerCase(); // 이메일은 소문자로 정규화
+    }
+
+    public static Email of(String value) {
+        return new Email(value);
+    }
+
+    private void validate(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalArgumentException("이메일은 필수입니다.");
+        }
+        if (!EMAIL_PATTERN.matcher(value).matches()) {
+            throw new IllegalArgumentException("유효하지 않은 이메일 형식입니다: " + value);
+        }
+        if (value.length() > 255) {
+            throw new IllegalArgumentException("이메일은 255자를 초과할 수 없습니다.");
+        }
+    }
+}
+```
+
+### PhoneNumber, Nickname Value Object
+동일한 패턴으로 `PhoneNumber`, `Nickname`도 구현:
+- **PhoneNumber**: 010-XXXX-XXXX 형식 검증
+- **Nickname**: 한글/영문/숫자/특수문자 2~20자 검증
+
+### JPA AttributeConverter
+```java
+@Converter(autoApply = true)
+public class EmailConverter implements AttributeConverter<Email, String> {
+    @Override
+    public String convertToDatabaseColumn(Email email) {
+        return email == null ? null : email.getValue();
+    }
+
+    @Override
+    public Email convertToEntityAttribute(String dbData) {
+        return dbData == null ? null : Email.of(dbData);
+    }
+}
+```
+
+### 개선 효과
+- **도메인 규칙 캡슐화**: 이메일/전화번호/닉네임 검증 로직이 한 곳에 집중
+- **중복 코드 제거**: 여러 곳에 흩어진 검증 로직 제거
+- **타입 안전성**: String 대신 의미 있는 타입 사용
+- **불변성 보장**: 값 변경 불가로 안전성 향상
+
+### 적용 파일
+- `Email.java`, `PhoneNumber.java`, `Nickname.java`
+- `EmailConverter.java`, `PhoneNumberConverter.java`, `NicknameConverter.java`
+
+---
+
+## 7. Domain Events 인프라 구현
+
+### DomainEvent 인터페이스
+```java
+public interface DomainEvent {
+    LocalDateTime occurredOn();
+    String getEventType();
+}
+```
+
+### DomainEventPublisher
+```java
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class DomainEventPublisher {
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    public void publish(DomainEvent event) {
+        log.info("도메인 이벤트 발행: {} - {}",
+                event.getClass().getSimpleName(), event.getEventType());
+        applicationEventPublisher.publishEvent(event);
+    }
+}
+```
+
+### 사용 예시
+```java
+// 도메인 로직에서 이벤트 발행
+domainEventPublisher.publish(new UserRegisteredEvent(user.getId(), LocalDateTime.now()));
+
+// 이벤트 리스너에서 처리
+@EventListener
+public void onUserRegistered(UserRegisteredEvent event) {
+    // 환영 이메일 발송, 알림 전송 등
+}
+```
+
+### 개선 효과
+- **느슨한 결합**: 도메인 로직과 부가 기능(알림, 이메일 등) 분리
+- **확장성**: 새로운 이벤트 리스너를 쉽게 추가 가능
+- **테스트 용이성**: 도메인 로직과 부가 기능을 독립적으로 테스트
+
+---
+
+## 8. Service 책임 분리 (CQRS 패턴)
+
+### 문제 상황
+기존 `ChatRoomService`는 너무 많은 책임을 가지고 있었습니다:
+- 채팅방 생성/종료 (도메인 로직)
+- 채팅방 목록 조회 (쿼리)
+- WebSocket/Redis 메시징
+- 알림 전송
+- DTO 변환
+
+### 해결 방법: 책임 분리
+
+#### 1. ChatRoomQueryService (조회 전용)
+```java
+@Service
+@RequiredArgsConstructor
+public class ChatRoomQueryService {
+    public List<ChatRoom> getActiveChatRooms() {
+        return chatRoomRepository.findAllByEndedAt(null);
+    }
+
+    public List<ChatRoomListResponse> getChatRoomListView() {
+        // 조회 + DTO 변환
+    }
+}
+```
+
+#### 2. ChatRoomMessagingService (메시징 전용)
+```java
+@Service
+@RequiredArgsConstructor
+public class ChatRoomMessagingService {
+    public void sendRoomClosedMessage(Long roomId) {
+        // WebSocket 메시지 전송
+    }
+
+    public void publishRoomCreatedEvent(ChatRoomListResponse chatRoom) {
+        // Redis Pub/Sub 이벤트 발행
+    }
+}
+```
+
+#### 3. ChatRoomNotificationService (알림 전용)
+```java
+@Service
+@RequiredArgsConstructor
+public class ChatRoomNotificationService {
+    public void notifyFollowersAboutNewChatRoom(User mentor, Long roomId) {
+        // 팔로워들에게 알림 전송
+    }
+}
+```
+
+#### 4. ChatRoomService (핵심 도메인 로직만)
+```java
+@Service
+@RequiredArgsConstructor
+public class ChatRoomService {
+    private final ChatRoomQueryService queryService;
+    private final ChatRoomMessagingService messagingService;
+    private final ChatRoomNotificationService notificationService;
+
+    @Transactional
+    public void mentorCreateRoom(long userId, String roomName, int userLimit) {
+        // 1. 채팅방 생성 (도메인 로직)
+        // 2. 메시징 서비스에 위임
+        // 3. 알림 서비스에 위임
+    }
+}
+```
+
+### 개선 효과
+- **단일 책임 원칙(SRP)**: 각 서비스가 하나의 책임만 담당
+- **테스트 용이성**: 독립적으로 테스트 가능
+- **가독성 향상**: 각 서비스의 목적이 명확
+- **유지보수성**: 변경 시 영향 범위가 명확
+
+---
+
+## 9. 장애 알림 시스템 구현
+
+### HealthCheckMonitor
+```java
+@Component
+@RequiredArgsConstructor
+public class HealthCheckMonitor {
+    private final HealthEndpoint healthEndpoint;
+    private final AlertService alertService;
+
+    @Scheduled(fixedRate = 60000) // 1분마다 체크
+    public void checkHealth() {
+        HealthComponent healthComponent = healthEndpoint.health();
+        Status currentStatus = healthComponent.getStatus();
+
+        if (Status.DOWN.equals(currentStatus)) {
+            alertService.sendCriticalAlert(
+                    "시스템 장애 발생",
+                    "애플리케이션 상태: DOWN"
+            );
+        }
+    }
+}
+```
+
+### AlertService 인터페이스
+```java
+public interface AlertService {
+    void sendCriticalAlert(String title, String message, Map<String, Object> details);
+    void sendInfoAlert(String title, String message);
+    void sendWarningAlert(String title, String message);
+}
+```
+
+### LogBasedAlertService 구현
+```java
+@Service
+public class LogBasedAlertService implements AlertService {
+    @Override
+    public void sendCriticalAlert(String title, String message, Map<String, Object> details) {
+        log.error("🚨 [ALERT] {} - {}", title, message);
+        // TODO: Slack Webhook, Email, SMS 등으로 확장
+    }
+}
+```
+
+### 개선 효과
+- **자동 장애 감지**: 1분마다 헬스 체크로 신속한 장애 감지
+- **확장 가능성**: Slack, Email, SMS 등으로 쉽게 확장 가능
+- **상태 추적**: 장애 발생 및 복구 이력 자동 기록
+
+---
+
 ## 변경 파일 목록
 
-### 신규 파일 (2개)
+### Phase 1: 성능 및 보안 개선 (신규 2개, 수정 7개)
+
+**신규 파일:**
 ```
 src/main/java/com/toty/common/config/AsyncConfig.java
 src/main/java/com/toty/common/security/jwt/JwtBlacklistService.java
 ```
 
-### 수정 파일 (7개)
+**수정 파일:**
 ```
 src/main/java/com/toty/common/image/infrastructure/S3StorageService.java
 src/main/java/com/toty/common/redis/infrastructure/RedisConfig.java
@@ -432,6 +703,38 @@ src/main/java/com/toty/common/security/jwt/JwtTokenUtil.java
 src/main/java/com/toty/post/application/post/PostPaginationService.java
 src/main/java/com/toty/post/domain/repository/post/PostRepository.java
 src/main/java/com/toty/user/application/UserInfoService.java
+```
+
+### Phase 2: 아키텍처 개선 (신규 15개, 수정 1개)
+
+**신규 파일:**
+```
+Value Objects (6개):
+- src/main/java/com/toty/user/domain/vo/Email.java
+- src/main/java/com/toty/user/domain/vo/PhoneNumber.java
+- src/main/java/com/toty/user/domain/vo/Nickname.java
+- src/main/java/com/toty/user/domain/vo/EmailConverter.java
+- src/main/java/com/toty/user/domain/vo/PhoneNumberConverter.java
+- src/main/java/com/toty/user/domain/vo/NicknameConverter.java
+
+Domain Events (2개):
+- src/main/java/com/toty/common/event/DomainEvent.java
+- src/main/java/com/toty/common/event/DomainEventPublisher.java
+
+Chat Services (3개):
+- src/main/java/com/toty/chat/application/service/ChatRoomQueryService.java
+- src/main/java/com/toty/chat/application/service/ChatRoomMessagingService.java
+- src/main/java/com/toty/chat/application/service/ChatRoomNotificationService.java
+
+Monitoring (3개):
+- src/main/java/com/toty/common/monitoring/AlertService.java
+- src/main/java/com/toty/common/monitoring/HealthCheckMonitor.java
+- src/main/java/com/toty/common/monitoring/LogBasedAlertService.java
+```
+
+**수정 파일:**
+```
+- src/main/java/com/toty/chat/application/service/ChatRoomService.java
 ```
 
 ---
@@ -456,17 +759,27 @@ src/main/java/com/toty/user/application/UserInfoService.java
 
 ## 다음 단계
 
-### Week 5-8: 보안 및 모니터링 강화 (예정)
-- [ ] **XSS 방어**: HTML Sanitizer 도입
-- [ ] **Rate Limiting**: API 요청 속도 제한 구현
-- [ ] **Prometheus + Grafana**: 메트릭 수집 및 대시보드 구축
-- [ ] **알림 시스템**: 장애 발생 시 자동 알림
+### 향후 개선 계획 (Phase 3)
 
-### 장기 개선 계획
-- [ ] **Value Object 패턴**: Email, PhoneNumber, Nickname 도메인 객체화
-- [ ] **Domain Events**: 알림 시스템을 이벤트 기반으로 리팩토링
-- [ ] **Service 책임 분리**: ChatRoomService 복잡도 개선
-- [ ] **테스트 커버리지**: 단위 테스트 및 통합 테스트 확대
+#### 보안 강화
+- [ ] **XSS 방어**: HTML Sanitizer 도입으로 XSS 공격 방어
+- [ ] **Rate Limiting**: API 요청 속도 제한으로 DDoS 방어
+- [ ] **CORS 정책 강화**: 명확한 출처 검증
+
+#### 모니터링 및 관측성
+- [ ] **Prometheus + Grafana**: 메트릭 수집 및 실시간 대시보드
+- [ ] **분산 트레이싱**: Sleuth + Zipkin 도입
+- [ ] **로그 집중화**: ELK Stack 구축
+
+#### 테스트 커버리지 확대
+- [ ] **단위 테스트**: JUnit5 + Mockito로 핵심 로직 테스트
+- [ ] **통합 테스트**: TestContainers로 실제 환경 테스트
+- [ ] **E2E 테스트**: Selenium 또는 Cypress 도입
+
+#### 성능 최적화
+- [ ] **DB 쿼리 최적화**: 남은 N+1 문제 해결
+- [ ] **Connection Pool 튜닝**: HikariCP 최적화
+- [ ] **CDN 도입**: 정적 자원 배포 최적화
 
 ---
 
