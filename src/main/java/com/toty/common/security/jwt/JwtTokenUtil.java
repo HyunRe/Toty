@@ -28,6 +28,7 @@ public class JwtTokenUtil {
     private long REFRESH_TOKEN_TTL; // 리프레시 토큰 수명
 
     private final RedisService redisService;
+    private final JwtBlacklistService jwtBlacklistService;
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
@@ -130,6 +131,50 @@ public class JwtTokenUtil {
 
     public void storeRefreshToken(String username, String newRefreshToken){
         redisService.setData(username, newRefreshToken, Duration.ofMillis(REFRESH_TOKEN_TTL));
+    }
+
+    /**
+     * 리프레시 토큰 로테이션
+     * - 기존 리프레시 토큰을 블랙리스트에 추가하고 새로운 리프레시 토큰 발급
+     * @param oldRefreshToken 기존 리프레시 토큰
+     * @param username 사용자 이름
+     * @return 새로운 리프레시 토큰
+     */
+    public String rotateRefreshToken(String oldRefreshToken, String username) {
+        // 기존 토큰을 블랙리스트에 추가
+        Date expirationDate = extractExpiration(oldRefreshToken);
+        jwtBlacklistService.addToBlacklist(oldRefreshToken, expirationDate);
+
+        // 새로운 리프레시 토큰 생성 및 저장
+        String newRefreshToken = generateRefreshToken(username);
+        storeRefreshToken(username, newRefreshToken);
+
+        return newRefreshToken;
+    }
+
+    /**
+     * 토큰을 블랙리스트에 추가 (로그아웃 시 사용)
+     * @param token JWT 토큰
+     */
+    public void blacklistToken(String token) {
+        Date expirationDate = extractExpiration(token);
+        jwtBlacklistService.addToBlacklist(token, expirationDate);
+    }
+
+    /**
+     * 토큰 유효성 검사 (블랙리스트 체크 포함)
+     * @param token JWT 토큰
+     * @param username 사용자 이름
+     * @return 유효하면 true, 아니면 false
+     */
+    public Boolean validateTokenWithBlacklist(String token, String username) {
+        // 블랙리스트 체크
+        if (jwtBlacklistService.isBlacklisted(token)) {
+            return false;
+        }
+
+        // 기존 유효성 검사
+        return validateToken(token, username);
     }
 
 }

@@ -22,6 +22,8 @@ import jakarta.transaction.Transactional;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,7 +48,8 @@ public class UserInfoService {
         return !user.getId().equals(id);
     }
 
-    // 사용자 정보 전체 조회
+    // 사용자 정보 전체 조회 (Redis 캐싱 적용)
+    @Cacheable(value = "userInfo", key = "#targetId")
     public UserInfoResponse getUserInfoByAccount(Long myId, Long targetId) {
         User foundUser = userService.findById(targetId);
 
@@ -87,6 +90,7 @@ public class UserInfoService {
 
     // 기본 정보 수정(닉네임, 사진, 구독, 비밀번호)
     @Transactional
+    @CacheEvict(value = "userInfo", key = "#userId")
     public void updateUserBasicInfo(User user, Long userId, BasicInfoUpdateRequest newInfo, MultipartFile imgFile) {
         if (isNotOwner(user, userId)) {
             throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
@@ -153,6 +157,7 @@ public class UserInfoService {
 
     // 링크 수정
     @Transactional
+    @CacheEvict(value = "userInfo", key = "#user.id")
     public void updateUserLinks(User user, LinkUpdateDto dto) {
         Long userId = user.getId();
         if (isNotOwner(user, dto.getId())) {
@@ -176,6 +181,7 @@ public class UserInfoService {
 
     //태그 수정
     @Transactional
+    @CacheEvict(value = "userInfo", key = "#user.id")
     public void updateUserTags(User user, TagUpdateDto dto) {
         Long userId = user.getId();
         if (isNotOwner(user, dto.getId())) {
@@ -193,6 +199,7 @@ public class UserInfoService {
     }
 
     // 휴대폰 번호 변경
+    @CacheEvict(value = "userInfo", key = "#userId")
     public void updatePhoneNumber(User user, Long userId, PhoneNumberUpdateRequest phoneNumberDto) {
         if (isNotOwner(user, userId)) {
             throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);
@@ -244,6 +251,7 @@ public class UserInfoService {
         return siteValue.toLowerCase().equals("github") ? Site.GITHUB : Site.BLOG;
     }
 
+    @CacheEvict(value = "userInfo", key = "#id")
     public void updateUserStatusMessage(User user, Long id, String request) {
         if (isNotOwner(user, id)) {
             throw new ExpectedException(ErrorCode.INSUFFICIENT_PERMISSION);

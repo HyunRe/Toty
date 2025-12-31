@@ -1,8 +1,13 @@
 package com.toty.common.redis.infrastructure;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -12,12 +17,18 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.time.Duration;
+
 /**
- * Redis 환경 설정
+ * Redis 환경 설정 (Pub/Sub + 캐싱)
  */
+@Slf4j
 @Configuration
+@EnableCaching
 public class RedisConfig {
     @Value("${spring.data.redis.host}")
     private String host;
@@ -68,6 +79,31 @@ public class RedisConfig {
     }
 
     /**
+     * Redis 캐시 매니저 설정
+     * - TTL: 1시간
+     * - Key: String
+     * - Value: JSON (Jackson serialization)
+     */
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofHours(1)) // 캐시 TTL 1시간
+                .disableCachingNullValues() // null 값 캐싱 방지
+                .serializeKeysWith(
+                        RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer())
+                )
+                .serializeValuesWith(
+                        RedisSerializationContext.SerializationPair.fromSerializer(
+                                new GenericJackson2JsonRedisSerializer()
+                        )
+                );
+
+        return RedisCacheManager.builder(connectionFactory)
+                .cacheDefaults(cacheConfig)
+                .build();
+    }
+
+    /**
      * 리스트에 접근하여 다양한 연산을 수행합니다.
      *
      * @return ListOperations<String, Object>
@@ -97,7 +133,7 @@ public class RedisConfig {
             operation.run();
             return 1;
         } catch (Exception e) {
-            System.out.println("Redis 작업 오류 발생 :: " + e.getMessage());
+            log.error("Redis 작업 오류 발생: {}", e.getMessage(), e);
             return 0;
         }
     }

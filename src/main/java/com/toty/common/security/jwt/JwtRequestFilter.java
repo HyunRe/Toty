@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 // 없으면 null, 있으면 정보 넣기
 // * 액세스 토큰 만료 시 익명 사용자로 설정
 //  -> AuthenticationEntryPoint에서 (Get /api/auth/refresh) 리다이렉트 구현
+@Slf4j
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
@@ -73,8 +75,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain chain)
             throws ServletException, IOException {
-        System.out.println("========== JwtRequestFilter.doFilterInternal ==========");
-        System.out.println("Request URI: " + request.getRequestURI());
+        log.debug("========== JwtRequestFilter.doFilterInternal ==========");
+        log.debug("Request URI: {}", request.getRequestURI());
 
         String username = null;
         String jwt = null;
@@ -84,35 +86,36 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         try {
             if (cookies != null) {
-                System.out.println("Cookies found: " + cookies.length);
+                log.debug("Cookies found: {}", cookies.length);
                 for (Cookie cookie : cookies) {
-                    System.out.println("Cookie name: " + cookie.getName());
+                    log.debug("Cookie name: {}", cookie.getName());
                     if (cookie.getName().equals("accessToken")) {
                         authorization = cookie.getValue();
-                        System.out.println("Access token found in cookie");
+                        log.debug("Access token found in cookie");
 
                         boolean isExpired = jwtTokenUtil.isTokenExpired(authorization);
-                        System.out.println("Token expired: " + isExpired);
+                        log.debug("Token expired: {}", isExpired);
 
                         if (!isExpired) {
                             // 유효한 경우
                             jwt = authorization;
                             username = jwtTokenUtil.extractUsername(jwt);
-                            System.out.println("Username from token: " + username);
+                            log.debug("Username from token: {}", username);
                         }
                     }
                 }
             } else {
-                System.out.println("No cookies found");
+                log.debug("No cookies found");
             }
 
             // contextHolder에 정보 저장하기
             if (username != null
                     && SecurityContextHolder.getContext().getAuthentication() == null) {
-                System.out.println("Loading user details for: " + username);
+                log.debug("Loading user details for: {}", username);
                 UserDetails userDetails = myUserDetailsService.loadUserByUsername(username);
-                if (jwtTokenUtil.validateToken(jwt, userDetails.getUsername())) {
-                    System.out.println("Token validated, setting authentication");
+                // 블랙리스트 체크 포함한 토큰 유효성 검사
+                if (jwtTokenUtil.validateTokenWithBlacklist(jwt, userDetails.getUsername())) {
+                    log.debug("Token validated, setting authentication");
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                             new UsernamePasswordAuthenticationToken(userDetails, null,
                                     userDetails.getAuthorities());
@@ -120,27 +123,26 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                             .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext()
                             .setAuthentication(usernamePasswordAuthenticationToken);
-                    System.out.println("Authentication set in SecurityContext");
+                    log.debug("Authentication set in SecurityContext");
                 } else {
-                    System.out.println("Token validation failed");
+                    log.warn("Token validation failed or blacklisted - username: {}", username);
                 }
             } else {
                 if (username == null) {
-                    System.out.println("Username is null, skipping authentication");
+                    log.debug("Username is null, skipping authentication");
                 } else {
-                    System.out.println("Authentication already exists in SecurityContext");
+                    log.debug("Authentication already exists in SecurityContext");
                 }
             }
 
             chain.doFilter(request, response);
 
         } catch (ExpiredJwtException e) {
-            System.out.println("ExpiredJwtException caught: " + e.getMessage());
+            log.debug("ExpiredJwtException: {}", e.getMessage());
             // 액세스 토큰 만료된 사람 -> 익명 사용자
             chain.doFilter(request, response);
         } catch (Exception e) {
-            System.out.println("Exception in JwtRequestFilter: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Exception in JwtRequestFilter: {}", e.getMessage(), e);
             chain.doFilter(request, response);
         }
 

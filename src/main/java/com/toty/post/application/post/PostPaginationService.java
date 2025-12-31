@@ -5,6 +5,7 @@ import com.toty.common.exception.ErrorCode;
 import com.toty.common.exception.ExpectedException;
 import com.toty.common.pagination.PaginationResult;
 import com.toty.post.domain.model.post.Post;
+import com.toty.post.domain.model.post.PostCategory;
 import com.toty.post.domain.pagination.PostPaginationStrategy;
 import com.toty.post.domain.repository.post.PostLikeRepository;
 import com.toty.post.domain.repository.post.PostRepository;
@@ -64,15 +65,19 @@ public class PostPaginationService {
         return postPaginationStrategy.getPaginationResult(posts, PAGE_SIZE, postLists);
     }
 
-    // 사용자 ID로 필터링된 게시글 목록 조회
+    // 사용자 ID로 필터링된 게시글 목록 조회 (N+1 해결: fetch join 사용)
     @Transactional(readOnly = true)
     public PaginationResult getPagedPostsByUserId(int page, Long userId, String postCategory) {
         PageRequest pageRequest = PageRequest.of(page - 1, PAGE_SIZE, Sort.by(Sort.Order.asc("updatedAt")));
-        Page<Post> posts = postRepository.findAll(
-                Specification.where(PostSpecifications.isNotDeleted())
-                        .and(PostSpecifications.hasUserId(userId))
-                        .and(PostSpecifications.hasCategory(postCategory)),
-                pageRequest);
+
+        // fetch join을 사용하여 N+1 문제 해결
+        Page<Post> posts;
+        if (postCategory == null || postCategory.isEmpty()) {
+            posts = postRepository.findByUserIdWithUser(userId, pageRequest);
+        } else {
+            PostCategory categoryEnum = PostCategory.fromString(postCategory);
+            posts = postRepository.findByUserIdAndCategoryWithUser(userId, categoryEnum, pageRequest);
+        }
 
         PostListResponseContext context = new PostListResponseContext(postCategory);
         List<? extends PostListResponse> postLists = context.convertPosts(posts.getContent());
@@ -80,14 +85,14 @@ public class PostPaginationService {
         return postPaginationStrategy.getPaginationResult(posts, PAGE_SIZE, postLists);
     }
 
-    // 카테고리로 필터링된 게시글 목록 조회
+    // 카테고리로 필터링된 게시글 목록 조회 (N+1 해결: fetch join 사용)
     @Transactional(readOnly = true)
     public PaginationResult getPagedPostsByCategory(int page, String postCategory) {
         PageRequest pageRequest = PageRequest.of(page - 1, PAGE_SIZE, Sort.by(Sort.Order.asc("updatedAt")));
-        Page<Post> posts = postRepository.findAll(
-                Specification.where(PostSpecifications.isNotDeleted())
-                        .and(PostSpecifications.hasCategory(postCategory)),
-                pageRequest);
+
+        // fetch join을 사용하여 N+1 문제 해결
+        PostCategory categoryEnum = PostCategory.fromString(postCategory);
+        Page<Post> posts = postRepository.findByCategoryWithUser(categoryEnum, pageRequest);
 
         PostListResponseContext context = new PostListResponseContext(postCategory);
         List<? extends PostListResponse> postLists = context.convertPosts(posts.getContent());

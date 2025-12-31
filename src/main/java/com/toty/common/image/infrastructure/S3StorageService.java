@@ -4,12 +4,15 @@ import com.toty.common.exception.ErrorCode;
 import com.toty.common.exception.ExpectedException;
 import io.awspring.cloud.s3.S3Template;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class S3StorageService {
@@ -26,7 +29,18 @@ public class S3StorageService {
         }
     }
 
+    /**
+     * S3에서 파일을 비동기로 삭제합니다.
+     * @param key S3 객체 키
+     */
+    @Async("taskExecutor")
     public void deleteFile(String key) {
-        s3Template.deleteObject(bucket, key);
+        try {
+            log.info("S3 파일 비동기 삭제 시작 - key: {}", key);
+            s3Template.deleteObject(bucket, key);
+            log.info("S3 파일 비동기 삭제 완료 - key: {}", key);
+        } catch (Exception e) {
+            log.error("S3 파일 삭제 실패 - key: {}, error: {}", key, e.getMessage(), e);
+        }
     }
 }
