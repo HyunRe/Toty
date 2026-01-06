@@ -37,6 +37,9 @@ public class SecurityConfig {
                 .headers(x -> x.frameOptions(y -> y.disable())) // H2 콘솔 등을 사용할 때 프레임 차단 해제
 
                 .authorizeHttpRequests(requests -> requests
+                        // [중요: Health Check 허용] CodeDeploy 헬스체크 시 302 리다이렉트 방지를 위해 루트(/)와 헬스체크 경로를 개방합니다.
+                        .requestMatchers("/", "/health", "/actuator/health").permitAll()
+
                         // [정적 리소스] 인증 없이 접근 가능하도록 허용
                         .requestMatchers("/posts/images/**", "/css/**", "/js/**", "/img/**", "/static/**", "/favicon.ico").permitAll()
                         .requestMatchers("/firebase-messaging-sw.js").permitAll()
