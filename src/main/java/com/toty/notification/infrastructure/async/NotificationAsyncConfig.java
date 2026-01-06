@@ -9,7 +9,7 @@ import java.util.concurrent.Executor;
 
 @Configuration
 @EnableAsync
-public class AsyncConfig {
+public class NotificationAsyncConfig {
     /**
      * 알림 전송을 위한 비동기 작업을 처리하는 Executor를 정의합니다.
      * @Bean의 name 속성은 @Async 어노테이션에서 참조됩니다.
