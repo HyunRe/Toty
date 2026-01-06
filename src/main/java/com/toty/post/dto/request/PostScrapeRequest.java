@@ -10,8 +10,4 @@ import lombok.NoArgsConstructor;
 public class PostScrapeRequest {
     @JsonProperty("scrapeAction")
     private String scrape;
-
-    public String getScrape() {
-        return scrape;
-    }
 }

@@ -111,6 +111,18 @@ spring:
 # Server
 server:
   port: 8070
+  # 프록시 헤더 인식 (Nginx에서 보내는 HTTPS 정보를 읽음)
+  forward-headers-strategy: native
+  tomcat:
+    remoteip:
+      protocol-header: x-forwarded-proto
+  # 쿠키 보안 설정 (HTTPS 전용 쿠키 사용)
+  servlet:
+    session:
+      cookie:
+        secure: true       # HTTPS에서만 쿠키 전송
+        http-only: true    # JS에서 쿠키 접근 방지
+        same-site: lax     # OAuth2 로그인을 위해 'lax' 권장 (none은 추가 보안 설정 필요)
   error:
     include-message: always
     include-stacktrace: never
