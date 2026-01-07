@@ -31,7 +31,7 @@ public class SecurityConfig {
                 // [HTTPS 강제 설정]
                 // Nginx가 헤더에 담아 보낸 X-Forwarded-Proto: https를 확인합니다.
                 // 만약 사용자가 http://로 접속하면 자동으로 https://로 리다이렉트 시킵니다.
-                .requiresChannel(channel -> channel.anyRequest().requiresSecure())
+                // .requiresChannel(channel -> channel.anyRequest().requiresSecure())
 
                 .csrf(auth -> auth.disable())       // REST API이므로 CSRF 보안은 비활성화
                 .headers(x -> x.frameOptions(y -> y.disable())) // H2 콘솔 등을 사용할 때 프레임 차단 해제
