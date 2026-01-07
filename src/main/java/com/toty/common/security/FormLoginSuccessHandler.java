@@ -48,7 +48,10 @@ public class FormLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
         log.info("Refresh Token Cookie (처음 100자): {}", refreshTokenCookie.substring(0, Math.min(100, refreshTokenCookie.length())));
         log.info("리다이렉트 URL: /view/users/home");
 
-        super.onAuthenticationSuccess(request, response, authentication);
+        // super.onAuthenticationSuccess(request, response, authentication);
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("{\"success\": true, \"redirectUrl\": \"/view/users/home\"}");
     }
 
 }
