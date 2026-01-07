@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -29,15 +30,15 @@ public class FormLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
 
         jwtTokenUtil.storeRefreshToken(authentication.getName(), refreshToken);
 
-        //응답에 쿠키 포함
-        response.addCookie(jwtTokenUtil.createCookie("accessToken", accessToken, false));
-        response.addCookie(jwtTokenUtil.createCookie("refreshToken", refreshToken, true));
-        // super.onAuthenticationSuccess(request, response, authentication);
+        // HTTPS 환경에서 Secure 및 SameSite 속성이 적용된 쿠키 생성
+        ResponseCookie accessTokenCookie = jwtTokenUtil.createSecureResponseCookie("accessToken", accessToken, false);
+        ResponseCookie refreshTokenCookie = jwtTokenUtil.createSecureResponseCookie("refreshToken", refreshToken, true);
 
-        // super 호출을 지우고 JSON으로 성공 응답을 보냅니다.
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("{\"success\": true, \"redirectUrl\": \"/view/users/home\"}");
+        // Set-Cookie 헤더로 쿠키 전송 (SameSite 속성 포함)
+        response.addHeader("Set-Cookie", accessTokenCookie.toString());
+        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+
+        super.onAuthenticationSuccess(request, response, authentication);
     }
 
 }

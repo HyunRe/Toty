@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 // * 리프레시 토큰 발행 메서드 추가, createCookie 메서드 jwtRequestFilter에서 여기로 옮겨옴
@@ -26,6 +27,12 @@ public class JwtTokenUtil {
 
     @Value("${jwt.refresh-token-expiration}")
     private long REFRESH_TOKEN_TTL; // 리프레시 토큰 수명
+
+    @Value("${server.servlet.session.cookie.secure:false}")
+    private boolean cookieSecure; // HTTPS 환경에서는 true
+
+    @Value("${server.servlet.session.cookie.same-site:Lax}")
+    private String cookieSameSite; // SameSite 속성
 
     private final RedisService redisService;
     private final JwtBlacklistService jwtBlacklistService;
@@ -116,17 +123,58 @@ public class JwtTokenUtil {
             cookie.setHttpOnly(false); // AccessToken은 JavaScript에서 읽을 수 있도록 설정
         }
 
-        cookie.setSecure(false); // 개발 환경에서는 false (HTTPS에서는 true로 변경 필요)
+        cookie.setSecure(cookieSecure); // application.yaml 설정에 따라 Secure 속성 적용
         return cookie;
+    }
+
+    /**
+     * HTTPS 환경에서 사용할 보안 쿠키 생성 (SameSite 속성 포함)
+     * @param key 쿠키 이름
+     * @param value 쿠키 값
+     * @param isRefreshToken 리프레시 토큰 여부
+     * @return ResponseCookie
+     */
+    public ResponseCookie createSecureResponseCookie(String key, String value, boolean isRefreshToken) {
+        if (isRefreshToken) {
+            return ResponseCookie.from(key, value)
+                    .maxAge(REFRESH_TOKEN_TTL / 1000)
+                    .path("/api/auth")
+                    .httpOnly(true) // RefreshToken은 HttpOnly 유지 (보안)
+                    .secure(cookieSecure) // HTTPS에서만 전송
+                    .sameSite(cookieSameSite) // SameSite 속성
+                    .build();
+        } else {
+            return ResponseCookie.from(key, value)
+                    .maxAge(ACCESS_TOKEN_TTL / 1000)
+                    .path("/")
+                    .httpOnly(false) // AccessToken은 JavaScript에서 읽을 수 있도록 설정
+                    .secure(cookieSecure) // HTTPS에서만 전송
+                    .sameSite(cookieSameSite) // SameSite 속성
+                    .build();
+        }
     }
 
     public Cookie accessTokenRemover() {
         Cookie accessToken = new Cookie("accessToken", null);
         accessToken.setMaxAge(0);
-        accessToken.setSecure(false);
+        accessToken.setSecure(cookieSecure); // application.yaml 설정에 따라 Secure 속성 적용
         accessToken.setPath("/");
         accessToken.setHttpOnly(false); // JavaScript에서도 접근 가능하도록
         return accessToken;
+    }
+
+    /**
+     * 액세스 토큰 삭제용 ResponseCookie 생성
+     * @return ResponseCookie
+     */
+    public ResponseCookie accessTokenRemoverResponseCookie() {
+        return ResponseCookie.from("accessToken", "")
+                .maxAge(0)
+                .path("/")
+                .httpOnly(false)
+                .secure(cookieSecure)
+                .sameSite(cookieSameSite)
+                .build();
     }
 
     public void storeRefreshToken(String username, String newRefreshToken){

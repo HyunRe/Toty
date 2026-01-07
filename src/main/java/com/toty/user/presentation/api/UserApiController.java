@@ -20,6 +20,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -123,7 +124,10 @@ public class UserApiController {
     @Operation(summary = "회원 탈퇴", description = "현재 로그인한 사용자의 계정을 탈퇴 처리합니다")
     @DeleteMapping("/")
     public ResponseEntity delete(@CurrentUser User user, HttpServletResponse response) {
-        response.addCookie(jwtTokenUtil.accessTokenRemover());
+        // HTTPS 환경에서도 동작하는 쿠키 삭제
+        ResponseCookie deleteCookie = jwtTokenUtil.accessTokenRemoverResponseCookie();
+        response.addHeader("Set-Cookie", deleteCookie.toString());
+
         userService.deleteUser(user.getId());
         SuccessResponse successResponse = new SuccessResponse(
                 HttpStatus.OK.value(),
