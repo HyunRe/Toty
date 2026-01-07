@@ -32,7 +32,12 @@ public class FormLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
         //응답에 쿠키 포함
         response.addCookie(jwtTokenUtil.createCookie("accessToken", accessToken, false));
         response.addCookie(jwtTokenUtil.createCookie("refreshToken", refreshToken, true));
-        super.onAuthenticationSuccess(request, response, authentication);
+        // super.onAuthenticationSuccess(request, response, authentication);
+
+        // super 호출을 지우고 JSON으로 성공 응답을 보냅니다.
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("{\"success\": true, \"redirectUrl\": \"/view/users/home\"}");
     }
 
 }
