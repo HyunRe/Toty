@@ -44,8 +44,9 @@ public class FormLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
 
         log.info("========== [FormLoginSuccessHandler] 로그인 성공 ==========");
         log.info("사용자: {}", authentication.getName());
-        log.info("Access Token Cookie (처음 100자): {}", accessTokenCookie.substring(0, Math.min(100, accessTokenCookie.length())));
-        log.info("Refresh Token Cookie (처음 100자): {}", refreshTokenCookie.substring(0, Math.min(100, refreshTokenCookie.length())));
+        log.info("Access Token Cookie 전체: {}", accessTokenCookie);
+        log.info("Refresh Token Cookie 전체: {}", refreshTokenCookie);
+        log.info("Set-Cookie 헤더 개수: 2개");
         log.info("리다이렉트 URL: /view/users/home");
 
         super.onAuthenticationSuccess(request, response, authentication);
