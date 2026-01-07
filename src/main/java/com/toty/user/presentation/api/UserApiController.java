@@ -124,9 +124,9 @@ public class UserApiController {
     @Operation(summary = "회원 탈퇴", description = "현재 로그인한 사용자의 계정을 탈퇴 처리합니다")
     @DeleteMapping("/")
     public ResponseEntity delete(@CurrentUser User user, HttpServletResponse response) {
-        // HTTPS 환경에서도 동작하는 쿠키 삭제
-        ResponseCookie deleteCookie = jwtTokenUtil.accessTokenRemoverResponseCookie();
-        response.addHeader("Set-Cookie", deleteCookie.toString());
+        // 쿠키 삭제
+        response.addHeader("Set-Cookie", jwtTokenUtil.createDeleteCookieHeader("accessToken"));
+        response.addHeader("Set-Cookie", jwtTokenUtil.createDeleteCookieHeader("refreshToken"));
 
         userService.deleteUser(user.getId());
         SuccessResponse successResponse = new SuccessResponse(

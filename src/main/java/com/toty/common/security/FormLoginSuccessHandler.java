@@ -31,12 +31,18 @@ public class FormLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
         jwtTokenUtil.storeRefreshToken(authentication.getName(), refreshToken);
 
         // HTTPS 환경에서 Secure 및 SameSite 속성이 적용된 쿠키 생성
-        ResponseCookie accessTokenCookie = jwtTokenUtil.createSecureResponseCookie("accessToken", accessToken, false);
-        ResponseCookie refreshTokenCookie = jwtTokenUtil.createSecureResponseCookie("refreshToken", refreshToken, true);
+        // Servlet 환경에서는 Set-Cookie 헤더를 직접 구성
+        String accessTokenCookie = jwtTokenUtil.createSetCookieHeader("accessToken", accessToken, false);
+        String refreshTokenCookie = jwtTokenUtil.createSetCookieHeader("refreshToken", refreshToken, true);
 
         // Set-Cookie 헤더로 쿠키 전송 (SameSite 속성 포함)
-        response.addHeader("Set-Cookie", accessTokenCookie.toString());
-        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+        // addHeader를 사용하여 여러 Set-Cookie 헤더 추가
+        response.addHeader("Set-Cookie", accessTokenCookie);
+        response.addHeader("Set-Cookie", refreshTokenCookie);
+
+        System.out.println("[FormLoginSuccessHandler] 로그인 성공 - 사용자: " + authentication.getName());
+        System.out.println("[FormLoginSuccessHandler] Access Token Cookie: " + accessTokenCookie.substring(0, Math.min(100, accessTokenCookie.length())));
+        System.out.println("[FormLoginSuccessHandler] Refresh Token Cookie: " + refreshTokenCookie.substring(0, Math.min(100, refreshTokenCookie.length())));
 
         super.onAuthenticationSuccess(request, response, authentication);
     }

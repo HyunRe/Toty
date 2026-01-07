@@ -128,12 +128,47 @@ public class JwtTokenUtil {
     }
 
     /**
+     * Set-Cookie 헤더 문자열 생성 (Servlet 환경에서 SameSite 속성 지원)
+     * @param key 쿠키 이름
+     * @param value 쿠키 값
+     * @param isRefreshToken 리프레시 토큰 여부
+     * @return Set-Cookie 헤더 문자열
+     */
+    public String createSetCookieHeader(String key, String value, boolean isRefreshToken) {
+        StringBuilder cookieHeader = new StringBuilder();
+        cookieHeader.append(key).append("=").append(value).append(";");
+
+        if (isRefreshToken) {
+            cookieHeader.append(" Max-Age=").append(REFRESH_TOKEN_TTL / 1000).append(";");
+            cookieHeader.append(" Path=/api/auth;");
+            cookieHeader.append(" HttpOnly;");
+        } else {
+            cookieHeader.append(" Max-Age=").append(ACCESS_TOKEN_TTL / 1000).append(";");
+            cookieHeader.append(" Path=/;");
+            // AccessToken은 HttpOnly 없음 (JavaScript 접근 가능)
+        }
+
+        if (cookieSecure) {
+            cookieHeader.append(" Secure;");
+        }
+
+        // SameSite 속성 추가 (대소문자 주의)
+        if (cookieSameSite != null && !cookieSameSite.isEmpty()) {
+            cookieHeader.append(" SameSite=").append(cookieSameSite).append(";");
+        }
+
+        return cookieHeader.toString();
+    }
+
+    /**
      * HTTPS 환경에서 사용할 보안 쿠키 생성 (SameSite 속성 포함)
      * @param key 쿠키 이름
      * @param value 쿠키 값
      * @param isRefreshToken 리프레시 토큰 여부
      * @return ResponseCookie
+     * @deprecated Servlet 환경에서는 createSetCookieHeader() 사용 권장
      */
+    @Deprecated
     public ResponseCookie createSecureResponseCookie(String key, String value, boolean isRefreshToken) {
         if (isRefreshToken) {
             return ResponseCookie.from(key, value)
@@ -164,9 +199,33 @@ public class JwtTokenUtil {
     }
 
     /**
+     * 쿠키 삭제용 Set-Cookie 헤더 생성
+     * @param key 쿠키 이름
+     * @return Set-Cookie 헤더 문자열
+     */
+    public String createDeleteCookieHeader(String key) {
+        StringBuilder cookieHeader = new StringBuilder();
+        cookieHeader.append(key).append("=;");
+        cookieHeader.append(" Max-Age=0;");
+        cookieHeader.append(" Path=/;");
+
+        if (cookieSecure) {
+            cookieHeader.append(" Secure;");
+        }
+
+        if (cookieSameSite != null && !cookieSameSite.isEmpty()) {
+            cookieHeader.append(" SameSite=").append(cookieSameSite).append(";");
+        }
+
+        return cookieHeader.toString();
+    }
+
+    /**
      * 액세스 토큰 삭제용 ResponseCookie 생성
      * @return ResponseCookie
+     * @deprecated createDeleteCookieHeader() 사용 권장
      */
+    @Deprecated
     public ResponseCookie accessTokenRemoverResponseCookie() {
         return ResponseCookie.from("accessToken", "")
                 .maxAge(0)
