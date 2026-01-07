@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
     private final MyOAuth2UserService myOAuth2UserService;
-    private final SavedRequestAwareAuthenticationSuccessHandler successfulnesses;
+    private final FormLoginSuccessHandler formLoginSuccessHandler;
     private final JwtRequestFilter jwtRequestFilter;
     private final AccessTokenValidationFilter accessTokenValidationFilter;
 
@@ -66,7 +66,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/api/users/sign-in")
                         .usernameParameter("email")
                         .passwordParameter("pwd")
-                        .successHandler(successfulnesses)
+                        .successHandler(formLoginSuccessHandler)
                         .failureHandler(loginFailureHandler())
                         .permitAll()
                 )

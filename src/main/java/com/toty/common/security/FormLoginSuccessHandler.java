@@ -5,11 +5,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class FormLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
     private final JwtTokenUtil jwtTokenUtil;
@@ -40,9 +42,11 @@ public class FormLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
         response.addHeader("Set-Cookie", accessTokenCookie);
         response.addHeader("Set-Cookie", refreshTokenCookie);
 
-        System.out.println("[FormLoginSuccessHandler] 로그인 성공 - 사용자: " + authentication.getName());
-        System.out.println("[FormLoginSuccessHandler] Access Token Cookie: " + accessTokenCookie.substring(0, Math.min(100, accessTokenCookie.length())));
-        System.out.println("[FormLoginSuccessHandler] Refresh Token Cookie: " + refreshTokenCookie.substring(0, Math.min(100, refreshTokenCookie.length())));
+        log.info("========== [FormLoginSuccessHandler] 로그인 성공 ==========");
+        log.info("사용자: {}", authentication.getName());
+        log.info("Access Token Cookie (처음 100자): {}", accessTokenCookie.substring(0, Math.min(100, accessTokenCookie.length())));
+        log.info("Refresh Token Cookie (처음 100자): {}", refreshTokenCookie.substring(0, Math.min(100, refreshTokenCookie.length())));
+        log.info("리다이렉트 URL: /view/users/home");
 
         super.onAuthenticationSuccess(request, response, authentication);
     }
