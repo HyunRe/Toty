@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
@@ -24,32 +25,36 @@ public class FormLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws ServletException, IOException {
+                                        Authentication authentication) throws ServletException, IOException {
 
-        // 새로 발급하고 response에 넣는 과정
         String accessToken = jwtTokenUtil.generateAccessToken(authentication.getName());
         String refreshToken = jwtTokenUtil.generateRefreshToken(authentication.getName());
 
         jwtTokenUtil.storeRefreshToken(authentication.getName(), refreshToken);
 
-        // HTTPS 환경에서 Secure 및 SameSite 속성이 적용된 쿠키 생성
-        // Servlet 환경에서는 Set-Cookie 헤더를 직접 구성
-        String accessTokenCookie = jwtTokenUtil.createSetCookieHeader("accessToken", accessToken, false);
-        String refreshTokenCookie = jwtTokenUtil.createSetCookieHeader("refreshToken", refreshToken, true);
+        boolean isSecure = "https".equalsIgnoreCase(request.getHeader("X-Forwarded-Proto"));
 
-        // Set-Cookie 헤더로 쿠키 전송 (SameSite 속성 포함)
-        // addHeader를 사용하여 여러 Set-Cookie 헤더 추가
-        response.addHeader("Set-Cookie", accessTokenCookie);
-        response.addHeader("Set-Cookie", refreshTokenCookie);
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
+                .httpOnly(true)
+                .secure(isSecure)     // ⭐ 중요
+                .path("/")            // ⭐ 반드시
+                .sameSite("Lax")
+                .maxAge(60 * 30)
+                .build();
 
-        log.info("========== [FormLoginSuccessHandler] 로그인 성공 ==========");
-        log.info("사용자: {}", authentication.getName());
-        log.info("Access Token Cookie 전체: {}", accessTokenCookie);
-        log.info("Refresh Token Cookie 전체: {}", refreshTokenCookie);
-        log.info("Set-Cookie 헤더 개수: 2개");
-        log.info("리다이렉트 URL: /view/users/home");
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(isSecure)     // ⭐ 중요
+                .path("/")            // ⭐ 반드시
+                .sameSite("Lax")
+                .maxAge(60 * 60 * 24 * 14)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+        log.info("로그인 성공: {}", authentication.getName());
 
         super.onAuthenticationSuccess(request, response, authentication);
     }
-
 }
