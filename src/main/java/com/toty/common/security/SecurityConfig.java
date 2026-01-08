@@ -64,6 +64,9 @@ public class SecurityConfig {
                         // Actuator endpoint
                         .requestMatchers("/actuator/**").permitAll()
 
+                        // 게시글 검색 API - 인증 불필요 (누구나 게시글 검색 가능)
+                        .requestMatchers("/api/search/**").permitAll()
+
                         // SSE 구독 (로그인 필수)
                         .requestMatchers("/api/sse/**").authenticated()
 
