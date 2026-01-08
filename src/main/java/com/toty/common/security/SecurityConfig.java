@@ -102,9 +102,7 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint))
                 .exceptionHandling(exception -> exception
-                        .accessDeniedHandler(customAccessDeniedHandler))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                        .accessDeniedHandler(customAccessDeniedHandler));
 
         // 토큰 관련 Filter 추가
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // 인증 경로 제외 모든 경로

@@ -55,6 +55,6 @@ public class FormLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
 
         log.info("로그인 성공: {}", authentication.getName());
 
-        super.onAuthenticationSuccess(request, response, authentication);
+        response.sendRedirect("/view/users/home");
     }
 }
