@@ -15,7 +15,8 @@
       "Bash(./gradlew test:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
