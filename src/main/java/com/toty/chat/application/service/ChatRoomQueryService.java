@@ -32,7 +32,8 @@ public class ChatRoomQueryService {
      */
     @Transactional(readOnly = true)
     public List<ChatRoom> getActiveChatRooms() {
-        return chatRoomRepository.findAllByEndedAt(null);
+        // N+1 문제 해결: fetch join 사용
+        return chatRoomRepository.findAllByEndedAtWithMentor(null);
     }
 
     /**

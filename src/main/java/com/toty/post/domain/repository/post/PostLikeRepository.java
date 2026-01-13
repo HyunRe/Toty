@@ -25,7 +25,16 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
     @Query("SELECT CASE WHEN COUNT(l) > 0 THEN true ELSE false END FROM PostLike l WHERE l.user.id = :userId AND l.post.id = :postId")
     boolean existsByUserIdAndPostId(@Param("userId") Long userId, @Param("postId") Long postId);
 
-    // 사용자가 좋아요한 게시글 목록 조회 (페이징)
+    // 사용자가 좋아요한 게시글 목록 조회 (페이징) - N+1 해결
+    @Query(value = "SELECT DISTINCT p FROM PostLike l " +
+                   "JOIN l.post p " +
+                   "JOIN FETCH p.user " +
+                   "WHERE l.user.id = :userId AND p.user.isDeleted = false " +
+                   "ORDER BY l.createdAt DESC",
+           countQuery = "SELECT COUNT(l) FROM PostLike l WHERE l.user.id = :userId AND l.post.user.isDeleted = false")
+    Page<Post> findLikedPostsByUserIdWithUser(@Param("userId") Long userId, Pageable pageable);
+
+    // 기존 메서드 (하위 호환성 유지)
     @Query("SELECT l.post FROM PostLike l WHERE l.user.id = :userId AND l.post.user.isDeleted = false ORDER BY l.createdAt DESC")
     Page<Post> findLikedPostsByUserId(@Param("userId") Long userId, Pageable pageable);
 }

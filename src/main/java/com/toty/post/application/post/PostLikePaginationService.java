@@ -26,7 +26,8 @@ public class PostLikePaginationService {
     @Transactional(readOnly = true)
     public PaginationResult getLikedPostsByUserId(int page, Long userId, String postCategory) {
         PageRequest pageRequest = PageRequest.of(page - 1, PAGE_SIZE);
-        Page<Post> posts = postLikeRepository.findLikedPostsByUserId(userId, pageRequest);
+        // N+1 문제 해결: fetch join 사용
+        Page<Post> posts = postLikeRepository.findLikedPostsByUserIdWithUser(userId, pageRequest);
 
         PostListResponseContext context = new PostListResponseContext(postCategory);
         List<? extends PostListResponse> postLists = context.convertPosts(posts.getContent());

@@ -29,7 +29,8 @@ public class ChatRoomNotificationService {
      * @param roomId 생성된 채팅방 ID
      */
     public void notifyFollowersAboutNewChatRoom(User mentor, Long roomId) {
-        List<Following> followings = followingRepository.findByToUserId(mentor.getId());
+        // N+1 문제 해결: fetch join 사용
+        List<Following> followings = followingRepository.findByToUserIdWithUsers(mentor.getId());
         log.info("멘토 {}의 팔로워 {}명에게 채팅방 생성 알림 전송 시작",
                 mentor.getNickname(), followings.size());
 

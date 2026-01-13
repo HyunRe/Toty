@@ -757,6 +757,147 @@ Monitoring (3개):
 
 ---
 
+## Phase 3: 추가 성능 최적화 (2026-01-09)
+
+### 10. 남은 N+1 쿼리 문제 해결
+
+Phase 1에서 PostRepository의 N+1 문제를 해결했지만, 다른 Repository에도 N+1 문제가 존재했습니다.
+
+#### 해결한 Repository 목록
+
+##### 1. FollowingRepository (가장 심각)
+
+**문제 상황:**
+```java
+// 기존 코드: Following 100개 조회 시 fromUser, toUser 조회 쿼리 200번 추가 발생
+Page<Following> followings = followingRepository.findPagedFollowingByToUserId(pageable, userId);
+followings.forEach(f -> {
+    f.getFromUser().getNickname();  // User 조회 1
+    f.getToUser().getProfileImageUrl();  // User 조회 2
+});
+// 총 쿼리 수: 1(Following) + 200(User) = 201개
+```
+
+**해결 방법:**
+```java
+// FollowingRepository에 fetch join 쿼리 추가
+@Query(value = "SELECT DISTINCT f FROM Following f " +
+               "LEFT JOIN FETCH f.fromUser " +
+               "LEFT JOIN FETCH f.toUser " +
+               "WHERE f.toUser.id = :uid",
+       countQuery = "SELECT COUNT(f) FROM Following f WHERE f.toUser.id = :uid")
+Page<Following> findPagedFollowingByToUserIdWithUsers(Pageable pageable, @Param("uid") Long uid);
+
+@Query("SELECT DISTINCT f FROM Following f " +
+       "LEFT JOIN FETCH f.fromUser " +
+       "LEFT JOIN FETCH f.toUser " +
+       "WHERE f.toUser.id = :uid")
+List<Following> findByToUserIdWithUsers(@Param("uid") Long uid);
+
+@Query(value = "SELECT DISTINCT f FROM Following f " +
+               "LEFT JOIN FETCH f.fromUser " +
+               "LEFT JOIN FETCH f.toUser " +
+               "WHERE f.fromUser.id = :uid",
+       countQuery = "SELECT COUNT(f) FROM Following f WHERE f.fromUser.id = :uid")
+Page<Following> findPagedFollowingByFromUserIdWithUsers(Pageable pageable, @Param("uid") Long uid);
+```
+
+**성능 개선 효과:**
+- **쿼리 수 감소**: 201개 → 1개 (약 99.5% 감소)
+- **적용 파일**:
+  - `FollowingRepository.java`
+  - `FollowingService.java` (2곳)
+  - `ChatRoomNotificationService.java` (1곳)
+
+---
+
+##### 2. PostLikeRepository
+
+**문제 상황:**
+```java
+// 기존 코드: 좋아요한 게시글 100개 조회 시 User 조회 쿼리 100번 추가 발생
+Page<Post> posts = postLikeRepository.findLikedPostsByUserId(userId, pageRequest);
+posts.forEach(post -> post.getUser().getNickname());  // User 조회
+// 총 쿼리 수: 1(PostLike + Post) + 100(User) = 101개
+```
+
+**해결 방법:**
+```java
+// PostLikeRepository에 fetch join 쿼리 추가
+@Query(value = "SELECT DISTINCT p FROM PostLike l " +
+               "JOIN l.post p " +
+               "JOIN FETCH p.user " +
+               "WHERE l.user.id = :userId AND p.user.isDeleted = false " +
+               "ORDER BY l.createdAt DESC",
+       countQuery = "SELECT COUNT(l) FROM PostLike l WHERE l.user.id = :userId AND l.post.user.isDeleted = false")
+Page<Post> findLikedPostsByUserIdWithUser(@Param("userId") Long userId, Pageable pageable);
+```
+
+**성능 개선 효과:**
+- **쿼리 수 감소**: 101개 → 1개 (약 99% 감소)
+- **적용 파일**:
+  - `PostLikeRepository.java`
+  - `PostLikePaginationService.java`
+
+---
+
+##### 3. ChatRoomRepository
+
+**문제 상황:**
+```java
+// 기존 코드: 채팅방 10개 조회 시 mentor(User) 조회 쿼리 10번 발생 가능
+List<ChatRoom> chatRooms = chatRoomRepository.findAllByEndedAt(null);
+chatRooms.forEach(room -> room.getMentor().getNickname());  // User 조회
+// 총 쿼리 수: 1(ChatRoom) + 10(User) = 11개
+```
+
+**해결 방법:**
+```java
+// ChatRoomRepository에 fetch join 쿼리 추가
+@Query("SELECT DISTINCT cr FROM ChatRoom cr " +
+       "LEFT JOIN FETCH cr.mentor " +
+       "WHERE cr.endedAt = :endedAt")
+List<ChatRoom> findAllByEndedAtWithMentor(@Param("endedAt") LocalDateTime endedAt);
+```
+
+**성능 개선 효과:**
+- **쿼리 수 감소**: 11개 → 1개 (약 91% 감소)
+- **적용 파일**:
+  - `ChatRoomRepository.java`
+  - `ChatRoomQueryService.java`
+
+---
+
+### 전체 성능 개선 효과
+
+#### 정량적 개선 (Phase 1 + Phase 3)
+| Repository | 대상 엔티티 | 개선 전 쿼리 수 | 개선 후 쿼리 수 | 개선율 |
+|-----------|-----------|----------------|----------------|--------|
+| PostRepository | Post + User | 101개 | 1개 | 99% ↓ |
+| FollowingRepository | Following + fromUser + toUser | 201개 | 1개 | 99.5% ↓ |
+| PostLikeRepository | PostLike + Post + User | 101개 | 1개 | 99% ↓ |
+| ChatRoomRepository | ChatRoom + mentor | 11개 | 1개 | 91% ↓ |
+
+#### 변경 파일 목록
+**수정 파일 (7개):**
+```
+src/main/java/com/toty/following/domain/repository/FollowingRepository.java
+src/main/java/com/toty/following/application/FollowingService.java
+src/main/java/com/toty/chat/application/service/ChatRoomNotificationService.java
+src/main/java/com/toty/post/domain/repository/post/PostLikeRepository.java
+src/main/java/com/toty/post/application/post/PostLikePaginationService.java
+src/main/java/com/toty/chat/domain/repository/ChatRoomRepository.java
+src/main/java/com/toty/chat/application/service/ChatRoomQueryService.java
+```
+
+#### 정성적 개선
+- ✅ **확장성 향상**: 팔로워 수, 게시글 수 증가 시에도 성능 저하 최소화
+- ✅ **응답 시간 개선**: 네트워크 왕복 시간 대폭 감소
+- ✅ **DB 부하 감소**: 동시 접속자 증가 시에도 안정적인 성능 유지
+- ✅ **사용자 경험 개선**: 팔로잉/팔로워 목록, 좋아요한 게시글 조회 속도 향상
+
+---
+
 ## 다음 단계
 
 ### 향후 개선 계획 (Phase 3)
@@ -777,7 +918,7 @@ Monitoring (3개):
 - [ ] **E2E 테스트**: Selenium 또는 Cypress 도입
 
 #### 성능 최적화
-- [ ] **DB 쿼리 최적화**: 남은 N+1 문제 해결
+- [x] **DB 쿼리 최적화**: 남은 N+1 문제 해결 (2026-01-09 완료)
 - [ ] **Connection Pool 튜닝**: HikariCP 최적화
 - [ ] **CDN 도입**: 정적 자원 배포 최적화
 
@@ -800,5 +941,5 @@ Monitoring (3개):
 
 ---
 
-**마지막 업데이트**: 2024-12-31
+**마지막 업데이트**: 2026-01-09
 **작성자**: Claude (with Human collaboration)

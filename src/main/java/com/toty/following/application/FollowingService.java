@@ -83,7 +83,8 @@ public class FollowingService {
         Page<Following> followings;
         List<Summary> userSummaries;
         if (isToUser) { // userId를 팔로우 하는 사람
-            followings = followingRepository.findPagedFollowingByToUserId(pageable, userId);
+            // N+1 문제 해결: fetch join 사용
+            followings = followingRepository.findPagedFollowingByToUserIdWithUsers(pageable, userId);
             userSummaries = followings.stream()
                     .map(following -> {
                         User fromUser = following.getFromUser();
@@ -96,10 +97,11 @@ public class FollowingService {
                     })
                     .toList();
         } else { // userId가 팔로우 하는 사람
-            followings = followingRepository.findPagedFollowingByFromUserId(pageable, userId);
+            // N+1 문제 해결: fetch join 사용
+            followings = followingRepository.findPagedFollowingByFromUserIdWithUsers(pageable, userId);
             userSummaries = followings.stream()
                     .map(following -> {
-                        User toUser = following.getToUser(); // 중복 호출 방지
+                        User toUser = following.getToUser();
                         return new Summary(
                                 toUser.getId(),
                                 toUser.getProfileImageUrl(),

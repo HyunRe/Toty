@@ -24,6 +24,28 @@ public interface FollowingRepository extends Repository<Following, Long> {
 
     void deleteById(Long id);
 
+    // N+1 문제 해결을 위한 fetch join 쿼리
+    @Query(value = "SELECT DISTINCT f FROM Following f " +
+                   "LEFT JOIN FETCH f.fromUser " +
+                   "LEFT JOIN FETCH f.toUser " +
+                   "WHERE f.toUser.id = :uid",
+           countQuery = "SELECT COUNT(f) FROM Following f WHERE f.toUser.id = :uid")
+    Page<Following> findPagedFollowingByToUserIdWithUsers(Pageable pageable, @Param("uid") Long uid);
+
+    @Query("SELECT DISTINCT f FROM Following f " +
+           "LEFT JOIN FETCH f.fromUser " +
+           "LEFT JOIN FETCH f.toUser " +
+           "WHERE f.toUser.id = :uid")
+    List<Following> findByToUserIdWithUsers(@Param("uid") Long uid);
+
+    @Query(value = "SELECT DISTINCT f FROM Following f " +
+                   "LEFT JOIN FETCH f.fromUser " +
+                   "LEFT JOIN FETCH f.toUser " +
+                   "WHERE f.fromUser.id = :uid",
+           countQuery = "SELECT COUNT(f) FROM Following f WHERE f.fromUser.id = :uid")
+    Page<Following> findPagedFollowingByFromUserIdWithUsers(Pageable pageable, @Param("uid") Long uid);
+
+    // 기존 메서드 (하위 호환성 유지)
     Page<Following> findPagedFollowingByToUserId(Pageable pageable, Long uid);
 
     List<Following> findByToUserId(Long uid);
