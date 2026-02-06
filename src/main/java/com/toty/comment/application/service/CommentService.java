@@ -48,7 +48,11 @@ public class CommentService {
         User user = userRepository.findById(userId).orElseThrow(() -> new ExpectedException(ErrorCode.USER_NOT_FOUND));
         Post post = postRepository.findById(postId).orElseThrow(() -> new ExpectedException(ErrorCode.POST_NOT_FOUND));
 
-        Comment comment = new Comment(user, post, commentCreateUpdateRequest.getContent());
+        Comment comment = Comment.builder()
+                .user(user)
+                .post(post)
+                .content(commentCreateUpdateRequest.getContent())
+                .build();
         post.addComment(comment);
         commentRepository.save(comment);
 

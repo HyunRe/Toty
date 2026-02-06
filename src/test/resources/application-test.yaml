@@ -1,0 +1,163 @@
+# Test Configuration
+
+spring:
+  # 인프라 auto-configuration 제외
+  autoconfigure:
+    exclude:
+      - io.awspring.cloud.autoconfigure.s3.S3AutoConfiguration
+      - org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
+      - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+
+  # H2 인메모리 데이터베이스
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+
+  # JPA 설정
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        show_sql: false
+        default_batch_fetch_size: 10
+        generate_statistics: true
+
+  # Thymeleaf
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    cache: false
+
+  # File Upload
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+  # Redis (테스트용)
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ""
+
+  # Elasticsearch (테스트용)
+  elasticsearch:
+    uris: http://localhost:9200
+    username: test
+    password: test
+
+  # Email (테스트용)
+  mail:
+    host: localhost
+    port: 25
+    username: test@test.com
+    password: test
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
+
+  # OAuth2 (테스트용)
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: test-kakao-id
+            client-secret: test-kakao-secret
+            scope: profile_nickname,account_email
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            provider: kakao
+          github:
+            client-id: test-github-id
+            client-secret: test-github-secret
+            scope: user
+          google:
+            client-id: test-google-id
+            client-secret: test-google-secret
+            scope: email,profile
+        provider:
+          kakao:
+            user-name-attribute: kakao_account
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+
+  # JSON
+  jackson:
+    default-property-inclusion: non_null
+
+  # SMS (테스트용)
+  coolsms:
+    api:
+      key: test-key
+      secret: test-secret
+      fromnumber: "01012345678"
+
+# Server
+server:
+  port: 0
+
+# JWT
+jwt:
+  secret: test-jwt-secret-key-for-testing-only-minimum-256-bits-required-here
+  access-token-expiration: 3600000
+  refresh-token-expiration: 86400000
+
+# AWS S3 (테스트용)
+cloud:
+  aws:
+    credentials:
+      access-key: test-access-key
+      secret-key: test-secret-key
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: test-bucket
+    stack:
+      auto: false
+
+# User Image Path
+user:
+  img-path: /tmp/test/userProfileImg/
+
+# File Upload Path
+file:
+  upload-dir: /tmp/test/uploads/posts/images
+
+# Firebase (테스트용)
+firebase:
+  service-account-json: test-service-account-json
+  project-id: test-project-id
+  service-account: classpath:firebase/test-service-account.json
+  admin-key: classpath:firebase/test-admin-key.json
+  credentials:
+    path: src/test/resources/firebase/test-credentials.json
+
+# Swagger (비활성화)
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# Logging
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.stat: DEBUG
+    com.toty: DEBUG

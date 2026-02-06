@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PhoneNumber {
     private static final Pattern PHONE_PATTERN = Pattern.compile(
-            "^01[0-9]-\\d{3,4}-\\d{4}$"
+            "^010-\\d{4}-\\d{4}$"
     );
 
     @Column(name = "phone_number")

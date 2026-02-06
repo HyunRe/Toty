@@ -33,8 +33,14 @@ public class QnaPostCreationStrategy implements PostCreationStrategy {
             throw new ExpectedException(ErrorCode.TAG_LIMIT_EXCEEDED);
         }
 
-        Post post = new Post(user, postCreateRequest.getPostCategory(), postCreateRequest.getTitle(),
-                postCreateRequest.getContent(), 0, 0, null, null);
+        Post post = Post.builder()
+                .user(user)
+                .postCategory(postCreateRequest.getPostCategory())
+                .title(postCreateRequest.getTitle())
+                .content(postCreateRequest.getContent())
+                .viewCount(0)
+                .likeCount(0)
+                .build();
 
         // 태그
         List<PostTag> postTags = tagNames.stream()

@@ -17,6 +17,11 @@
   - [7. Domain Events 인프라 구현](#7-domain-events-인프라-구현)
   - [8. Service 책임 분리 (CQRS 패턴)](#8-service-책임-분리-cqrs-패턴)
   - [9. 장애 알림 시스템 구현](#9-장애-알림-시스템-구현)
+- [Phase 4: 코드 품질 및 테스트 인프라 개선](#phase-4-코드-품질-및-테스트-인프라-개선-2026-02-03)
+  - [11. Builder 패턴 도입](#11-builder-패턴-도입-post-comment-엔티티)
+  - [12. User Builder에 Role 파라미터 추가](#12-user-builder에-role-파라미터-추가)
+  - [13. PhoneNumber 검증 강화](#13-phonenumber-검증-강화)
+  - [14. 테스트 인프라 재구성](#14-테스트-인프라-재구성)
 - [변경 파일 목록](#변경-파일-목록)
 - [성능 개선 효과](#성능-개선-효과)
 - [다음 단계](#다음-단계)
@@ -898,9 +903,153 @@ src/main/java/com/toty/chat/application/service/ChatRoomQueryService.java
 
 ---
 
+## Phase 4: 코드 품질 및 테스트 인프라 개선 (2026-02-03)
+
+### 11. Builder 패턴 도입 (Post, Comment 엔티티)
+
+#### 문제 상황
+```java
+// 기존 코드: 긴 생성자로 인한 가독성 저하 및 파라미터 실수 가능성
+Post post = new Post(user, category, title, content, 0, 0, null, null);
+Comment comment = new Comment(user, post, content);
+```
+
+#### 해결 방법
+Lombok `@Builder` 패턴을 도입하여 명시적인 객체 생성 지원:
+
+```java
+// Post 엔티티: @Builder + @AllArgsConstructor(access = AccessLevel.PRIVATE)
+// @Builder.Default로 comments, postTags 리스트 초기화
+Post post = Post.builder()
+    .user(user)
+    .postCategory(category)
+    .title(title)
+    .content(content)
+    .viewCount(0)
+    .likeCount(0)
+    .build();
+
+// Comment 엔티티: 동일한 Builder 패턴 적용
+Comment comment = Comment.builder()
+    .user(user)
+    .post(post)
+    .content(content)
+    .build();
+```
+
+#### 개선 효과
+- **가독성 향상**: 파라미터 이름이 명시되어 실수 방지
+- **유연한 객체 생성**: 선택적 필드를 자연스럽게 처리
+- **@Builder.Default**: 리스트 필드 자동 초기화로 NullPointerException 방지
+
+#### 적용 파일
+- `src/main/java/com/toty/post/domain/model/post/Post.java`
+- `src/main/java/com/toty/comment/domain/model/comment/Comment.java`
+- `src/main/java/com/toty/post/domain/strategy/creation/GeneralPostCreationStrategy.java`
+- `src/main/java/com/toty/post/domain/strategy/creation/KnowledgePostCreationStrategy.java`
+- `src/main/java/com/toty/post/domain/strategy/creation/QnaPostCreationStrategy.java`
+- `src/main/java/com/toty/comment/application/service/CommentService.java`
+
+---
+
+### 12. User Builder에 Role 파라미터 추가
+
+#### 변경 내용
+```java
+// User 엔티티 Builder에 role 파라미터 추가
+// null인 경우 기본값 Role.USER 적용
+this.role = role != null ? role : Role.USER;
+```
+
+#### 개선 효과
+- **테스트 용이성**: 테스트 시 MENTOR, ADMIN 등 다양한 역할로 User 생성 가능
+- **기본값 보장**: role 미지정 시 안전하게 USER 역할 부여
+
+#### 적용 파일
+- `src/main/java/com/toty/user/domain/model/User.java`
+
+---
+
+### 13. PhoneNumber 검증 강화
+
+#### 변경 내용
+```java
+// 기존: 01X-XXX(X)-XXXX (011, 016 등 허용, 3자리 중간번호 허용)
+private static final Pattern PHONE_PATTERN = Pattern.compile("^01[0-9]-\\d{3,4}-\\d{4}$");
+
+// 변경: 010-XXXX-XXXX만 허용 (010 고정, 4자리-4자리)
+private static final Pattern PHONE_PATTERN = Pattern.compile("^010-\\d{4}-\\d{4}$");
+```
+
+#### 개선 효과
+- **현실 반영**: 현재 대부분의 한국 휴대폰 번호는 010 번호
+- **검증 강화**: 3자리 중간번호(예: 010-123-4567) 불허
+
+#### 적용 파일
+- `src/main/java/com/toty/user/domain/vo/PhoneNumber.java`
+
+---
+
+### 14. 테스트 인프라 재구성
+
+#### 문제 상황
+- 단위 테스트와 통합 테스트가 동일한 소스셋에 혼재
+- 패키지 구조가 메인 소스와 불일치
+- 통합 테스트 전용 설정 부재
+
+#### 해결 방법
+
+##### Gradle 소스셋 분리
+```groovy
+// build.gradle에 integrationTest 소스셋 추가
+sourceSets {
+    integrationTest {
+        java.srcDir 'src/test_integration/java'
+        resources.srcDir 'src/test/resources'  // 공유 리소스
+    }
+}
+
+// 테스트 실행 순서 보장
+unitTest → integrationTest → apiE2ETest
+```
+
+##### 디렉토리 구조
+```
+src/test/resources/              # 공유 테스트 설정 (application-test.yaml)
+src/test_unit/java/com/toty/
+├── domain/                      # Value Object 단위 테스트
+├── service/                     # Service 단위 테스트
+├── infrastructure/              # Infrastructure 단위 테스트
+└── util/                        # Utility 단위 테스트
+src/test_integration/java/com/toty/
+├── TestJpaApplication.java      # 통합 테스트용 Application
+└── repository/                  # Repository 통합 테스트
+src/test_apiE2E/java/            # API E2E 테스트
+```
+
+##### H2 인메모리 DB 도입
+```groovy
+testRuntimeOnly 'com.h2database:h2'
+unitTestRuntimeOnly 'com.h2database:h2'
+integrationTestRuntimeOnly 'com.h2database:h2'
+```
+
+#### 개선 효과
+- **명확한 테스트 분류**: 단위/통합/E2E 테스트가 물리적으로 분리
+- **독립적 실행**: 각 테스트 유형을 개별 Gradle 태스크로 실행 가능
+- **패키지 정규화**: `com.toty` 패키지 구조로 메인 소스와 일치
+- **IntelliJ 지원**: `idea` 플러그인으로 커스텀 소스셋 자동 인식
+
+#### 적용 파일
+- `build.gradle`
+- `src/test/resources/application-test.yaml` (신규)
+- `src/test_integration/java/com/toty/TestJpaApplication.java` (신규)
+
+---
+
 ## 다음 단계
 
-### 향후 개선 계획 (Phase 3)
+### 향후 개선 계획
 
 #### 보안 강화
 - [ ] **XSS 방어**: HTML Sanitizer 도입으로 XSS 공격 방어
@@ -916,6 +1065,11 @@ src/main/java/com/toty/chat/application/service/ChatRoomQueryService.java
 - [ ] **단위 테스트**: JUnit5 + Mockito로 핵심 로직 테스트
 - [ ] **통합 테스트**: TestContainers로 실제 환경 테스트
 - [ ] **E2E 테스트**: Selenium 또는 Cypress 도입
+
+#### 코드 품질
+- [x] **Builder 패턴 도입**: Post, Comment 엔티티 리팩토링 (2026-02-03 완료)
+- [x] **PhoneNumber 검증 강화**: 010-XXXX-XXXX만 허용 (2026-02-03 완료)
+- [x] **테스트 인프라 재구성**: 소스셋 분리 및 패키지 정규화 (2026-02-03 완료)
 
 #### 성능 최적화
 - [x] **DB 쿼리 최적화**: 남은 N+1 문제 해결 (2026-01-09 완료)
@@ -941,5 +1095,5 @@ src/main/java/com/toty/chat/application/service/ChatRoomQueryService.java
 
 ---
 
-**마지막 업데이트**: 2026-01-09
+**마지막 업데이트**: 2026-02-03
 **작성자**: Claude (with Human collaboration)

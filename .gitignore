@@ -38,8 +38,8 @@ out/
 
 /logs/
 
-# application-local.yaml은 더 이상 gitignore 안 함 (시크릿 정보 없음)
-application-test.yaml
+# application-local.yaml, application-test.yaml은 gitignore 안 함 (시크릿 정보 없음)
+# application-test.yaml  # 테스트용 더미 데이터만 있음 - git 포함
 application-deploy.yaml
 application-staging.yaml
 application-secret.yaml

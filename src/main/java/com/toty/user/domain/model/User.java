@@ -58,7 +58,7 @@ public class User extends BaseTime {
 
     @Builder
     public User(String email, String password, String nickname, String phoneNumber, LoginProvider loginProvider, boolean isDeleted, String username,
-                boolean smsSubscribed, boolean emailSubscribed, boolean notificationAllowed) {
+                boolean smsSubscribed, boolean emailSubscribed, boolean notificationAllowed, Role role) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
@@ -66,6 +66,7 @@ public class User extends BaseTime {
         this.loginProvider = loginProvider;
         this.username = username;
         this.isDeleted = isDeleted;
+        this.role = role != null ? role : Role.USER;
         this.userSubscribeInfo = new UserSubscribeInfo(smsSubscribed, emailSubscribed, notificationAllowed);
     }
 

@@ -19,6 +19,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@lombok.Builder
+@lombok.AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Comment extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,12 +37,6 @@ public class Comment extends BaseTime {
 
     @Column(name = "content", nullable = false)
     private String content;
-
-    public Comment(User user, Post post, String content) {
-        this.user = user;
-        this.post = post;
-        this.content = content;
-    }
 
     public void updateComment(String content) {
         this.content = content;

@@ -21,6 +21,8 @@ import java.util.function.BiConsumer;
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Post extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,10 +50,12 @@ public class Post extends BaseTime {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
+    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = false)
     @JsonManagedReference
+    @Builder.Default
     private List<PostTag> postTags = new ArrayList<>();
 
     private <T> void addRelatedEntity(List<T> list, T entity, BiConsumer<T, Post> setPostMethod) {
@@ -82,18 +86,6 @@ public class Post extends BaseTime {
         if (this.likeCount > 0) {
             this.likeCount--;
         }
-    }
-
-    public Post(User user, PostCategory postCategory, String title, String content, int viewCount, int likeCount,
-                List<Comment> comments, List<PostTag> postTags) {
-        this.user = user;
-        this.postCategory = postCategory;
-        this.title = title;
-        this.content = content;
-        this.viewCount = viewCount;
-        this.likeCount = likeCount;
-        this.comments = comments;
-        this.postTags = postTags;
     }
 
     public Post updatePost(String title, String content, List<PostTag> postTags) {

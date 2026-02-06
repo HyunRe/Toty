@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'idea'
     id 'org.springframework.boot' version '3.4.1'
     id 'io.spring.dependency-management' version '1.1.7'
 }
@@ -19,6 +20,8 @@ configurations {
     }
     unitTestImplementation.extendsFrom implementation
     unitTestRuntimeOnly.extendsFrom runtimeOnly
+    integrationTestImplementation.extendsFrom implementation
+    integrationTestRuntimeOnly.extendsFrom runtimeOnly
     apiE2ETestImplementation.extendsFrom implementation
     apiE2ETestRuntimeOnly.extendsFrom runtimeOnly
 }
@@ -42,9 +45,17 @@ dependencies {
 
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'com.h2database:h2'
 
     unitTestImplementation 'org.springframework.boot:spring-boot-starter-test'
     unitTestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    unitTestRuntimeOnly 'com.h2database:h2'
+
+    integrationTestImplementation 'org.springframework.boot:spring-boot-starter-test'
+    integrationTestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    integrationTestRuntimeOnly 'com.h2database:h2'
 
     apiE2ETestImplementation 'org.springframework.boot:spring-boot-starter-test'
     apiE2ETestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -102,42 +113,74 @@ dependencies {
 sourceSets {
     unitTest {
         java {
-            srcDirs = ['src/test_unit/java']
+            srcDir 'src/test_unit/java'
         }
         resources {
-            srcDirs = ['src/test/resources']
+            srcDir 'src/test/resources'  // test의 resources 공유
         }
-        compileClasspath += sourceSets.main.output
-        runtimeClasspath += sourceSets.main.output
+        compileClasspath += main.output + test.compileClasspath
+        runtimeClasspath += main.output + test.runtimeClasspath
+    }
+    integrationTest {
+        java {
+            srcDir 'src/test_integration/java'
+        }
+        resources {
+            srcDir 'src/test/resources'  // test의 resources 공유
+        }
+        compileClasspath += main.output + test.compileClasspath
+        runtimeClasspath += main.output + test.runtimeClasspath
     }
     apiE2ETest {
         java {
-            srcDirs = ['src/test_apiE2E/java']
+            srcDir 'src/test_apiE2E/java'
         }
         resources {
-            srcDirs = ['src/test/resources']
+            srcDir 'src/test/resources'  // test의 resources 공유
         }
-        compileClasspath += sourceSets.main.output
-        runtimeClasspath += sourceSets.main.output
+        compileClasspath += main.output + test.compileClasspath
+        runtimeClasspath += main.output + test.runtimeClasspath
     }
 }
 
 tasks.register('unitTest', Test) {
+    description = '단위 테스트 실행 (도메인 로직, Mock 기반)'
+    group = 'verification'
     testClassesDirs = sourceSets.unitTest.output.classesDirs
     classpath = sourceSets.unitTest.runtimeClasspath
-
     useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+}
+
+tasks.register('integrationTest', Test) {
+    description = '통합 테스트 실행 (@SpringBootTest, 전체 컨텍스트)'
+    group = 'verification'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+
+    shouldRunAfter unitTest
 }
 
 tasks.register('apiE2ETest', Test) {
     testClassesDirs = sourceSets.apiE2ETest.output.classesDirs
     classpath = sourceSets.apiE2ETest.runtimeClasspath
-    shouldRunAfter unitTest
+    shouldRunAfter integrationTest
 
     useJUnitPlatform()
 }
 
 check.dependsOn unitTest
+check.dependsOn integrationTest
 check.dependsOn apiE2ETest
 
 /* =======================
@@ -145,4 +188,18 @@ check.dependsOn apiE2ETest
  ======================= */
 tasks.withType(JavaCompile).configureEach {
     options.annotationProcessorPath = configurations.annotationProcessor
+}
+
+/* =======================
+   IntelliJ IDEA 커스텀 소스셋 인식
+ ======================= */
+idea {
+    module {
+        testSources.from(sourceSets.unitTest.java.srcDirs)
+        testSources.from(sourceSets.integrationTest.java.srcDirs)
+        testSources.from(sourceSets.apiE2ETest.java.srcDirs)
+        testResources.from(sourceSets.unitTest.resources.srcDirs)
+        testResources.from(sourceSets.integrationTest.resources.srcDirs)
+        testResources.from(sourceSets.apiE2ETest.resources.srcDirs)
+    }
 }

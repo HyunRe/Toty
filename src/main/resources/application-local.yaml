@@ -74,10 +74,6 @@ spring:
   jackson:
     default-property-inclusion: non_null
 
-  # Profile 설정 - application-secret.yaml도 함께 로드
-  profiles:
-    include: secret
-
 # User Image Path (로컬 개발용)
 user:
   img-path: C:/toty/userProfileImg/

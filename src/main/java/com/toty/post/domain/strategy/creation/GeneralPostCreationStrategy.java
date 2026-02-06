@@ -15,8 +15,14 @@ public class GeneralPostCreationStrategy implements PostCreationStrategy {
 
     @Override
     public Post createPostRequest(PostCreateRequest postCreateRequest, User user) {
-        Post post = new Post(user, postCreateRequest.getPostCategory(), postCreateRequest.getTitle(),
-                postCreateRequest.getContent(), 0, 0, null, null);
+        Post post = Post.builder()
+                .user(user)
+                .postCategory(postCreateRequest.getPostCategory())
+                .title(postCreateRequest.getTitle())
+                .content(postCreateRequest.getContent())
+                .viewCount(0)
+                .likeCount(0)
+                .build();
 
         postRepository.save(post);
         return post;

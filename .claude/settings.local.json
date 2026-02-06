@@ -20,7 +20,15 @@
       "Bash(git mv:*)",
       "Bash(git config:*)",
       "Bash(git rm:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(mkdir:*)",
+      "Bash(./gradlew clean test:*)",
+      "Bash(./gradlew clean compileTestJava:*)",
+      "Bash(./gradlew compileTestJava:*)",
+      "Bash(cat:*)",
+      "Bash(rsync:*)",
+      "Bash(./gradlew:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []
