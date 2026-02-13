@@ -36,6 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 
+### Claude Code ###
+.claude/
+
 /logs/
 
 # application-local.yaml, application-test.yaml은 gitignore 안 함 (시크릿 정보 없음)
