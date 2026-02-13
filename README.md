@@ -1,36 +1,53 @@
 # TOTY Backend
 
+
 게시글 기반 멘토–멘티 매칭과 실시간 알림 시스템을 구현한 커뮤니티형 멘토링 플랫폼 백엔드
+
 
 TOTY는 멘토링 모집 게시글, 멘토 선정 날짜 스케줄링, 실시간 알림(SSE), 푸시 알림(FCM), 이메일/SMS 발송을 통합 설계한 백엔드 시스템입니다.  
 팀 프로젝트로 시작하여 이후 개인 고도화를 통해 ElasticSearch 도입, 캐시 전략 개선, HTTPS 전환 및 인프라 안정화를 수행했습니다.
 
+
 ---
+
 
 ## 1. 프로젝트 소개
 
+
 ###  기획 배경
 
+
 #### 문제 정의
+
+
 - 멘토링 플랫폼에서 멘토 선정이 수동적으로 관리됨  
 - 선정/박탈 결과에 대한 실시간 알림 체계 부재  
 - 게시글 기반 커뮤니티와 매칭 로직이 분리되지 않음  
 
+
 #### 기존 서비스의 한계
+
+
 - 멘토 선정 날짜 자동 처리 불가  
 - 알림 시스템이 실시간이 아님  
 - 대용량 게시글 조회 시 성능 저하  
 
+
 #### 해결 방향
+
+
 - 멘토 선정 날짜 기반 스케줄 자동화  
 - Redis 기반 SSE 실시간 알림 구조 설계  
 - FCM + Email + SMS 통합 알림 시스템 구축  
 - ElasticSearch 도입으로 검색 성능 개선  
 - HTTPS 전환으로 보안 강화  
 
+
 ---
 
+
 ###  프로젝트 목표
+
 
 - 게시글 중심 멘토링 플랫폼 설계  
 - 멘토 자동 선정/박탈 스케줄링 구현  
@@ -38,9 +55,12 @@ TOTY는 멘토링 모집 게시글, 멘토 선정 날짜 스케줄링, 실시간
 - ElasticSearch 기반 검색 고도화  
 - HTTPS 기반 실서비스 수준 보안 환경 구축  
 
+
 ---
 
+
 ## 2. 기술 스택
+
 
 | 분류 | 기술 |
 |------|------|
@@ -61,10 +81,14 @@ TOTY는 멘토링 모집 게시글, 멘토 선정 날짜 스케줄링, 실시간
 | Test | JUnit5, Mockito |
 | Docs | Swagger |
 
+
 ---
+
 
 ## 3. 시스템 아키텍처
 
+
+```
                           ┌──────────┐
                           │  Client  │
                           │ (Web/App)│
@@ -88,9 +112,11 @@ TOTY는 멘토링 모집 게시글, 멘토 선정 날짜 스케줄링, 실시간
 ┌────────────┐
 │ SSE Server │
 └────────────┘
+```
 
 
 ###  설계 원칙
+
 
 - 도메인 중심 설계 (DDD 기반 구조)  
 - 읽기/쓰기 책임 분리  
@@ -98,10 +124,14 @@ TOTY는 멘토링 모집 게시글, 멘토 선정 날짜 스케줄링, 실시간
 - 트랜잭션 범위 최소화  
 - 확장 가능한 알림 아키텍처 설계  
 
+
 ---
+
 
 ## 4. 프로젝트 구조
 
+
+```
 com.toty
 ├── user/ # 사용자, 인증, 프로필
 ├── post/ # 게시글 (모집글, Q&A)
@@ -113,32 +143,44 @@ com.toty
 ├── image/ # 이미지 관리 (S3)
 ├── search/ # 검색 (ElasticSearch)
 └── common/ # 공통 설정, 보안, 예외 처리
+```
 
 
 ---
 
+
 ## 5. 핵심 기능
 
+
 ###  인증 / 인가
+
 
 - JWT 기반 인증 (Access + Refresh Token)  
 - Spring Security Filter 기반 토큰 검증  
 - 사용자 상태 기반 접근 제어  
 
+
+
 ---
+
 
 ##  핵심 비즈니스 로직
 
+
 ### 1️ 게시글 & 댓글
+
 
 - 멘토링 모집 게시글 CRUD  
 - 댓글/대댓글 구조 설계  
 - 게시글 작성자 기준 멘토 선정 가능  
 - 멘토 선정 시 권한 상태 자동 변경  
 
+
 ---
 
+
 ### 2️ 멘토 선정 & 박탈
+
 
 - 선정 날짜 도달 시 자동 상태 변경 (Scheduler 기반)  
 - 단일 트랜잭션 처리로 데이터 정합성 보장  
@@ -146,235 +188,447 @@ com.toty
 - 선정/박탈 시 실시간 알림 + 푸시 + 이메일 + SMS 발송  
 - 멘토 상태 변경 시 관련 채팅방 접근 권한 자동 갱신  
 
+
 ---
+
 
 ### 3️ 알림 시스템 (핵심 설계)
 
+
 ####  실시간 알림 구조
+
 
 - Redis Pub/Sub 기반 이벤트 브로드캐스트  
 - SSE(Server-Sent Events)로 실시간 전송  
 - 멀티 인스턴스 환경 대응  
 
+
 ####  온라인 / 오프라인 처리 전략
+
 
 - 온라인 사용자 → SSE 즉시 전송  
 - 오프라인 사용자 → FCM 푸시 발송  
 - 중요 이벤트 → 이메일 / SMS 추가 발송  
 
+
 ####  알림 발생 이벤트
+
 
 - 멘토 선정 / 박탈  
 - 채팅 메시지 수신  
 - 댓글 작성  
 - 게시글 관련 상태 변경  
 
+
 ####  설계 특징
+
 
 - 이벤트 기반 구조  
 - 비동기 처리 분리  
 - 알림 실패 시 재시도 전략 고려  
 - 알림 도메인 독립 설계로 확장 가능 구조 유지  
 
+
 ---
+
 
 ### 4️ 멘토 중심 채팅방 시스템
 
+
 ####  채팅 구조
+
 
 - WebSocket 기반 실시간 양방향 통신  
 - 멘토링 모집 게시글 단위 채팅방 생성  
 - 멘토 선정 이후에만 채팅방 활성화  
 
+
 ####  권한 기반 채팅 로직
+
 
 - 멘토 + 선정된 멘티만 채팅 가능  
 - 멘토 박탈 시 채팅 권한 자동 제거  
 - 채팅방 접근 시 사용자 권한 검증  
 
+
 ####  실시간 처리
+
 
 - 메시지 수신 즉시 브로드캐스트  
 - 오프라인 사용자에게는 푸시 알림 연동  
 - 채팅 메시지 저장 후 전송 (영속성 보장)
 
+
 ####  확장 고려 사항
+
 
 - Redis 활용 확장 가능 구조  
 - 채팅 이벤트 → 알림 시스템과 연동  
 - 멀티 인스턴스 환경에서 메시지 동기화 고려  
 
+
 ---
+
 
 ## 6. 실시간 기능
 
+
 ###  통신 방식
+
+
 - SSE (Server-Sent Events)
+
 
 ###  처리 구조
 - Redis Pub/Sub 기반 다중 인스턴스 대응  
 - 온라인: SSE 즉시 전송  
 - 오프라인: FCM 푸시 발송  
 
+
 ---
 
+
 ## 7. 기타 주요 기능
+
 
 - S3 기반 이미지 업로드  
 - 이메일 발송 (멘토 선정/박탈)  
 - SMS 발송  
 - 채팅 기능 (WebSocket 기반)  
 
+
 ---
+
 
 ## 8. 성능 개선 및 설계 고민
 
+
 ### 8-1. ElasticSearch 도입
 
+
 #### 문제
-- 게시글 LIKE 검색 시 성능 저하  
+
+
+- 게시글 LIKE 검색 시 성능 저하
+
 
 #### 해결
+
+
 - ElasticSearch 도입  
 - 검색 전용 인덱스 분리  
 
 #### 결과
+
+
 - 검색 응답 속도 개선  
 - DB 부하 감소  
 
+
 ---
+
 
 ### 8-2. Redis 기반 SSE 확장성 개선
 
+
 #### 문제
-- 멀티 인스턴스 환경에서 SSE 동기화 불가  
+
+
+- 멀티 인스턴스 환경에서 SSE 동기화 불가
+
 
 #### 해결
+
+
 - Redis Pub/Sub 도입  
 - 인스턴스 간 이벤트 브로드캐스트  
 
+
 ---
+
 
 ### 8-3. HTTPS 전환
 
+
 #### 문제
+
+
 - HTTP 환경 보안 취약  
 
+
 #### 해결
+
+
 - Nginx Reverse Proxy 구성  
 - 도메인 연결 (가비아)  
 - Route 53 DNS 설정  
 - ACM 인증서 발급  
 - HTTP → HTTPS 리다이렉트 설정  
 
+
 #### 사용 서비스
+
+
 - Amazon Web Services  
 - Gabia  
 
+
 ---
+
 
 ## 9. 테스트 전략
 
+
 ###  테스트 구조
 
-src/test_unit/
-src/test_integration/
+
+```
+src/test_unit/          # 단위 테스트 (12개)
+src/test_integration/   # 통합 테스트 (3개)
+```
 
 
-###  단위 테스트
-- 도메인 로직 테스트  
-- 멘토 선정 로직 테스트  
-- 인증 로직 테스트  
+Gradle Custom SourceSet으로 분리 관리
 
-###  통합 테스트
-- DB 연동 테스트  
-- Redis 연동 테스트  
-- SSE 동작 테스트  
-- 동시성 테스트  
+
+###  단위 테스트 (12개)
+
+
+| 파일 | 대상 |
+|------|------|
+| `EmailTest`                       | 이메일 형식 및 유효성 검증       |
+| `NicknameTest`                    | 닉네임 검증 로직             |
+| `PhoneNumberTest`                 | 전화번호 검증 로직            |
+| `FcmNotificationSenderTest`       | Firebase FCM 알림 전송 로직 |
+| `S3StorageServiceTest`            | AWS S3 업로드/삭제 로직      |
+| `SseNotificationSenderTest`       | SSE 알림 전송 로직          |
+| `ImageUploadServiceTest`          | 이미지 업로드 처리 로직         |
+| `NotificationCreationServiceTest` | 알림 생성 로직              |
+| `NotificationServiceTest`         | 알림 비즈니스 로직            |
+| `RoleRefreshSchedulerTest`        | 역할 갱신 스케줄러 로직         |
+| `ImageValidatorTest`              | 이미지 유효성 검증            |
+| `S3KeyGeneratorTest`              | S3 Key 생성 규칙          |
+
+
+###  통합 테스트 - Repository (3개)
+
+
+| 파일 | 대상 |
+|------|------|
+| `NPlusOnePerformanceTest`    | N+1 문제 성능 검증      |
+| `PostCommentIntegrationTest` | 게시글 댓글 DB 연동 테스트  |
+| `PostImageIntegrationTest`   | 게시글 이미지 DB 연동 테스트 |
+
 
 ---
+
 
 ## 10. CI/CD
 
-push / PR
-↓
-Unit Test
-↓
-Integration Test
-↓
-Build
-↓
-Deploy
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        GitHub Actions                           │
+├─────────────────────────────────────────────────────────────────┤
+│  push / PR (main, develop)                                      │
+│           ↓                                                     │
+│  ┌─────────────────┐                                            │
+│  │   Test Stage    │                                            │
+│  │  ┌───────────┐  │                                            │
+│  │  │ unitTest  │  │                                            │
+│  │  └───────────┘  │                                            │
+│  │  ┌─────────────────────────┐                                 │
+│  │  │    integrationTest      │                                 │
+│  │  │  (Testcontainers MySQL) │                                 │
+│  │  │  (CI Service: Redis)    │                                 │
+│  │  │  (Testcontainers ES)    │                                 │
+│  │  └─────────────────────────┘                                 │
+│  └─────────────────┘                                            │
+│           ↓ 테스트 통과 시                                         │
+│  ┌─────────────────┐                                            │
+│  │  Build Stage    │                                            │
+│  │  - JAR 빌드     │                                             │
+│  │  - 배포 번들 생성│                                              │
+│  └─────────────────┘                                            │
+│           ↓                                                     │
+│  ┌─────────────────┐                                            │
+│  │   AWS S3 업로드  │                                             │
+│  └─────────────────┘                                            │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                      AWS CodeDeploy                             │
+├─────────────────────────────────────────────────────────────────┤
+│  S3에서 번들 다운로드 → EC2로 배포                               │
+│                                                                 │
+│  배포 파일:                                                      │
+│  - build/libs/*.jar                                             │
+│  - Dockerfile                                                   │
+│  - docker-compose.yml                                           │
+│  - appspec.yml                                                  │
+│  - scripts/deploy.sh                                            │
+│  - .env                                                         │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                        AWS EC2                                  │
+├─────────────────────────────────────────────────────────────────┤
+│  deploy.sh 실행                                                  │
+│           ↓                                                     │
+│  ┌─────────────────────────────────────┐                        │
+│  │         Docker Compose              │                        │
+│  │  ┌─────────────┐  ┌─────────────┐   │                        │
+│  │  │   MySQL     │  │ Spring Boot │   │                        │
+│  │  │ Container   │  │ Container   │   │                        │
+│  │  │             │  │             │   │                        │
+│  │  │   Redis     │  │ Elasticsearch│  │                        │
+│  │  └─────────────┘  └─────────────┘   │                        │
+│  └─────────────────────────────────────┘                        │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 
-- GitHub Actions 기반 자동 배포  
-- main 브랜치 배포 전략  
+## 주요 파일
+
+| 파일 | 역할 |
+|------|------|
+| .github/workflows/gradle.yml | CI/CD 파이프라인 정의 |
+| Dockerfile | Spring Boot 앱 컨테이너 이미지 |
+| docker-compose.yml | MySQL + Redis + Elasticsearch + Spring Boot 컨테이너 구성 |
+| appspec.yml | CodeDeploy 배포 설정 |
+| scripts/deploy.sh | EC2에서 Docker Compose 실행 |
+| scripts/validate.sh | 배포 후 Health Check 검증 |
+| .env | 애플리케이션 환경변수 설정 파일 |
+
 
 ---
+
 
 ## 11. 트러블슈팅
 
+
 ### 1️ SSE 다중 인스턴스 문제
 
+
 #### 원인
+
+
 - 인스턴스 간 메모리 공유 불가  
 
+
 #### 해결
+
+
 - Redis Pub/Sub으로 이벤트 브로드캐스트  
 
+
 ---
+
 
 ### 2️ HTTPS 적용 문제
 
+
 #### 원인
+
+
 - SSL 인증서 미적용  
 
+
 #### 해결
+
+
 - Nginx + Route 53 + ACM 설정 후 HTTPS 전환  
+
 
 ---
 
+
 ## 12. 실행 방법
 
+
 ### 1️ 인프라 실행
+
+
 ```bash
-docker-compose up -d
-2️ 애플리케이션 실행
+docker network create toty-network
+
+docker run -d --name toty-mysql \
+  --network toty-network \
+  -p 3306:3306 \
+  -e MYSQL_ROOT_PASSWORD=test \
+  -e MYSQL_DATABASE=toty_dev \
+  mysql:8.0
+
+docker run -d --name toty-redis \
+  --network toty-network \
+  -p 6379:6379 \
+  redis:7-alpine
+
+docker run -d --name toty-elasticsearch \
+  --network toty-network \
+  -p 9200:9200 \
+  -e "discovery.type=single-node" \
+  -e "xpack.security.enabled=false" \
+  -e ES_JAVA_OPTS="-Xms512m -Xmx512m" \
+  docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+
+docker build -t toty-app .
+
+docker run -d --name toty-app \
+  --network toty-network \
+  -p 8070:8070 \
+  --env-file .env \
+  toty-app
+```
+
+
+### 2️ 애플리케이션 실행
+
+
+```bash
 ./gradlew bootRun
-3️ API 문서
-http://localhost:8080/swagger-ui
- 프로젝트를 통해 얻은 경험
-실시간 알림 시스템 설계 경험
+```
 
-Redis Pub/Sub 기반 확장성 확보 경험
 
-ElasticSearch 도입 및 검색 고도화 경험
+### 3️ Swagger
+```
+http://localhost:8080/swagger-ui/index.html
+```
 
-HTTPS 전환 및 도메인 연결 경험
 
-인프라–애플리케이션 통합 설계 경험
+---
 
- 담당 영역
- 팀 프로젝트 당시
-게시글/댓글 도메인 설계 및 구현
 
-멘토 선정 날짜 스케줄 설정
+## 프로젝트를 통해 얻은 경험
 
-Redis 기반 SSE 구축
 
-FCM 알림 시스템 구축
+- 실시간 알림 시스템 설계 경험
+- Redis Pub/Sub 기반 확장성 확보 경험
+- ElasticSearch 도입 및 검색 고도화 경험
+- HTTPS 전환 및 도메인 연결 경험
+- 인프라–애플리케이션 통합 설계 경험
 
-멘토 선정 & 박탈 이메일/SMS 발송 구현
 
- 개인 고도화
-ElasticSearch 도입
+---
 
-캐시 전략 개선
 
-테스트 코드 보강
+## 담당 영역
 
-구조 리팩토링
 
-Nginx 기반 HTTPS 전환
+### 팀 프로젝트 당시
+- 게시글/댓글 도메인 설계 및 구현
+- 멘토 선정 날짜 스케줄 설정
+- Redis 기반 SSE 구축
+- FCM 알림 시스템 구축
+- 멘토 선정 & 박탈 이메일/SMS 발송 구현
 
-가비아 도메인 + Route 53 + ACM 연동
+### 개인 고도화
+- ElasticSearch 도입
+- 캐시 전략 개선
+- 테스트 코드 보강
+- 구조 리팩토링
+- Nginx 기반 HTTPS 전환
+- 가비아 도메인 + Route 53 + ACM 연동
+
+
+---
