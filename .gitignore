@@ -51,6 +51,7 @@ application-secret.yaml
 src/main/resources/firebase/*.json
 
 README-SECRET.md
+CODE_REVIEW.md
 
 ### Docker & CI/CD ###
 .env
