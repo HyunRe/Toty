@@ -37,7 +37,7 @@
 #### Phase 1: 성능 및 보안 개선 (Week 1-4)
 - ✅ **N+1 쿼리 문제 해결** - fetch join으로 데이터베이스 쿼리 수 대폭 감소
 - ✅ **Redis 캐싱 도입** - 사용자 정보 조회 성능 향상 (캐시 히트 시 DB 부하 제로)
-- ✅ **비동기 처리** - S3 이미지 삭제 비동기화로 응답 속도 개선
+- ✅ **비동기 처리** - S3 이미지 삭제 · 알림 발송 비동기화로 응답 속도 개선 (재시도 큐로 알림 유실 방지)
 - ✅ **JWT 보안 강화** - 토큰 로테이션 및 블랙리스트로 보안 수준 향상
 - ✅ **로깅 체계 개선** - System.out → SLF4J로 전환하여 프로덕션 레벨 로깅 구현
 
@@ -274,14 +274,179 @@ public class S3StorageService {
                                 S3 이미지 삭제 (2초)
 ```
 
-### 성능 개선 효과
+### 성능 개선 효과 (S3 이미지 삭제)
 - **응답 시간 단축**: 2.5초 → 0.5초 (약 80% 개선)
 - **사용자 경험 향상**: 삭제 작업이 즉시 완료된 것처럼 느껴짐
 - **시스템 안정성**: S3 삭제 실패 시에도 메인 트랜잭션 영향 없음
 
+---
+
+### NotificationAsyncConfig 설정 (알림 전용 스레드풀)
+
+S3 삭제와 알림 발송이 같은 스레드풀을 공유하면 서로의 처리량에 영향을 주므로,
+알림 전용 Executor를 별도로 분리했습니다.
+
+```java
+@Configuration
+@EnableAsync
+public class NotificationAsyncConfig {
+
+    @Bean(name = "notificationExecutor")
+    public Executor notificationExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);        // 기본 스레드 5개
+        executor.setMaxPoolSize(10);        // 최대 스레드 10개
+        executor.setQueueCapacity(25);      // 대기 큐 25개
+        executor.setThreadNamePrefix("Notification-Async-");
+        executor.initialize();
+        return executor;
+    }
+}
+```
+
+### 알림 발송 비동기화
+
+**문제 상황**
+
+멘토가 지식 게시글을 작성하면 팔로워 전원에게 알림을 발송하는데,
+이 루프가 요청 스레드에서 동기로 실행되고 있었습니다.
+
+```java
+// KnowledgePostCreationStrategy - 팔로워 수만큼 외부 API 왕복이 누적
+List<Following> followings = followingRepository.findByToUserId(user.getId());
+for (Following following : followings) {
+    notificationSendService.sendNotification(notificationSendRequest);
+}
+```
+
+채널별 외부 I/O 비용:
+
+| 채널 | 대상 EventType | 단건 소요 시간(예상) |
+|------|---------------|-------------------|
+| FCM | QNA_POST, MENTOR_POST, MENTOR_CHAT | 약 200ms |
+| Email (SMTP + 인라인 이미지 2개) | BECOME_MENTOR, REVOKE_MENTOR | 약 1,200ms |
+| SMS (CoolSMS REST) | BECOME_MENTOR, REVOKE_MENTOR | 약 350ms |
+| SSE (로컬 Emitter write) | COMMENT, LIKE, FOLLOW | 약 2ms |
+
+**해결 방법**
+
+발송 요청을 이벤트 발행으로 전환하고, 리스너와 각 채널 Sender 전 구간에 `@Async`를 적용했습니다.
+
+```java
+@Service
+@RequiredArgsConstructor
+public class NotificationSendService {
+    private final ApplicationEventPublisher eventPublisher;
+
+    @Async("notificationExecutor")
+    public void sendNotification(NotificationSendRequest request) {
+        eventPublisher.publishEvent(new NotificationEvent(this, request));
+    }
+}
+```
+
+```java
+@Component
+@RequiredArgsConstructor
+public class NotificationEventListener {
+    private final NotificationSenderService notificationSenderService;
+
+    @Async("notificationExecutor")
+    @EventListener
+    public void onNotificationEvent(NotificationEvent event) {
+        try {
+            notificationSenderService.send(event.getNotificationSendRequest());
+        } catch (Exception e) {
+            log.error("알림 전송 실패: receiverId={}, error={}", ..., e.getMessage(), e);
+        }
+    }
+}
+```
+
+또한 하나의 EventType에 여러 Sender가 매핑된 경우(멘토 선정 = Email + SMS),
+개별 Sender 실패가 나머지 발송을 중단시키지 않도록 예외를 격리했습니다.
+
+```java
+// NotificationSenderService - Sender 단위 예외 격리
+for (NotificationSender sender : senders) {
+    try {
+        sender.send(notification);
+    } catch (Exception e) {
+        log.error("알림 전송 실패: sender={}, error={}", sender.getClass().getSimpleName(), e.getMessage(), e);
+    }
+}
+```
+
+### 비동기 처리 시나리오 (알림)
+```
+[동기 처리 - 기존] 팔로워 10명에게 멘토 게시글 알림
+클라이언트 요청 → 게시글 저장(50ms) → FCM 발송 × 10회 (약 2,050ms) → 응답 (총 약 2.1초)
+
+[비동기 처리 - 개선]
+클라이언트 요청 → 게시글 저장(50ms) → 이벤트 발행 × 10회 (약 5ms) → 응답 (총 약 0.06초)
+                                            ↓
+                                      [백그라운드]
+                                      FCM 발송 × 10회
+```
+
+### 성능 개선 효과 (알림 발송)
+- **멘토 게시글 작성 응답 시간**: 약 2.1초 → 약 0.06초 (팔로워 10명 기준 예상치)
+- **멘토 선정 알림(Email + SMS)**: 약 1.5초 → 즉시 반환
+- **확장성**: 팔로워 수가 늘어도 응답 시간이 비례해 증가하지 않음
+- **시스템 안정성**: FCM · SMTP 장애 시에도 게시글 작성 트랜잭션은 정상 완료
+
+> 위 수치는 각 외부 API의 일반적인 왕복 지연을 기준으로 산출한 예상치입니다.
+> 실측은 `NotificationEventListener`의 "알림 이벤트 수신" ~ "알림 전송 완료" 로그 구간으로 확인할 수 있습니다.
+
+### 알림 전송 실패 재시도 (재시도 큐 + 지수 백오프)
+
+**문제 상황**
+- 수신자의 SSE 연결이 없거나 전송에 실패하면 알림이 그대로 유실됨
+- 비동기화로 요청 스레드와 분리된 만큼, 실패를 호출자에게 되돌릴 수 없음
+
+**해결 방법**
+
+실패 건을 큐에 적재하고 스케줄러가 지수 백오프로 재전송합니다.
+
+```java
+// NotificationSseService - 미연결 / 전송 실패 시 재시도 큐 적재
+if (sseEmitterRepository.getSingle(key) == null) {
+    log.warn("SSE 연결 없음 - 재시도 큐에 추가: receiverId={}", request.getReceiverId());
+    retryQueue.offer(new NotificationRetryEnvelope(request, INITIAL_RETRY_DELAY_MS));
+    return;
+}
+```
+
+```java
+// NotificationRetryScheduler - 지수 백오프 (2초 → 2배씩 증가, 상한 60초)
+private long computeBackoffMillis(int attempts) {
+    long backoff = INITIAL_BACKOFF_MS * (1L << (attempts - 1));
+    return Math.min(backoff, 60_000L);
+}
+```
+
+- `NotificationRetryQueue`: `ConcurrentLinkedQueue` 기반 스레드 세이프 큐
+- `NotificationRetryEnvelope`: 시도 횟수와 다음 시도 시각 보관
+- 최대 시도 횟수 초과 시 `handlePermanentFailure`로 영구 실패 처리
+
+### 개선 효과 (재시도)
+- **알림 유실 방지**: 일시적 네트워크 오류 · 수신자 미접속 상태에서도 재전송
+- **서버 부하 완화**: 지수 백오프로 실패 시 재시도 간격을 점진적으로 확대
+- **장애 가시성**: 영구 실패 건을 로그로 분리 기록
+
 ### 적용 파일
 - `src/main/java/com/toty/common/config/AsyncConfig.java` (신규)
 - `src/main/java/com/toty/common/image/infrastructure/S3StorageService.java`
+- `src/main/java/com/toty/notification/infrastructure/async/NotificationAsyncConfig.java` (신규)
+- `src/main/java/com/toty/notification/application/service/NotificationSendService.java`
+- `src/main/java/com/toty/notification/application/event/NotificationEventListener.java`
+- `src/main/java/com/toty/notification/application/sender/NotificationSenderService.java`
+- `src/main/java/com/toty/notification/application/sse/NotificationSseService.java`
+- `src/main/java/com/toty/notification/infrastructure/email/application/service/EmailService.java`
+- `src/main/java/com/toty/notification/infrastructure/sms/application/service/SmsService.java`
+- `src/main/java/com/toty/notification/infrastructure/retry/NotificationRetryQueue.java` (신규)
+- `src/main/java/com/toty/notification/infrastructure/retry/NotificationRetryEnvelope.java` (신규)
+- `src/main/java/com/toty/notification/infrastructure/retry/NotificationRetryScheduler.java` (신규)
 
 ---
 
@@ -752,6 +917,10 @@ Monitoring (3개):
 | 게시글 목록 조회 쿼리 수 | 101개 | 1개 | 99% ↓ |
 | 사용자 정보 조회 응답 시간 (캐시 히트) | 100ms | 5ms | 95% ↓ |
 | 이미지 삭제 응답 시간 | 2.5초 | 0.5초 | 80% ↓ |
+| 멘토 게시글 작성 응답 시간 (팔로워 10명, 예상치) | 약 2.1초 | 약 0.06초 | 97% ↓ |
+| 멘토 선정 알림 발송 대기 시간 (Email + SMS, 예상치) | 약 1.5초 | 즉시 반환 | - |
+
+> 알림 관련 수치는 외부 API(FCM 200ms / SMTP 1,200ms / SMS 350ms)의 일반적인 왕복 지연을 기준으로 한 예상치입니다.
 
 ### 정성적 개선
 - ✅ **확장성 향상**: 동시 접속자 증가 시에도 안정적인 성능 유지
@@ -759,6 +928,7 @@ Monitoring (3개):
 - ✅ **사용자 경험 개선**: 빠른 응답 속도로 UX 향상
 - ✅ **운영 효율성**: 구조화된 로깅으로 문제 추적 용이
 - ✅ **비용 절감**: DB 부하 감소로 서버 리소스 절약
+- ✅ **알림 신뢰성**: 재시도 큐 + 지수 백오프로 전송 실패 · 미접속 시 알림 유실 방지
 
 ---
 
