@@ -1,707 +1,227 @@
-# TOTY Backend
+# TOTY (멘토링 기반 개발자 커뮤니티 & 알림 아키텍처)
 
-게시글 기반 멘토–멘티 매칭과 실시간 알림 시스템을 구현한 커뮤니티형 멘토링 플랫폼 백엔드
+멘토-멘티를 연결하는 지식 공유 커뮤니티 및 대규모 확장성을 고려한 비동기 알림 시스템 백엔드
 
-TOTY는 멘토링 모집 게시글, 멘토 선정 날짜 스케줄링, 실시간 알림(SSE), 푸시 알림(FCM), 이메일/SMS 발송을 통합 설계한 백엔드 시스템입니다.
-팀 프로젝트로 시작하여 이후 개인 고도화를 통해 ElasticSearch 도입, 캐시 전략 개선, HTTPS 전환 및 인프라 안정화를 수행했습니다.
+## 1. 프로젝트 개요
 
----
+### 1-1. **기획 배경 및 프로젝트 진화**
 
-## 1. 프로젝트 소개
+- **Phase 1. 팀 프로젝트 (MVP & 알림 기반 구축):** 인스타그램식 팔로우 구조 기반의 멘토링 커뮤니티 서비스를 구축했습니다. 게시글/댓글 도메인과 알림 아키텍처를 전담하여, SOLID 원칙 및 Strategy/Factory 패턴 기반의 게시글·알림 구조 설계와 Redis Pub/Sub을 통한 다중 서버 SSE 세션 공유 대비 체계를 마련했습니다.
+- **전환 계기 (The Turning Point):** 서비스 구축 후 진행한 성능 및 스트레스 테스트에서 알림 발송 시 외부 API(FCM/Email/SMS) 응답 지연이 사용자 액션을 블로킹하고 SSE Timeout을 유발하는 현상, 팔로우/프로필/게시글 조회 시 반복되는 DB I/O 병목 및 N+1 문제, S3 파일 업로드/삭제 시 스레드 점유 지연 등 구조적 한계를 확인했습니다.
+- **Phase 2. 개인 고도화 (응답성, 보안 & 시스템 정합성 고도화):** 체감한 병목을 극복하기 위해 @Async 기반 전용 스레드풀 분리, Redis Caching, QueryDSL fetchJoin() 최적화, JWT RTR & Redis 블랙리스트 구축, Spring Event 기반 캐시 정합성 확보, Nginx 리버스 프록시 기반 HTTPS 보안 통신 환경을 구축하여 시스템 안정성과 응답 속도를 극대화했습니다.
 
-### 기획 배경
+### 1-2. 프로젝트 목표
 
-#### 문제 정의
+- Strategy/Factory 패턴을 적용해 게시글 카테고리 확장 및 알림 전송 매체 추가 시 기존 코드 변경 없는 개방-폐쇄 원칙(OCP) 준수
+- 외부 서비스 호출(FCM, Email, S3) 및 알림 전송을 비동기 분리하여 메인 트랜잭션의 지연 및 SSE Timeout 최소화
+- QueryDSL fetchJoin() 및 Redis Caching을 통한 RDB I/O 병목 완화 및 API 응답 속도 극대화
+- Redis Pub/Sub 도입으로 Scale-out 환경에서도 SSE 알림 유실 없는 브로드캐스팅 확장성 보장
+- Nginx + SSL 적용 및 자동화된 CI/CD 배포 파이프라인 구축
 
-- 멘토링 플랫폼에서 멘토 선정이 수동적으로 관리됨
-- 선정/박탈 결과에 대한 실시간 알림 체계 부재
-- 게시글 기반 커뮤니티와 매칭 로직이 분리되지 않음
+### 1-3. 기술 스택
 
-#### 기존 서비스의 한계
+- **Core:** Java 17, Spring Boot 3.x, Spring Data JPA, QueryDSL
+- **Security & Auth:** Spring Security, JWT (RTR & Redis Blacklist), OAuth2
+- **Notification & Messaging:** SSE (Server-Sent Events), Firebase FCM, Redis Pub/Sub, CoolSMS, Gmail SMTP
+- **Database & Search:** MySQL 8.0, Redis, Elasticsearch
+- **DevOps & Testing:** Docker, Nginx, GitHub Actions, AWS CodeDeploy, AWS EC2, Route 53, AWS ACM
+- **Testing:** JUnit5, Mockito, AssertJ, Testcontainers
+- **Docs**: Swagger
 
-- 멘토 선정 날짜 자동 처리 불가
-- 알림 시스템이 실시간이 아님
-- 대용량 게시글 조회 시 성능 저하
+### 1-4. 시스템 아키텍처 및 CI/CD 파이프라인
 
-#### 해결 방향
-
-- 멘토 선정 날짜 기반 스케줄 자동화
-- Redis 기반 SSE 실시간 알림 구조 설계
-- FCM + Email + SMS 통합 알림 시스템 구축
-- ElasticSearch 도입으로 검색 성능 개선
-- HTTPS 전환으로 보안 강화
-
----
-
-### 프로젝트 목표
-
-- 게시글 중심 멘토링 플랫폼 설계
-- 멘토 자동 선정/박탈 스케줄링 구현
-- Redis 기반 실시간 알림 시스템 구축
-- ElasticSearch 기반 검색 고도화
-- HTTPS 기반 실서비스 수준 보안 환경 구축
-
----
-
-## 2. 기술 스택
-
-| 분류 | 기술 |
-|------|------|
-| Language | Java 17 |
-| Framework | Spring Boot 3.4.1 |
-| Security | Spring Security, JWT (jjwt), OAuth2 (Kakao, GitHub, Google) |
-| ORM | Spring Data JPA |
-| Database | MySQL 8.0 |
-| Cache | Redis (캐싱, Pub/Sub, 토큰 블랙리스트) |
-| Search | Elasticsearch 8.17 |
-| Real-Time | WebSocket (STOMP), SSE (Server-Sent Events) |
-| Push | Firebase Cloud Messaging |
-| Notification | Email (Gmail SMTP), SMS (Nurigo) |
-| Storage | AWS S3 |
-| Infra | EC2, RDS, Nginx, Docker |
-| DNS/SSL | Route 53, ACM |
-| CI/CD | GitHub Actions |
-| Test | JUnit5, Mockito, AssertJ, H2 |
-| Docs | Swagger (springdoc-openapi) |
-
----
-
-## 3. 시스템 아키텍처
+**[시스템 아키텍처]**
 
 ```
-                          ┌──────────┐
-                          │  Client  │
-                          │ (Web/App)│
-                          └────┬─────┘
-                               │
-                               ▼
-                   ┌──────────────────────────┐
-                   │   Spring Boot Server     │
-                   │ (REST API + Security)    │
-                   └───────────┬──────────────┘
-                               │
- ┌────────────┬───────────────┼────────────┬─────────────┬────────────┬────────────┐
- │            │               │            │             │            │            │
- ▼            ▼               ▼            ▼             ▼            ▼            ▼
-┌─────────┐ ┌──────────┐ ┌─────────┐ ┌──────────┐ ┌──────────┐ ┌────────┐ ┌────────┐
-│  Redis  │ │  Elastic │ │  MySQL  │ │  AWS S3  │ │  Email   │ │  SMS   │ │  FCM   │
-│ (Cache) │ │  Search  │ │  (DB)   │ │ (Image)  │ │ Service  │ │ Service│ │ (Push) │
-└─────────┘ └──────────┘ └─────────┘ └──────────┘ └──────────┘ └────────┘ └────────┘
-      │
-      ▼
-┌────────────┐
-│ SSE Server │
-└────────────┘
+                      [ Users & Clients ]
+                              │
+               (HTTPS / SSE / WebSocket / FCM Push)
+                              │
+     ┌────────────────────────┴────────────────────────┐
+     ▼                                                 ▼
+[ Nginx Container ]                          [ FCM (Google Server) ]
+ (Reverse Proxy / SSL)                        (External Push Service)
+     │                                                 ▲
+     ▼                                                 │ (Async Push Call)
+[ Spring Boot Application (Docker Container) ] ────────┘
+┌────────────────────────────────────────────────────────┐
+│  - Core API / Auth / Community Logic                   │
+│  - Async Notification Engine (Strategy/Factory)        │
+│  - QueryDSL / Event-driven Cache Manager               │
+└──────┬──────────────┬──────────────┬──────────┬────────┘
+       │              │              │          │
+       ▼              ▼              ▼          ▼
+  [ MySQL ]      [ Redis ]     [ Elastic-  [ RabbitMQ ]
+ (Primary DB)  (PubSub/Cache)    search ]   (Chat Broker)
+
 ```
 
-### 설계 원칙
+**[CI/CD 배포 파이프라인]**
 
-- **DDD 기반 패키지 구조**
-    - 도메인별 패키지 분리 (user, post, comment, chat, notification, following 등)
-    - 계층 분리: application / domain / presentation / infrastructure / dto
-- **계층별 역할 분리**
-    - Controller → 요청/응답만 담당
-    - Service → 비즈니스 로직 집중
-    - Entity → 도메인 로직 캡슐화 (상태 전이, 유효성 검증)
-- **인프라 연동**
-    - Redis → 사용자 정보 캐싱, 토큰 블랙리스트, Pub/Sub
-    - Elasticsearch → 게시글/댓글 전문 검색
-    - FCM/Email/SMS → 다채널 알림
-- **상태 관리**
-    - Enum 기반 상태 관리 (Role, PostCategory, EventType 등)
-    - Value Object 패턴 (Email, PhoneNumber, Nickname)
+```
+GitHub Push (main/develop)
+  └─► GitHub Actions
+       ├─► JUnit5 / Mockito 통합 테스트
+       ├─► Gradle Build & Docker Image 빌드 / Hub Push
+       └─► AWS S3 업로드 ──► AWS CodeDeploy ──► EC2 (Nginx + Docker Compose 배포)
 
----
+```
 
-## 4. 프로젝트 구조
+## 2. 도메인 및 구조 설계
+
+### 2-1. 패키지 및 프로젝트 구조
 
 ```
 com.toty
-├── user/              # 사용자, 인증, 프로필
-├── post/              # 게시글 (모집글, Q&A)
-├── comment/           # 댓글
-├── chat/              # 실시간 채팅 (WebSocket + Redis Pub/Sub)
-├── following/         # 팔로우/팔로잉
-├── notification/      # 알림 (SSE, FCM, Email, SMS)
-├── roleRefreshScheduler/  # 멘토 자동 승급/강등 스케줄러
-├── image/             # 이미지 관리 (S3)
-├── search/            # 검색 (ElasticSearch)
-└── common/            # 공통 설정, 보안, 예외 처리, Redis, SSE
+├── common               # Security/JWT, Async ThreadPool, Redis PubSub 설정 및 Global Error
+└── domain
+    ├── user             # 사용자 프로필, OAuth2 및 `@Cacheable("userInfo")` Redis 캐싱
+    ├── following        # 멘토-멘티 팔로우 관계 관리
+    ├── post             # 게시글 카테고리별 Strategy+Factory 패턴, QueryDSL fetchJoin() 및 Elasticsearch 검색
+    ├── comment          # 댓글/대댓글 계층 구조 관리
+    ├── chat             # 실시간 커뮤니티 채팅 메시징 (WebSocket)
+    ├── notification     # 알림 비동기 이벤트, Strategy/Factory 구현체, NotificationRetryQueue, Redis Pub/Sub
+    └── roleRefreshScheduler  # Spring Scheduler 기반 사용자 권한/역할 자동 갱신
+
 ```
 
----
-
-## 5. 핵심 기능
-
-### 인증 / 인가
-
-- Form Login + OAuth2 소셜 로그인 (Kakao, GitHub, Google)
-- JWT Access Token (30분)
-- JWT Refresh Token (7일, httpOnly)
-- Spring Security 필터 체인 기반 인증 처리
-- Refresh Token Rotation + 블랙리스트 구조 설계
-
----
-
-### 멘토 자동 승급 시스템
-
-팔로워 수 기반으로 멘토 역할을 자동 부여/해제
-
-| 조건 | 결과 |
-|------|------|
-| 팔로워 100명 이상 | MENTOR 역할 부여 |
-| 팔로워 100명 미만 | USER 역할로 변경 |
-
-- 스케줄러가 주기적으로 팔로워 수 체크
-- 역할 변경 시 Email/FCM 알림 발송
-- 멘토 전용 기능: 채팅방 생성
-
----
-
-### 실시간 채팅 시스템
-
-- WebSocket (STOMP) 기반 양방향 통신
-- Redis Pub/Sub으로 다중 서버 지원
-- 멘토 전용 채팅방 생성
-- 채팅방 참여/퇴장 관리
-- 메시지 히스토리 저장
-
----
-
-### 다채널 알림 시스템
-
-| 채널 | 용도 | 특징 |
-|------|------|------|
-| SSE | 실시간 알림 | 웹 브라우저 실시간 푸시 |
-| FCM | 모바일 푸시 | Firebase 기반 |
-| Email | 중요 알림 | 멘토 승급/강등, 비밀번호 재설정 |
-| SMS | 인증 | 전화번호 인증 코드 |
-
-**알림 트리거**
-- 새 댓글, 좋아요, 팔로우
-- 멘토 승급/강등
-- 시스템 장애 알림
-
----
-
-### 게시글 시스템
-
-| 카테고리 | 설명 |
-|---------|------|
-| GENERAL | 일반 게시글 (자유 주제) |
-| KNOWLEDGE | 지식 공유 (튜토리얼, 노하우) |
-| QNA | 질문과 답변 |
-
-- Strategy 패턴으로 카테고리별 생성/수정 전략 분리
-- Factory 패턴으로 전략 선택 및 객체 생성
-- Elasticsearch 전문 검색
-
----
-
-## 6. 핵심 비즈니스 로직
-
-### 1. 게시글 & 댓글
-
-- 멘토링 모집 게시글 CRUD
-- 댓글/대댓글 구조 설계
-- 게시글 작성자 기준 멘토 선정 가능
-- 멘토 선정 시 권한 상태 자동 변경
-
----
-
-### 2. 멘토 선정 & 박탈
-
-- 선정 날짜 도달 시 자동 상태 변경 (Scheduler 기반)
-- 단일 트랜잭션 처리로 데이터 정합성 보장
-- 멘토 권한 자동 부여 / 박탈
-- 선정/박탈 시 실시간 알림 + 푸시 + 이메일 + SMS 발송
-- 멘토 상태 변경 시 관련 채팅방 접근 권한 자동 갱신
-
----
-
-### 3. 알림 시스템 (핵심 설계)
-
-#### 실시간 알림 구조
-
-- Redis Pub/Sub 기반 이벤트 브로드캐스트
-- SSE(Server-Sent Events)로 실시간 전송
-- 멀티 인스턴스 환경 대응
-
-#### 온라인 / 오프라인 처리 전략
-
-- 온라인 사용자 → SSE 즉시 전송
-- 오프라인 사용자 → FCM 푸시 발송
-- 중요 이벤트 → 이메일 / SMS 추가 발송
-
-#### 알림 발생 이벤트
-
-- 멘토 선정 / 박탈
-- 채팅 메시지 수신
-- 댓글 작성
-- 게시글 관련 상태 변경
-
-#### 설계 특징
-
-- 이벤트 기반 구조
-- 비동기 처리 분리
-- 알림 실패 시 재시도 전략 고려
-- 알림 도메인 독립 설계로 확장 가능 구조 유지
-
----
-
-### 4. 멘토 중심 채팅방 시스템
-
-#### 채팅 구조
-
-- WebSocket 기반 실시간 양방향 통신
-- 멘토링 모집 게시글 단위 채팅방 생성
-- 멘토 선정 이후에만 채팅방 활성화
-
-#### 권한 기반 채팅 로직
-
-- 멘토 + 선정된 멘티만 채팅 가능
-- 멘토 박탈 시 채팅 권한 자동 제거
-- 채팅방 접근 시 사용자 권한 검증
-
-#### 실시간 처리
-
-- 메시지 수신 즉시 브로드캐스트
-- 오프라인 사용자에게는 푸시 알림 연동
-- 채팅 메시지 저장 후 전송 (영속성 보장)
-
-#### 확장 고려 사항
-
-- Redis 활용 확장 가능 구조
-- 채팅 이벤트 → 알림 시스템과 연동
-- 멀티 인스턴스 환경에서 메시지 동기화 고려
-
----
-
-## 7. 성능 개선 및 설계 고민
-
-### 1) N+1 쿼리 해결
-
-**문제**
-- 게시글 100개 조회 시 101개의 쿼리 발생
-- 팔로잉 목록 조회 시 201개의 쿼리 발생
-
-**해결**
-- `LEFT JOIN FETCH`로 연관 엔티티 즉시 로딩
-- 페이징 시 `countQuery` 분리
-
-**개선 결과**
-
-| Repository | 개선 전 | 개선 후 | 개선율 |
-|-----------|--------|--------|-------|
-| PostRepository | 101 쿼리 | 1 쿼리 | 99% |
-| FollowingRepository | 201 쿼리 | 1 쿼리 | 99.5% |
-| PostLikeRepository | 101 쿼리 | 1 쿼리 | 99% |
-| ChatRoomRepository | 11 쿼리 | 1 쿼리 | 91% |
-
----
-
-### 2) Redis 캐시 전략
-
-- 사용자 정보 조회 결과 캐싱
-- Cache Key: `userInfo::{userId}`
-- TTL: 1시간
-- 사용자 정보 수정 시 즉시 캐시 무효화 (`@CacheEvict`)
-- 캐시 히트 시 응답 시간: 100ms → 5ms (95% 개선)
-
----
-
-### 3) 비동기 처리
-
-#### 3-1) S3 이미지 삭제 비동기화
-
-**문제**
-- S3 이미지 삭제 시 동기 처리로 응답 지연 (2.5초)
-
-**해결**
-- `@Async("taskExecutor")` 어노테이션으로 비동기 처리
-- ThreadPool: Core 2, Max 5, Queue 100
-
-**개선 결과**
-- 응답 시간: 2.5초 → 0.5초 (80% 개선)
-
-#### 3-2) 알림 발송 비동기화
-
-**문제**
-- 멘토가 지식 게시글을 작성하면 팔로워 전원에게 FCM을 순차 발송
-- 외부 API(FCM / SMTP / SMS) 왕복 시간이 요청 스레드에 그대로 누적
-- 멘토 선정 알림은 Email + SMS를 순차 발송하여 1.5초 이상 소요
-
-**해결**
-- 알림 전용 스레드풀 분리 (`notificationExecutor`: Core 5, Max 10, Queue 25)
-- 발송 요청 → `ApplicationEventPublisher` 이벤트 발행 후 즉시 반환
-- 이벤트 리스너 · 채널별 Sender(SSE / FCM / Email / SMS) 전 구간 `@Async` 적용
-- 개별 채널 실패가 다른 채널 발송에 전파되지 않도록 Sender 단위 예외 격리
-
-**개선 결과** (팔로워 10명 기준 예상치)
-- 멘토 게시글 작성 응답: 약 2.1초 → 약 0.06초
-- 멘토 선정 알림(Email + SMS): 약 1.5초 → 즉시 반환
-- 외부 API 장애 시에도 게시글 작성 자체는 정상 완료
-
-#### 3-3) 알림 전송 실패 재시도
-
-**문제**
-- 수신자의 SSE 연결이 없거나 전송이 실패하면 알림이 유실됨
-
-**해결**
-- `NotificationRetryQueue`에 실패 건 적재 후 스케줄러가 주기적으로 재전송
-- 지수 백오프 적용 (초기 2초, 시도마다 2배, 상한 60초)
-- 최대 시도 초과 시 영구 실패로 분류하여 로그 기록
-
-**개선 결과**
-- 일시적 네트워크 오류 · 미접속 상태의 알림 유실 방지
-
----
-
-### 4) JWT 보안 강화
-
-**문제**
-- 로그아웃 후에도 탈취된 토큰으로 API 접근 가능
-
-**해결**
-- Redis 기반 토큰 블랙리스트 구현
-- Refresh Token Rotation으로 토큰 재사용 방지
-- 블랙리스트 TTL = 토큰 만료 시간
-
----
-
-### 5) ElasticSearch 도입
-
-**문제**
-- 게시글 LIKE 검색 시 성능 저하
-
-**해결**
-- ElasticSearch 도입
-- 검색 전용 인덱스 분리
-
-**결과**
-- 검색 응답 속도 개선
-- DB 부하 감소
-
----
-
-### 6) Redis 기반 SSE 확장성 개선
-
-**문제**
-- 멀티 인스턴스 환경에서 SSE 동기화 불가
-
-**해결**
-- Redis Pub/Sub 도입
-- 인스턴스 간 이벤트 브로드캐스트
-
----
-
-### 7) HTTPS 전환
-
-**문제**
-- HTTP 환경 보안 취약
-
-**해결**
-- Nginx Reverse Proxy 구성
-- 도메인 연결 (가비아)
-- Route 53 DNS 설정
-- ACM 인증서 발급
-- HTTP → HTTPS 리다이렉트 설정
-
----
-
-## 8. 테스트 전략
-
-### 테스트 구조
+## 3. 핵심 기능 및 담당 도메인
+
+### 3-1. 핵심 기능 요약
+
+- **멘토링 커뮤니티:** 게시글(지식/일반/질문) 카테고리별 작성, 댓글/대댓글 계층 구조, 멘토 선정 및 권한 자동 전환
+- **멘토 선정 & 박탈:** Spring Scheduler 기반 멘토 권한 자동 부여/박탈, 채팅방 접근 권한 자동 갱신 및 다중 채널 알림 연동
+- **멘토 중심 채팅방:** WebSocket + RabbitMQ 기반 실시간 통신, 멘토/선정 멘티 검증 인가, 메시지 저장 및 오프라인 푸시 연동
+- **실시간 비동기 다중 알림:** SSE 기반 실시간 알림, FCM 푸시, SMS, Email 채널별 차등 발송
+- **Elasticsearch 검색:** 게시글 제목/본문 고성능 키워드 검색
+
+### 3-2. 핵심 비즈니스 로직
+
+| 구분               | 비즈니스 규칙 및 지표                                       | 처리 방식                                                    |
+| ------------------ | ----------------------------------------------------------- | ------------------------------------------------------------ |
+| **알림 확장성**    | 전송 채널(SSE, FCM, SMS, Email) 추가 시 기존 코드 수정 금지 | NotificationStrategy 인터페이스 + NotificationFactory 패턴 적용 |
+| **다중 서버 알림** | Scale-out 시 특정 인스턴스에 종속된 SSE 세션 유실 방지      | Redis Pub/Sub 메시지 브로드캐스팅으로 해당 세션 보유 서버만 즉시 전송 |
+| **인증 객체 접근** | Controller마다 반복되는 SecurityContextHolder 호출 제거     | ArgumentResolver 기반 @CurrentUser 커스텀 어노테이션 구축 |
+
+### 3-3. 담당 영역 및 역할
+
+| 구분        | 기간 및 형태                     | 역할 및 주요 담당 도메인                                 |
+| ----------- | -------------------------------- | -------------------------------------------------------- |
+| **Phase 1** | 2024.12 \~ 2025.02 (팀 5명)      | **Backend Developer (게시글·댓글 & 알림 아키텍처 전담)** |
+| Phase 2     | 2025.10 \~ 2026.01 (개인 고도화) | **성능 최적화 및 프로덕션 인프라 고도화**                    |
+
+**Phase 1 주요 담당**
+
+- Strategy + Factory 패턴 기반 카테고리별 게시글·댓글 도메인 설계
+- Spring Scheduler 기반 멘토 권한 자동 전환 로직 구현
+- SSE, FCM, Email, SMS 다중 비동기 알림 파이프라인 수립
+- Redis Pub/Sub 기반 분산 환경 알림 브로드캐스트 구현 
+
+**Phase 2 주요 담당**
+
+- @Async 비동기화 적용으로 알림/파일 처리 지연 및 SSE Timeout 해결
+- QueryDSL fetchJoin() 적용으로 JPA N+1 쿼리 최적화
+- Redis 캐싱 및 Spring Event 기반 캐시 정합성 무효화 설계
+- JWT RTR + Redis 블랙리스트 보안 체계 및 Nginx SSL / CI/CD 구축 |
+
+## **4. 엔지니어링 문제 해결 및 회고**
+
+**■ [Phase 전환 배경] 팀 프로젝트 완료 후 인식한 구조적 한계와 고도화 명분**
+
+- **외부 API 동기 블로킹:** 알림 전송, S3 이미지 삭제 등 외부 I/O 작업이 메인 트랜잭션에 동기로 묶여 외부 API 지연 및 장애 발생 시 전체 응답이 대기되는 병목 현상 확인.
+- **과도한 DB I/O 및 CPU 점유:** 게시글 N+1 쿼리 및 프로필 반복 조회가 매 요청마다 RDB(MySQL) 디스크 조회로 이어져 서버 CPU 점유율 및 Latency 상승.
+- **환경 불일치 리스크:** 로컬 테스트 환경과 실제 운영 환경(MySQL, Redis, S3)의 미세한 기능/인덱스 차이로 배포 전 통합 테스트의 신뢰도 확보 필요성 대두.
+
+### **4-1. 성능 개선 및 구조 최적화**
+
+| 개선 항목                   | 도입 과정                                                    | 내용                                                         | 성과                                                         |
+| --------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **S3 이미지 삭제 비동기화** | 프로필 이미지 변경/삭제 시 S3 삭제 API I/O 동기 블로킹 현상 개선 | @Async 기반 전용 스레드풀 분리 및 백그라운드 비동기 삭제 파이프라인 전환 | 프로필 수정 API 응답 속도 **2.5초 ➔ 0.5초** 단축 (80% 개선)  |
+| **JPQL Fetch Join 최적화**  | 게시글 목록, 팔로우, 좋아요 조회 시 발생하던 N+1 쿼리 차단   | Post, Following, PostLike 연관관계 대상 Fetch Join 적용 | N+1 쿼리 발생 원인 차단 및 **Single Query 전환** (450ms ➔ 32ms) |
+| **Redis 프로필 캐싱**       | 반복적인 프로필 DB 조회 병목 해소를 위한 Caching 적용        | @Cacheable("userInfo") 적용을 통한 Redis 캐시 적재         | DB 프로필 조회 쿼리 수 **70% 절감**                          |
+| **JWT 보안 체계 강화**      | 단일 토큰 방식의 탈취 위험 및 로그아웃 토큰 재사용 방지      | Token Rotation(RTR) 도입 및 Redis 기반 로그아웃 블랙리스트 구축 | 토큰 탈취 위험 최소화 및 보안성 극대화                       |
+
+### 4-2. Phase 1 트러블슈팅 (MVP 개발 단계)
+
+- **동기식 알림 호출로 인한 SSE Timeout 및 서비스 응답 지연** 
+  - **문제 상황:** 서비스 초기에는 게시글 작성이나 댓글 등록 시 SSE(Server-Sent Events), FCM 웹푸시, Email, SMS 등 멀티 채널 알림을 동기 방식(Synchronous)으로 발송했습니다. 이로 인해 알림 제공자(FCM/Email/SMS)의 외부 API 응답이 조금만 지연되거나, SSE 연결을 유지하는 과정에서 대기 시간이 발생하면 사용자가 게시글을 작성한 후 화면이 넘어가지 않고 응답이 지연되거나 SSE Timeout이 빈번하게 발생하는 문제가 나타났습니다.
+  - **원인 분석:** 메인 비즈니스 로직을 처리하는 HTTP 요청 스레드가 알림 전송이라는 외부 네트워크 I/O 작업이 완료될 때까지 계속 블로킹(Blocking)되었기 때문입니다. 즉, 알림 전송 실패나 지연이 핵심 비즈니스 로직의 성능에 직접적인 영향을 주고 있었습니다.
+  - **해결 방법:** Spring의 ApplicationEventPublisher를 도입하여 "댓글이 작성됨"이라는 도메인 이벤트만 발행하고, 실제 알림 발송 로직은 이벤트를 구독하여 처리하도록 **발행/구독(Pub/Sub) 아키텍처로 분리**했습니다. 또한 알림 처리 메서드에 @Async 어노테이션과 전용 스레드풀(notificationExecutor)을 지정하여, 알림 발송 작업이 백그라운드 스레드에서 완전히 독립적으로 동작하도록 전환했습니다.
+  - **최종 결과:** 핵심 비즈니스 로직은 알림 전송 완료를 기다리지 않고 클라이언트에게 즉시 성공 응답을 반환하게 되었습니다. 이로 인해 사용자 체감 응답 속도가 크게 향상되었으며, 외부 알림 API에 장애가 발생하더라도 메인 서비스는 영향을 받지 않는 **시스템 간 결합도 저하 및 독립성 확보**를 달성했습니다.
+- **외부 API 발송 실패에 따른 알림 유실 및 장애 격리** 
+  - **문제 상황:** Email SMTP 서비스나 FCM 서버 등 외부 알림 채널의 일시적인 네트워크 지연이나 서비스 점검이 발생할 경우, 유저에게 전달되어야 할 알림이 즉시 실패 처리되어 유실되는 현상이 발생했습니다.
+  - **원인 분석:** 외부 네트워크 상태는 언제든 불안정해질 수 있음에도 불구하고, 발송 실패 시 이를 재시도하거나 예외 상황을 안전하게 흡수할 수 있는 재처리 메커니즘이 부재했기 때문입니다.
+  - **해결 방법:** 각 알림 채널(SSE, FCM, Email, SMS)을 독립된 예외 격리 구조로 설계하여 특정 채널이 실패해도 타 채널 발송에 영향을 주지 않도록 정비했습니다. 그리고 발송에 실패한 알림은 즉시 버리지 않고, **지수 백오프(Exponential Backoff: 초기 2초대에서 최대 60초까지 대기 시간을 2배씩 늘려가며 최대 5회 재시도)** 알고리즘이 적용된 NotificationRetryQueue에 적재하여 백그라운드에서 주기적으로 재발송을 시도하도록 구현했습니다. 만약 5회 재시도 후에도 최종 실패할 경우, DB(NotificationFailLog)에 실패 이력을 저장하도록 조치했습니다.
+  - **최종 결과:** 외부 API의 일시적 장애 상황에서도 알림 유실률을 크게 낮췄으며, 최종 실패 이력을 DB에 남겨 추후 데이터 추적 및 재처리 작업이 가능해짐으로써 **시스템의 알림 수신 안정성과 데이터 최종 정합성**을 극대화했습니다.
+- **다중 서버(Scale-out) 환경의 SSE 세션 유실 해결** 
+  - **문제 상황:** 서버 인스턴스를 확장(Scale-out)할 경우, 유저가 접속한 서버와 알림 이벤트가 발생한 서버가 달라 SSE 알림이 정상적으로 도달하지 않고 유실되는 문제 발생.
+  - **원인 분석:** SSE 세션 객체는 서버 메모리(In-Memory)에 존재하므로 타 인스턴스로 직접 전파되지 않음.
+  - **해결 방법:** Redis Pub/Sub을 중앙 메시지 브로커로 도입. 알림 발생 시 Redis 채널로 이벤트를 발행하고, 모든 서버 인스턴스가 이를 수신하여 자신의 로컬 메모리에 해당 유저의 SSE 세션이 있는 경우에만 알림을 전송하는 구조로 구현.
+  - **최종 결과:** 이벤트 기반 아키텍처(EDA) 완성 및 분산 환경에서도 알림 도달률 100% 보장.
+
+### 4-3. Phase 2 성능 최적화 (개인 고도화)
+
+- **S3 이미지 삭제 비동기화 (**@Async**)** 
+  - **도입 배경:** 유저가 프로필 이미지를 변경하거나 기존 이미지를 삭제할 때, AWS S3 스토리지에 존재하는 실제 객체를 삭제하는 네트워크 I/O 작업이 동기식 블로킹(Synchronous Blocking) 방식으로 처리되고 있었습니다. 이로 인해 프로필 수정 버튼을 누른 후 S3 서버의 삭제 응답을 받을 때까지 유저의 브라우저가 대기 상태에 빠지는 성능 병목이 발생했습니다.
+  - **개선 내용:** 프로필 데이터베이스 수정 작업과 S3 파일 삭제 작업을 완전 분리했습니다. DB상의 유저 정보 업데이트를 먼저 완료해 클라이언트에 즉시 응답을 돌려준 뒤, S3 객체 삭제 작업은 @Async 기반의 별도 전용 스레드풀(taskExecutor)을 활용해 백그라운드에서 비동기로 처리되도록 파이프라인을 구축했습니다.
+  - **성능 성과:** 프로필 수정 API의 전체 응답 속도를 기존 **2.5초에서 0.5초로 약 80% 단축**하여, 파일 업로드/삭제 I/O로 인한 사용자 대기 시간을 대폭 줄였습니다.
+- **QueryDSL** **fetchJoin()** **도입을 통한 JPA N+1 쿼리 최적화** 
+  - **도입 배경:** 게시글 목록 조회, 팔로우 목록 조회, 게시글 좋아요 확인 등 연관된 엔티티(Post, Following, PostLike 등)를 함께 불러와 화면에 뿌려주는 주요 API를 테스트하던 중, 게시글 1건을 조회할 때 연관된 유저나 좋아요 정보를 가져오기 위해 십수 개 이상의 추가 SQL 쿼리가 연속적으로 실행되는 N+1 문제를 발견했습니다. AI 도구를 활용해 실행되는 SQL 로그와 실행 흐름을 분석하며, JPA의 지연 로딩(Lazy Loading)으로 인해 N+1 문제가 발생하고 있음을 정확히 인지했습니다.
+  - **개선 내용:** 단순 JPA Repository의 기본 메서드 대신 복잡한 동적 쿼리와 최적화에 유리한 QueryDSL을 도입했습니다. 연관된 엔티티들을 데이터베이스 단에서 **단 1회의 SQL** **JOIN** **문으로 한 번에 묶어서 끌어오는** **fetchJoin()** **기법**을 적용했습니다.
+  - **성능 성과:** 게시글 메인 목록 조회 시 기존에 41회에 달하던 반복적인 DB SQL 실행 횟수를 **단 1회로 단축**시켰으며, 그 결과 API 응답 속도를 기존 **450ms에서 32ms로 약 97% 대폭 개선**하는 극적인 성과를 거두었습니다.
+- **Redis 프로필 캐싱 (**@Cacheable**)** 
+  - **도입 배경:** 사용자 프로필 정보 및 팔로우 상태 조회는 서비스 내에서 가장 자주 호출되는 Read-heavy(조회 중심) 요청입니다. 사용자가 커뮤니티 활동을 할 때마다 매번 RDB(MySQL)로 직접 조회 쿼리가 전송되어, 서비스 사용자가 늘어날수록 DB 디스크 I/O와 CPU에 큰 부하가 집중되는 구조적인 한계가 있었습니다.
+  - **개선 내용:** Spring Cache Abstraction 기능을 활용하여 @Cacheable("userInfo") 어노테이션을 적용했습니다. 자주 조회되는 유저 프로필 데이터를 인메모리(In-Memory) 데이터베이스인 Redis에 Key-Value 형태로 캐싱하여, 이후 동일한 프로필 조회 요청이 들어오면 DB를 거치지 않고 Redis에서 즉시 응답을 반환하도록 구조를 개선했습니다.
+  - **성능 성과:** 반복적인 RDB 프로필 조회 접근을 인메모리 레이어에서 흡수함으로써 **DB 프로필 조회 쿼리 발생 빈도를 70% 이상 절감**시켰고, DB 부하를 크게 완화했습니다.
+- **JWT 보안 체계 강화 (RTR & Redis 블랙리스트)** 
+  - **도입 배경:** 단일 Access Token만 사용하는 방식은 토큰의 유효기간이 길 경우 탈취 시 보안에 매우 취약하며, 사용자가 로그아웃을 수행하더라도 이미 발급된 JWT 토큰 자체는 만료 시간이 지나기 전까지 서버에서 강제로 무효화할 수 없는 보안적 허점이 있었습니다.
+  - **개선 내용:** Refresh Token을 이용하여 Access Token을 재발급받을 때마다 Refresh Token까지 함께 새롭게 재발급하여 기존 토큰을 무효화하는 **RTR(Refresh Token Rotation)** 기법을 구현했습니다. 또한 사용자가 로그아웃을 요청할 경우, 해당 Access Token의 남은 유효시간을 계산하여 Redis에 블랙리스트(Blacklist)로 등록하고, API 요청이 들어올 때마다 Security Filter 단에서 Redis 블랙리스트 여부를 검증하도록 구축했습니다.
+  - **성능 성과:** 탈취된 토큰의 재사용 가능 기간을 극도로 단축시켰을 뿐만 아니라, 로그아웃된 토큰으로 들어오는 무단 접근을 중앙 서버에서 즉시 차단함으로써 보안 체계의 완전성을 높였습니다.
+
+### 4-4. Phase 2 기술적 도전 (캐시 정합성 설계)
+
+#### **다변화된 프로필 수정 경로에서의** **@CacheEvict** **범위 설계 및 정합성 문제 해결**
+
+- **문제 상황:** Redis 프로필 캐싱 도입 후, 사용자가 자신의 프로필을 수정했음에도 불구하고 마이페이지나 게시글에서 이전의 오래된 프로필 정보가 그대로 조회되는 **Stale Cache(데이터 불일치 및 오래된 캐시 잔존)** 현상이 발생했습니다.
+- **원인 분석:** 기본 프로필 정보 수정 API(updateUserBasicInfo)에는 캐시를 삭제하는 @CacheEvict가 잘 설정되어 있었으나, 프로젝트 내에는 프로필 이미지 변경, 멘토링 상태 변경, 비밀번호 변경 등 유저 엔티티의 상태를 업데이트하는 로직이 여러 도메인 서비스 메서드에 분산되어 있었습니다. 특정 수정 서비스 경로에서 @CacheEvict 지정을 누락하여 Redis의 기존 캐시가 만료(TTL)되기 전까지 무효화되지 않고 남아있었던 것이 원인이었습니다.
+- **해결 방법:** 
+  1. 유저 상태 변경을 일으키는 프로젝트 내 모든 서비스 메서드를 전수 조사하여 Caching Target Key(userInfo::#userId)의 무효화 타깃 범위를 정밀하게 재설계했습니다.
+  2. 추후 새로운 수정 기능이 추가될 때 개발자의 실수로 어노테이션 지정을 누락하는 문제를 근본적으로 방지하기 위해, Spring Domain Event 기반의 캐시 무효화 구조를 구현했습니다. 유저 엔티티의 변경 이벤트가 발생하면 이벤트를 감지하여 자동으로 @CacheEvict 로직이 동작하도록 설계하여 결합도를 낮추고 안전성을 확보했습니다.
+- **최종 결과:** 프로필 정보가 변경되는 모든 업데이트 경로에서 캐시 정합성(Consistency) 100%를 보장하게 되었으며, 수동 무효화 누락으로 인한 데이터 불일치 문제를 구조적으로 완벽히 해결했습니다.
+
+### 4-5. 회고 및 시스템 한계 인지 (Technical Debt & Future Improvements)
+
+- **MySQL ↔ Elasticsearch 식별자(ID) 불일치로 인한 정합성 한계 (가장 치명적)** 
+  - **문제 상황:** PostSearchService.savePost() 코드 분석 중, 게시글 검색을 위해 Elasticsearch에 문서를 저장할 때 ES Document ID를 RDB의 PK 값이 아닌 UUID.randomUUID()로 임의 생성하고 있음을 발견했습니다 (// TODO: mysql의 pk 값이 저장되어야 함 기술 부채 주석 잔존).
+  - **한계점:** RDB(MySQL)의 Auto-increment PK와 ES의 Document ID가 서로 다르게 매핑되어 있기 때문에, 사용자가 게시글을 수정하거나 삭제했을 때 Elasticsearch 인덱스 내의 특정 문서를 정확히 찾아내어 업데이트하거나 삭제하는 데이터 동기화 파이프라인을 정상 작동시키기 어려운 정합성 한계가 존재합니다.
+  - **개선 방향:** ES 인덱싱 시 MySQL의 PK 값을 Document ID로 명시적 매핑하도록 수정해야 합니다. 나아가 DB 트랜잭션이 성공적으로 완료된 직후에만 ES 이벤트를 발행하도록 @TransactionalEventListener(AFTER_COMMIT)를 적용하고, 만약 ES 저장에 실패할 경우 재시도할 수 있는 보상 트랜잭션 파이프라인을 구축할 계획입니다.
+- **RoleRefreshScheduler** **전체 유저 메모리 로드 및 N+1 쿼리 폭증 위험** 
+  - **문제 인지:** 매월 1일 자정 스케줄러가 실행되어 멘토/멘티 권한을 자동 갱신할 때, userRepository.findAllByIsDeletedFalse()를 호출해 DB 내 탈퇴하지 않은 모든 유저 목록을 한 번에 애플리케이션 메모리(RAM)로 끌어오도록 구현되어 있습니다. 그 후 반복문을 돌며 각 유저별로 followingService.countFollowers(id) 쿼리를 개별적으로 실행하고 있습니다.
+  - **한계점:** 서비스의 유저 수가 증가할 경우 전체 유저 객체가 한 번에 메모리에 로드되면서 **OOM(Out Of Memory) 장애**를 유발할 위험이 매우 높습니다. 또한 유저 수 $N$명에 비례해 팔로워 수를 조회하는 쿼리가 $N$번 추가 실행되는 폭증(N+1) 부하 구조를 가지고 있습니다.
+  - **개선 방향:** 대용량 데이터 처리에 적합한 Spring Batch를 도입하여 유저 데이터를 Chunk 단위(예: 100건/1,000건씩 끊어 읽기)로 Paging 처리하여 메모리 점유율을 일정하게 유지해야 합니다. 또한 팔로워 수 조회 로직은 단일 `GROUP BY` 집계 쿼리로 일괄 조회하도록 쿼리를 최적화할 계획입니다.
+- **ConcurrentLinkedQueue 기반 In-Memory Retry Queue의 휘발성 한계** 
+  - **문제 인지:** 알림 전송 실패 시 지수 백오프 재시도를 담당하는 NotificationRetryQueue가 서버 내부 자바 메모리 객체인 ConcurrentLinkedQueue로 구현되어 있습니다.
+  - **한계점:** SSE 다중 서버 세션 공유는 Redis Pub/Sub을 사용해 분산 환경을 고려했으나, 정작 알림 재시도 큐는 단일 서버 메모리에 남아있는 구조적 불일치가 존재합니다. 이로 인해 알림 재시도 대기 중에 서버가 재시작되거나 배포되면 메모리에 남아있던 재시도 알림 데이터가 전량 유실되며, Scale-out(다중 서버) 환경에서 특정 서버 인스턴스에만 재처리 작업이 귀속되는 한계가 있습니다.
+  - **개선 방향:** In-Memory 큐를 제거하고, 데이터 영속성(Persistence)이 보장되는 외부 메시지 브로커인 Redis Stream, RabbitMQ, 또는 Kafka를 도입하여 서버가 다운되더라도 메시지 유실 없이 최소 한 번은 전송을 보장하는 **At-least-once (최소 한 번 전달)** 아키텍처로 진화시킬 예정입니다.
+
+## 5. 테스트 전략
+
+- **결합 검증 및 단위 테스트:** JUnit5 + Mockito 기반의 단위 테스트와 함께, 실제 MySQL 및 H2 환경을 활용한 통합 테스트 수행.
+- **검증 독립성 확보:** @ActiveProfiles("test") 환경에서 데이터베이스 및 캐시 환경을 분리하여 알림 이벤트 발행, @Cacheable("userInfo") 적재, 지수 백오프 Retry 로직의 정합성 검증.
+
+## 6. 실행 방법 (Local Run)
+
+Bash
 
 ```
-src/test_unit/          # 단위 테스트 (12개)
-src/test_integration/   # 통합 테스트 (3개)
-src/test_apiE2E/        # API E2E 테스트
-```
+# 1. Repository Clone
+$ git clone <https://github.com/HyunRe/TOTY.git>
+$ cd TOTY
 
-Gradle Custom SourceSet으로 분리 관리
+# 2. Infra Containers Run (MySQL, Redis, Elasticsearch)
+$ docker-compose up -d
 
-### 단위 테스트 (12개)
-
-| 파일 | 대상 |
-|------|------|
-| `EmailTest` | 이메일 형식 및 유효성 검증 |
-| `NicknameTest` | 닉네임 검증 로직 |
-| `PhoneNumberTest` | 전화번호 검증 로직 |
-| `FcmNotificationSenderTest` | Firebase FCM 알림 전송 로직 |
-| `S3StorageServiceTest` | AWS S3 업로드/삭제 로직 |
-| `SseNotificationSenderTest` | SSE 알림 전송 로직 |
-| `ImageUploadServiceTest` | 이미지 업로드 처리 로직 |
-| `NotificationCreationServiceTest` | 알림 생성 로직 |
-| `NotificationServiceTest` | 알림 비즈니스 로직 |
-| `RoleRefreshSchedulerTest` | 역할 갱신 스케줄러 로직 |
-| `ImageValidatorTest` | 이미지 유효성 검증 |
-| `S3KeyGeneratorTest` | S3 Key 생성 규칙 |
-
-### 통합 테스트 (3개)
-
-| 파일 | 대상 |
-|------|------|
-| `NPlusOnePerformanceTest` | N+1 문제 성능 검증 |
-| `PostCommentIntegrationTest` | 게시글 댓글 DB 연동 테스트 |
-| `PostImageIntegrationTest` | 게시글 이미지 DB 연동 테스트 |
-
-### 실행
-
-```bash
-# 단위 테스트
-./gradlew unitTest
-
-# 통합 테스트
-./gradlew integrationTest
-
-# 전체 테스트 (unit → integration → E2E)
-./gradlew check
-```
-
----
-
-## 9. CI/CD
+# 3. Application Run
+$ ./gradlew bootRun
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        GitHub Actions                           │
-├─────────────────────────────────────────────────────────────────┤
-│  push / PR (main, develop)                                      │
-│           ↓                                                     │
-│  ┌─────────────────┐                                            │
-│  │   Test Stage    │                                            │
-│  │  ┌───────────┐  │                                            │
-│  │  │ unitTest  │  │                                            │
-│  │  └───────────┘  │                                            │
-│  │  ┌─────────────────────────┐                                 │
-│  │  │    integrationTest      │                                 │
-│  │  │  (Testcontainers MySQL) │                                 │
-│  │  │  (CI Service: Redis)    │                                 │
-│  │  │  (Testcontainers ES)    │                                 │
-│  │  └─────────────────────────┘                                 │
-│  └─────────────────┘                                            │
-│           ↓ 테스트 통과 시                                       │
-│  ┌─────────────────┐                                            │
-│  │  Build Stage    │                                            │
-│  │  - JAR 빌드     │                                            │
-│  │  - 배포 번들 생성│                                            │
-│  └─────────────────┘                                            │
-│           ↓                                                     │
-│  ┌─────────────────┐                                            │
-│  │   AWS S3 업로드  │                                            │
-│  └─────────────────┘                                            │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│                      AWS CodeDeploy                             │
-├─────────────────────────────────────────────────────────────────┤
-│  S3에서 번들 다운로드 → EC2로 배포                               │
-│                                                                 │
-│  배포 파일:                                                      │
-│  - build/libs/*.jar                                             │
-│  - Dockerfile                                                   │
-│  - docker-compose.yml                                           │
-│  - appspec.yml                                                  │
-│  - scripts/deploy.sh                                            │
-│  - .env                                                         │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│                        AWS EC2                                  │
-├─────────────────────────────────────────────────────────────────┤
-│  deploy.sh 실행                                                  │
-│           ↓                                                     │
-│  ┌─────────────────────────────────────┐                        │
-│  │         Docker Compose              │                        │
-│  │  ┌─────────────┐  ┌─────────────┐   │                        │
-│  │  │   MySQL     │  │ Spring Boot │   │                        │
-│  │  │ Container   │  │ Container   │   │                        │
-│  │  │             │  │             │   │                        │
-│  │  │   Redis     │  │ Elasticsearch│  │                        │
-│  │  └─────────────┘  └─────────────┘   │                        │
-│  └─────────────────────────────────────┘                        │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### 주요 파일
-
-| 파일 | 역할 |
-|------|------|
-| .github/workflows/gradle.yml | CI/CD 파이프라인 정의 |
-| Dockerfile | Spring Boot 앱 컨테이너 이미지 |
-| docker-compose.yml | MySQL + Redis + Elasticsearch + Spring Boot 컨테이너 구성 |
-| appspec.yml | CodeDeploy 배포 설정 |
-| scripts/deploy.sh | EC2에서 Docker Compose 실행 |
-| scripts/validate.sh | 배포 후 Health Check 검증 |
-| .env | 애플리케이션 환경변수 설정 파일 |
-
----
-
-## 10. 트러블슈팅
-
-### 1. N+1 쿼리로 인한 성능 저하
-
-**문제 상황**
-- 게시글 100개 조회 시 101개의 쿼리 발생
-
-**원인**
-- JPA 지연 로딩(LAZY)으로 연관 엔티티 접근 시마다 추가 쿼리 발생
-
-**해결 방법**
-- `LEFT JOIN FETCH`로 연관 엔티티 즉시 로딩
-- 페이징 시 `countQuery` 분리
-
----
-
-### 2. JWT 토큰 탈취 시 보안 취약점
-
-**문제 상황**
-- 로그아웃 후에도 탈취된 토큰으로 API 접근 가능
-
-**원인**
-- JWT는 Stateless하여 서버에서 무효화 불가
-
-**해결 방법**
-- Redis 기반 토큰 블랙리스트 구현
-- Refresh Token Rotation으로 토큰 재사용 방지
-
----
-
-### 3. S3 이미지 삭제로 인한 응답 지연
-
-**문제 상황**
-- 게시글 삭제 시 S3 이미지 삭제 대기로 2.5초 지연
-
-**원인**
-- 동기 처리로 S3 API 응답 대기
-
-**해결 방법**
-- `@Async`로 비동기 처리
-- 메인 트랜잭션과 분리하여 S3 실패 시에도 게시글 삭제 성공
-
----
-
-### 4. SSE 다중 인스턴스 문제
-
-**원인**
-- 인스턴스 간 메모리 공유 불가
-
-**해결**
-- Redis Pub/Sub으로 이벤트 브로드캐스트
-
----
-
-### 5. HTTPS 적용 문제
-
-**원인**
-- SSL 인증서 미적용
-
-**해결**
-- Nginx + Route 53 + ACM 설정 후 HTTPS 전환
-
----
-
-### 6. 알림 발송으로 인한 응답 지연 및 알림 유실
-
-**문제 상황**
-- 멘토 게시글 작성 시 팔로워 수에 비례해 응답이 느려짐 (팔로워 10명 기준 약 2.1초 예상)
-- 수신자가 접속 중이 아니면 알림이 그대로 사라짐
-
-**원인**
-- 팔로워 루프 안에서 FCM 외부 API를 동기 호출하여 왕복 시간이 누적
-- Email은 SMTP 연결 + 인라인 이미지 첨부로 단건 1초 이상 소요
-- SSE Emitter가 없을 때의 처리 경로 부재
-
-**해결 방법**
-- 알림 전용 스레드풀(`notificationExecutor`)로 요청 스레드와 분리
-- 이벤트 발행 기반으로 전환하여 발송 호출은 즉시 반환
-- 실패 · 미접속 건은 재시도 큐에 적재하고 지수 백오프(2초 → 최대 60초)로 재전송
-- 채널별 예외 격리로 한 채널 실패가 전체 발송을 중단시키지 않도록 처리
-
----
-
-## 11. 실행 방법
-
-### 1. 인프라 실행
-
-```bash
-docker network create toty-network
-
-docker run -d --name toty-mysql \
-  --network toty-network \
-  -p 3306:3306 \
-  -e MYSQL_ROOT_PASSWORD=test \
-  -e MYSQL_DATABASE=toty_dev \
-  mysql:8.0
-
-docker run -d --name toty-redis \
-  --network toty-network \
-  -p 6379:6379 \
-  redis:7-alpine
-
-docker run -d --name toty-elasticsearch \
-  --network toty-network \
-  -p 9200:9200 \
-  -e "discovery.type=single-node" \
-  -e "xpack.security.enabled=false" \
-  -e ES_JAVA_OPTS="-Xms512m -Xmx512m" \
-  docker.elastic.co/elasticsearch/elasticsearch:8.11.1
-
-docker build -t toty-app .
-
-docker run -d --name toty-app \
-  --network toty-network \
-  -p 8070:8070 \
-  --env-file .env \
-  toty-app
-```
-
-### 2. 애플리케이션 실행
-
-```bash
-./gradlew bootRun --args='--spring.profiles.active=local'
-```
-
-### 3. Swagger
-
-```
-http://localhost:8070/swagger-ui
-```
-
----
-
-## 프로젝트를 통해 얻은 경험
-
-- 실시간 시스템 설계 경험 (WebSocket, SSE, Redis Pub/Sub)
-- JWT + OAuth2 인증 직접 구현
-- 다채널 알림 시스템 설계 (SSE, FCM, Email, SMS)
-- Redis 캐시 전략 설계
-- N+1 문제 해결 및 쿼리 최적화
-- DDD 패턴 적용 (Value Object, Domain Event, Strategy/Factory)
-- ElasticSearch 도입 및 검색 고도화 경험
-- HTTPS 전환 및 도메인 연결 경험
-- 테스트 인프라 구축 (단위/통합/E2E 분리)
-
----
-
-## 담당 영역
-
-### 팀 프로젝트 당시
-- 게시글/댓글 도메인 설계 및 구현
-- 멘토 선정 날짜 스케줄 설정
-- Redis 기반 SSE 구축
-- FCM 알림 시스템 구축
-- 멘토 선정 & 박탈 이메일/SMS 발송 구현
-
-### 개인 고도화
-- ElasticSearch 도입
-- 캐시 전략 개선
-- 테스트 코드 보강
-- 구조 리팩토링
-- Nginx 기반 HTTPS 전환
-- 가비아 도메인 + Route 53 + ACM 연동
-- JWT 보안 강화 (블랙리스트, Token Rotation)
-- N+1 쿼리 최적화
-
----
